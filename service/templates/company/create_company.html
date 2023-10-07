@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Создание компании</title>
+</head>
+<body>
+    <h1>Создание компании</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ company_form.as_p }}
+        <button type="submit">Создать компанию</button>
+    </form>
+</body>
+</html>

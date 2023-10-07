@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Детали заявки</title>
+</head>
+<body>
+    <h2>Детали заявки</h2>
+    <h3>{{ request.title }}</h3>
+    <p>{{ request.description }}</p>
+    <p>Исполнитель: {% if request.assignee %}{{ request.assignee.username }}{% else %}Не назначен{% endif %}</p>
+    <a href="{% url 'request_list' %}">Вернуться к списку заявок</a>
+</body>
+</html>
