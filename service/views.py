@@ -4,6 +4,8 @@ from .models import CustomUser, Company,Request
 from .forms import  CompanyForm
 from django.contrib.auth import login
 from .forms import CustomUserCreationForm
+from django.urls import reverse_lazy
+from  .forms import *
 def register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
@@ -20,36 +22,33 @@ def home(request):
 
 @login_required
 def profile(request):
-    user_profile = UserProfile.objects.get(user=request.user)
+    # Получите текущего пользователя
+    user = request.user
 
-    if request.method == 'POST':
-        form = UserProfileForm(request.POST, instance=user_profile)
-        if form.is_valid():
-            form.save()
-            return redirect('profile')
-    else:
-        form = UserProfileForm(instance=user_profile)
+    try:
+        # Попробуйте найти объект CustomUser по username или id пользователя
+        user_profile = CustomUser.objects.get(username=user.username)
+    except CustomUser.DoesNotExist:
+        # Обработайте случай, если пользователь не найден
+        user_profile = None
 
-    return render(request, 'profile/profile.html', {'user_profile': user_profile, 'form': form})
+    return render(request, 'profile/profile.html', {'user_profile': user_profile})
 
 @login_required
 def edit_profile(request):
-    user_profile = UserProfile.objects.get(user=request.user)
-
+    user = request.user
     if request.method == 'POST':
-        form = UserProfileForm(request.POST, instance=user_profile)
+        form = CustomUserCreationForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
             return redirect('profile')
-
     else:
-        form = UserProfileForm(instance=user_profile)
+        form = CustomUserCreationForm(instance=user)
 
-    context = {'form': form}
-    return render(request, 'profile/edit_profile.html', context)
+    return render(request, 'profile/edit_profile.html', {'form': form})
 def request_list(request):
     requests = Request.objects.filter(requester=request.user)
-    return render(request, 'requests/request_list.html', {'requests': requests})
+    return render(request, 'request/request_list.html', {'requests': requests})
 
 @login_required
 def create_request(request):
@@ -62,12 +61,12 @@ def create_request(request):
             return redirect('request_list')
     else:
         form = RequestForm()
-    return render(request, 'requests/create_request.html', {'form': form})
+    return render(request, 'request/request_create.html', {'form': form})
 
 @login_required
 def request_detail(request, pk):
     request_detail = get_object_or_404(Request, pk=pk)
-    return render(request, 'requests/request_detail.html', {'request_detail': request_detail})
+    return render(request, 'request/request_detail.html', {'request_detail': request_detail})
 
 @login_required
 def request_update(request, pk):
@@ -79,4 +78,17 @@ def request_update(request, pk):
             return redirect('request_detail', pk=pk)
     else:
         form = RequestForm(instance=request_instance)
-    return render(request, 'requests/request_update.html', {'form': form})
+    return render(request, 'request/request_update.html', {'form': form})
+
+
+def create_company(request):
+    if request.method == 'POST':
+        form = CompanyForm(request.POST)
+        if form.is_valid():
+            # Сохранение компании в базе данных
+            company = form.save()
+            return redirect('profile')  # Перенаправление на страницу профиля после успешного создания компании
+    else:
+        form = CompanyForm()
+
+    return render(request, 'company/create_company.html', {'form': form})
