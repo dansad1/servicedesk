@@ -9,8 +9,8 @@ class CustomUserCreationForm(UserCreationForm):
 
 class CompanyForm(forms.ModelForm):
     class Meta:
-        model = Company  # Используйте модель Company для создания формы
-        fields = ['name', 'address', 'description']  # Укажите поля, которые вы хотите включить в форму
+        model = Company
+        fields = ['name', 'address', 'description']  # Здесь перечислите поля, которые вы хотите отображать в форме
 
 class RequestForm(forms.ModelForm):
     class Meta:

@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Создание компании</title>
+    <title>Create Company</title>
 </head>
 <body>
-    <h1>Создание компании</h1>
+    <h2>Create Company</h2>
     <form method="post">
         {% csrf_token %}
-        {{ company_form.as_p }}
-        <button type="submit">Создать компанию</button>
+        {{ form.as_p }}
+        <button type="submit">Create Company</button>
     </form>
 </body>
 </html>

@@ -124,4 +124,4 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'service.CustomUser'
 OGOUT_REDIRECT_URL = 'templates/pages/home.html'  # Замените 'home' на URL вашей домашней страницы
-LOGIN_REDIRECT_URL ='templates/profile/profile.html'
+LOGIN_REDIRECT_URL = '/profile/'  # Путь к вашей странице профиля
