@@ -5,7 +5,7 @@ from .models import Company,Request
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
-        fields = ('username', 'email', 'first_name', 'last_name', 'phone_number', 'address','company')
+        fields = ('username', 'email', 'first_name', 'last_name', 'phone_number', 'address','company','role')
 
 class CompanyForm(forms.ModelForm):
     class Meta:

@@ -47,7 +47,8 @@ def edit_profile(request):
 
     return render(request, 'profile/edit_profile.html', {'form': form})
 def request_list(request):
-    requests = Request.objects.filter(requester=request.user)
+    user=request.user
+    requests = Request.objects.filter(company=user.company)
     return render(request, 'request/request_list.html', {'requests': requests})
 
 @login_required

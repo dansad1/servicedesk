@@ -39,6 +39,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     company = models.ForeignKey('Company', on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Компания')
+    role = models.CharField(max_length=10, choices=ROLES_CHOICES, default='user', verbose_name='Роль')
 
 
     objects = CustomUserManager()
@@ -72,6 +73,8 @@ class Request(models.Model):
     description = models.TextField()
     requester = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='requests')
     assignee = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_requests')
+    company = models.ForeignKey('Company', on_delete=models.CASCADE, null=True)
+
 
     def __str__(self):
         return self.title

@@ -1,17 +1,17 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Список заявок</title>
-</head>
-<body>
-    <h2>Список заявок</h2>
-    <ul>
-        {% for request in requests %}
-            <li><a href="{% url 'request_detail' request.id %}">{{ request.title }}</a></li>
-        {% empty %}
-            <p>Заявок пока нет.</p>
-        {% endfor %}
-    </ul>
-    <a href="{% url 'profile' %}">Назад в профиль</a>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Request List</h1>
+  <ul>
+    {% for request in requests %}
+      <li>
+        <h2>{{ request.title }}</h2>
+        <p>{{ request.description }}</p>
+        <a href="{% url 'request_update' pk=request.pk %}">Edit Request</a>
+      </li>
+    {% empty %}
+      <li>No requests available.</li>
+    {% endfor %}
+  </ul>
+  <a href="{% url 'create_request' %}">Create New Request</a>
+{% endblock %}
