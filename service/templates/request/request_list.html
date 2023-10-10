@@ -1,17 +1,24 @@
+<!-- request_list.html -->
 {% extends 'base.html' %}
 
 {% block content %}
-  <h1>Request List</h1>
+  <h2>Список заявок</h2>
   <ul>
     {% for request in requests %}
       <li>
-        <h2>{{ request.title }}</h2>
-        <p>{{ request.description }}</p>
-        <a href="{% url 'request_update' pk=request.pk %}">Edit Request</a>
+        {{ request.title }}
+        <form method="post" action="{% url 'change_status' request.id %}">
+          {% csrf_token %}
+          <select name="new_status">
+            {% for status in statuses %}
+              <option value="{{ status.id }}">{{ status.name }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit">Изменить статус</button>
+        </form>
       </li>
     {% empty %}
-      <li>No requests available.</li>
+      <p>Нет заявок</p>
     {% endfor %}
   </ul>
-  <a href="{% url 'create_request' %}">Create New Request</a>
 {% endblock %}

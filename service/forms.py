@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import CustomUser
-from .models import Company,Request
+from .models import Company,Request,Status
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
@@ -11,12 +11,9 @@ class CompanyForm(forms.ModelForm):
     class Meta:
         model = Company
         fields = ['name', 'address', 'description']  # Здесь перечислите поля, которые вы хотите отображать в форме
-
 class RequestForm(forms.ModelForm):
+    status = forms.ModelChoiceField(queryset=Status.objects.all(), empty_label=None, widget=forms.Select(attrs={'class': 'form-control'}))
+
     class Meta:
         model = Request
-        fields = ['title', 'description', 'assignee']
-
-    def __init__(self, *args, **kwargs):
-        super(RequestForm, self).__init__(*args, **kwargs)
-        # Добавьте необходимую логику для настройки полей формы, если требуется
+        fields = ['title', 'description', 'status']
