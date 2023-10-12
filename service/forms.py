@@ -12,8 +12,11 @@ class CompanyForm(forms.ModelForm):
         model = Company
         fields = ['name', 'address', 'description']  # Здесь перечислите поля, которые вы хотите отображать в форме
 class RequestForm(forms.ModelForm):
-    status = forms.ModelChoiceField(queryset=Status.objects.all(), empty_label=None, widget=forms.Select(attrs={'class': 'form-control'}))
-
     class Meta:
         model = Request
-        fields = ['title', 'description', 'status']
+        fields = ['title', 'description', 'assignee', 'completed']
+
+    def __init__(self, *args, **kwargs):
+        super(RequestForm, self).__init__(*args, **kwargs)
+        self.fields['assignee'].widget.attrs.update({'class': 'form-control'})
+        self.fields['completed'].widget.attrs.update({'class': 'form-check-input'})

@@ -1,34 +1,16 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Детали заявки</title>
-</head>
-<body>
-    <h2>Детали заявки</h2>
-    <h3>{{ request.title }}</h3>
-    <p>{{ request.description }}</p>
-    <p>Исполнитель:
-      {% if request.assignee %}
-        {{ request.assignee.username }}
-      {% else %}
-        Не назначен
-      {% endif %}
-    </p>
-    <p>Статус: {{ request.status }}</p>
+{% extends 'base.html' %}
 
-    {% if request.assignee == user or user.is_staff %}
-      <form method="post" action="{% url 'change_status' request.pk %}">
-        {% csrf_token %}
-        <label for="status">Изменить статус:</label>
-        <select name="status" id="status">
-          <option value="Открыта" {% if request.status == "Открыта" %}selected{% endif %}>Открыта</option>
-          <option value="В работе" {% if request.status == "В работе" %}selected{% endif %}>В работе</option>
-          <option value="Выполнена" {% if request.status == "Выполнена" %}selected{% endif %}>Выполнена</option>
-        </select>
-        <button type="submit">Сохранить</button>
-      </form>
-    {% endif %}
+{% block content %}
+  <h2>Детали заявки</h2>
+  <p><strong>Название:</strong> {{ request_instance.title }}</p>
+  <p><strong>Описание:</strong> {{ request_instance.description }}</p>
+  <p><strong>Заявитель:</strong> {{ request_instance.requester }}</p>
+  <p><strong>Исполнитель:</strong> {{ request_instance.assignee }}</p>
+  <p><strong>Статус:</strong> {{ request_instance.status }}</p>
 
-    <a href="{% url 'request_list' %}">Вернуться к списку заявок</a>
-</body>
-</html>
+  {% if user.is_authenticated and (user == request_instance.requester or user == request_instance.assignee or user.is_staff) %}
+    <a href="{% url 'request_update' request_instance.pk %}" class="btn btn-primary">Редактировать</a>
+  {% endif %}
+
+  <a href="{% url 'request_list' %}" class="btn btn-secondary">Вернуться к списку заявок</a>
+{% endblock %}

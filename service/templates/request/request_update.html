@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
 {% block content %}
   <h2>Редактировать заявку</h2>
@@ -7,6 +7,14 @@
     {{ form.as_p }}
 
     <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a href="{% url 'request_list' %}" class="btn btn-secondary">Вернуться к списку заявок</a>
   </form>
-  <a href="{% url 'request_detail' request_instance.pk %}" class="btn btn-secondary">Отмена</a>
+
+  {% if user.is_authenticated and (user == request_instance.requester or user == request_instance.assignee or user.is_staff) %}
+    <form method="post" action="{% url 'change_status' request_instance.pk %}">
+      {% csrf_token %}
+      <button type="submit" name="new_status" value="completed" class="btn btn-success">Выполнить</button>
+      <button type="submit" name="new_status" value="canceled" class="btn btn-danger">Отменить</button>
+    </form>
+  {% endif %}
 {% endblock %}

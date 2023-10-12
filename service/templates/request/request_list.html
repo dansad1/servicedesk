@@ -1,24 +1,14 @@
-<!-- request_list.html -->
 {% extends 'base.html' %}
-
+{% load custom_filters %}
 {% block content %}
   <h2>Список заявок</h2>
   <ul>
     {% for request in requests %}
-      <li>
-        {{ request.title }}
-        <form method="post" action="{% url 'change_status' request.id %}">
-          {% csrf_token %}
-          <select name="new_status">
-            {% for status in statuses %}
-              <option value="{{ status.id }}">{{ status.name }}</option>
-            {% endfor %}
-          </select>
-          <button type="submit">Изменить статус</button>
-        </form>
-      </li>
-    {% empty %}
-      <p>Нет заявок</p>
-    {% endfor %}
+  <li>
+    <a href="{% if request|can_edit_request:user %}{% url 'request_update' request.pk %}{% else %}{% url 'request_detail' request.pk %}{% endif %}">
+      {{ request.title }}
+    </a>
+  </li>
+{% endfor %}
   </ul>
 {% endblock %}

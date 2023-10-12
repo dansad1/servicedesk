@@ -19,8 +19,7 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('company/create_company/', views.create_company, name='create_company'),
     path('request/<int:pk>/', views.request_detail, name='request_detail'),
-    path('request/<int:pk>/', views.request_detail, name='request_detail')
-
+    path('request/<int:pk>/', views.request_detail, name='request_detail'),
 
 ]
 

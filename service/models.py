@@ -86,6 +86,7 @@ class Request(models.Model):
     assignee = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_requests')
     company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True)
     status = models.ForeignKey(Status, on_delete=models.SET_NULL, null=True, default=None)
+    completed = models.BooleanField(default=False)  # Add the completed field
 
     def __str__(self):
         return self.title
