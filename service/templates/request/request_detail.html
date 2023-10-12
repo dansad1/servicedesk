@@ -1,16 +1,27 @@
-{% extends 'base.html' %}
-
+{% extends "base.html" %}
 {% block content %}
-  <h2>Детали заявки</h2>
-  <p><strong>Название:</strong> {{ request_instance.title }}</p>
-  <p><strong>Описание:</strong> {{ request_instance.description }}</p>
-  <p><strong>Заявитель:</strong> {{ request_instance.requester }}</p>
-  <p><strong>Исполнитель:</strong> {{ request_instance.assignee }}</p>
-  <p><strong>Статус:</strong> {{ request_instance.status }}</p>
+  <h2>Заявка: {{ request_instance.title }}</h2>
+  <p>Описание: {{ request_instance.description }}</p>
+  <p>Статус: {{ request_instance.status }}</p>
 
-  {% if user.is_authenticated and (user == request_instance.requester or user == request_instance.assignee or user.is_staff) %}
-    <a href="{% url 'request_update' request_instance.pk %}" class="btn btn-primary">Редактировать</a>
+  {% if can_edit %}
+    <h3>Редактировать заявку</h3>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Сохранить</button>
+    </form>
   {% endif %}
 
-  <a href="{% url 'request_list' %}" class="btn btn-secondary">Вернуться к списку заявок</a>
+  {% if can_mark_completed %}
+    <h3>Отметить как выполненную</h3>
+    <form method="post">
+      {% csrf_token %}
+      <input type="checkbox" name="completed" id="id_completed" {% if request_instance.completed %}checked{% endif %}>
+      <label for="id_completed">Заявка выполнена</label>
+      <button type="submit">Сохранить</button>
+    </form>
+  {% endif %}
+
+  <a href="{% url 'request_list' %}">Вернуться к списку заявок</a>
 {% endblock %}

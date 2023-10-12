@@ -49,3 +49,15 @@ def edit_profile(request):
         form = CustomUserCreationForm(instance=user)
 
     return render(request, 'profile/edit_profile.html', {'form': form})
+@login_required
+@permission_required('auth.add_user', raise_exception=True)
+def create_user(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('user_list')  # Перенаправьте на страницу списка пользователей после создания
+    else:
+        form = UserCreationForm()
+
+    return render(request, 'user/create_user.html', {'form': form})
