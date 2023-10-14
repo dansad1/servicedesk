@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required, permission_required
 
 @login_required
+@permission_required('service.can_view_requests', raise_exception=True)
 def request_list(request):
     user = request.user
 
@@ -28,6 +29,8 @@ def request_list(request):
         'requests': requests,
     }
     return render(request, 'request/request_list.html', context)
+
+
 @login_required
 def request_create(request):
     if request.method == 'POST':
@@ -35,13 +38,18 @@ def request_create(request):
         if form.is_valid():
             new_request = form.save(commit=False)
             new_request.requester = request.user
-            new_request.status = Status.objects.get(name='Открыта')  # Set the default status to "Открыта"
+
+            # Check if the "Открыта" status exists; if not, create it
+            status, created = Status.objects.get_or_create(name='Открыта')
+            new_request.status = status
+
             new_request.save()
             return redirect('request_list')
     else:
         form = RequestForm()
 
     return render(request, 'request/request_create.html', {'form': form})
+
 
 @login_required
 def request_detail(request, pk):
@@ -84,40 +92,58 @@ def request_detail(request, pk):
     }
 
     return render(request, 'request/request_detail.html', context)
+
+
 @login_required
 def request_update(request, pk):
     request_instance = get_object_or_404(Request, pk=pk)
     user = request.user
 
-    # Check if the user can edit the request
-    can_edit = user.has_perm('change_request') or user == request_instance.requester
+    # Проверка, может ли пользователь редактировать заявку
+    can_edit = user == request_instance.requester or user == request_instance.assignee or user.is_superuser
+    can_change_status = user == request_instance.assignee or user.is_superuser
+    if can_edit:
+        if request.method == 'POST':
+            form = RequestForm(request.POST, instance=request_instance)
+            comment_form = CommentForm(request.POST)
+            if form.is_valid() and comment_form.is_valid():
+                form.save()
 
-    if can_edit and request.method == 'POST':
-        form = RequestForm(request.POST, instance=request_instance)
-        if form.is_valid():
-            form.save()
-            # Update request status based on form data
-            if request_instance.assignee:
-                status_in_work, created = Status.objects.get_or_create(name="В работе")
-                request_instance.status = status_in_work
-            else:
-                status_opened, created = Status.objects.get_or_create(name="Открыта")
-                request_instance.status = status_opened
+                # Проверьте и обновите статус заявки
+                if request_instance.assignee:
+                    status_in_work, created = Status.objects.get_or_create(name="В работе")
+                    request_instance.status = status_in_work
+                else:
+                    status_opened, created = Status.objects.get_or_create(name="Открыта")
+                    request_instance.status = status_opened
 
-            is_completed = form.cleaned_data.get('completed', False)
-            if is_completed:
-                status_completed, created = Status.objects.get_or_create(name="Выполнена")
-                request_instance.status = status_completed
+                is_completed = form.cleaned_data.get('completed', False)
+                if is_completed:
+                    status_completed, created = Status.objects.get_or_create(name="Выполнена")
+                    request_instance.status = status_completed
 
-            request_instance.save()
-            return redirect('request_detail', pk=pk)
+                request_instance.save()
+
+                # Сохраните новый комментарий
+                new_comment = comment_form.save(commit=False)
+                new_comment.request = request_instance
+                new_comment.author = request.user
+                new_comment.save()
+
+                return redirect('request_detail', pk=pk)
+        else:
+            form = RequestForm(instance=request_instance)
+            comment_form = CommentForm()
+
+        comments = Comment.objects.filter(request=request_instance)
+
+        return render(request, 'request/request_update.html', {
+            'form': form,
+            'request_instance': request_instance,
+            'comment_form': comment_form,
+            'comments': comments,
+        })
     else:
-        form = RequestForm(instance=request_instance)
-
-    context = {
-        'request_instance': request_instance,
-        'form': form,
-        'can_edit': can_edit,
-    }
-
-    return render(request, 'request/request_update.html', context)
+        # Если пользователь не имеет разрешения на редактирование этой заявки, показать сообщение об ошибке
+        messages.error(request, 'У вас нет разрешения на редактирование этой заявки.')
+        return redirect('request_detail', pk=pk)

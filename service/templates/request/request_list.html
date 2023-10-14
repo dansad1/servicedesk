@@ -2,7 +2,7 @@
 {% block content %}
   <h2>Список заявок</h2>
 
-  {% if can_view_requests %}
+  {% if user.is_superuser %}
     <ul>
       {% for request_instance in requests %}
         <li>

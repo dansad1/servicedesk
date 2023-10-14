@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{{% extends "base.html" %}
 {% block content %}
   <h2>Заявка: {{ request_instance.title }}</h2>
   <p>Описание: {{ request_instance.description }}</p>
@@ -20,6 +20,24 @@
       <input type="checkbox" name="completed" id="id_completed" {% if request_instance.completed %}checked{% endif %}>
       <label for="id_completed">Заявка выполнена</label>
       <button type="submit">Сохранить</button>
+    </form>
+  {% endif %}
+
+  <h3>Комментарии</h3>
+  <ul>
+    {% for comment in request_instance.comments.all %}
+      <li>{{ comment.text }}</li>
+    {% empty %}
+      <li>Нет комментариев</li>
+    {% endfor %}
+  </ul>
+
+  {% if user.is_authenticated %}
+    <h3>Добавить комментарий</h3>
+    <form method="post">
+      {% csrf_token %}
+      {{ comment_form.as_p }}
+      <button type="submit">Добавить комментарий</button>
     </form>
   {% endif %}
 

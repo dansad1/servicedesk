@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from ckeditor.fields import RichTextField  # Import RichTextField
+from ckeditor_uploader.fields import RichTextUploadingField
+from ckeditor_uploader.fields import RichTextUploadingField
 
 ROLES_CHOICES = (
     ('user', 'Пользователь'),
@@ -77,7 +80,12 @@ class Status(models.Model):
 
     def __str__(self):
         return self.name
+class Request_type(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    description = models.TextField(blank=True, null=True)
 
+    def __str__(self):
+        return self.name
 
 class Request(models.Model):
     title = models.CharField(max_length=100)
@@ -86,7 +94,19 @@ class Request(models.Model):
     assignee = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_requests')
     company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True)
     status = models.ForeignKey(Status, on_delete=models.SET_NULL, null=True, default=None)
-    completed = models.BooleanField(default=False)  # Add the completed field
+    completed = models.BooleanField(default=False)
+    request_type = models.ForeignKey(Request_type, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.title
+class Comment(models.Model):
+    request = models.ForeignKey(Request, on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    text = RichTextUploadingField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    content = RichTextUploadingField()  # Use RichTextUploadingField for rich text content
+
+    def __str__(self):
+        return f'Comment by {self.author.username} on {self.request.title}'
+
+

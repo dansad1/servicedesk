@@ -1,16 +1,53 @@
 {% extends "base.html" %}
+
 {% block content %}
-  <h2>Редактировать заявку: {{ request_instance.title }}</h2>
+  <h2>Редактирование заявки: {{ request_instance.title }}</h2>
 
   {% if can_edit %}
+    <h3>Редактировать заявку</h3>
     <form method="post">
       {% csrf_token %}
       {{ form.as_p }}
-      <button type="submit">Сохранить</button>
+      <button type="submit">Сохранить изменения</button>
     </form>
   {% else %}
-    <p>У вас нет прав на редактирование этой заявки.</p>
+    <h3>Информация о заявке</h3>
+    <p>Описание: {{ request_instance.description }}</p>
+    <p>Статус: {{ request_instance.status }}</p>
   {% endif %}
 
-  <a href="{% url 'request_detail' request_instance.pk %}">Назад к заявке</a>
+  {% if can_mark_completed %}
+    <h3>Отметить как выполненную</h3>
+    <form method="post">
+      {% csrf_token %}
+      <input type="checkbox" name="completed" id="id_completed" {% if request_instance.completed %}checked{% endif %}>
+      <label for="id_completed">Заявка выполнена</label>
+      <button type="submit">Сохранить</button>
+    </form>
+  {% endif %}
+
+  <h3>Комментарии</h3>
+  {% if comments %}
+    <ul>
+      {% for comment in comments %}
+        <li>
+          {{ comment.author.username }} ({{ comment.created_at|date:"d.m.Y H:i" }}):
+          {{ comment.text }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Комментариев пока нет.</p>
+  {% endif %}
+
+  {% if can_edit %}
+    <h3>Добавить комментарий</h3>
+    <form method="post">
+      {% csrf_token %}
+      {{ comment_form.as_p }}
+      <button type="submit">Добавить комментарий</button>
+    </form>
+  {% endif %}
+
+  <a href="{% url 'request_list' %}">Вернуться к списку заявок</a>
 {% endblock %}
