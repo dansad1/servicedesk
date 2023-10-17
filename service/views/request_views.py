@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from service.models import CustomUser, Company,Request,Status
+from service.models import CustomUser, Company,Request,Status,Request_type
 from service.forms import  CompanyForm
 from django.contrib.auth import login
 from service.forms import CustomUserCreationForm
@@ -8,29 +8,21 @@ from django.urls import reverse_lazy
 from  service.forms import *
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required, permission_required,user_passes_test
+from service.permissions import*
+from django.contrib.auth.models import Group
+
+
 
 @login_required
-@permission_required('service.can_view_requests', raise_exception=True)
 def request_list(request):
     user = request.user
-
-    # Проверьте, может ли текущий пользователь видеть список заявок
-    if user.is_superuser:
-        # Если пользователь является администратором (superuser),
-        # он видит все заявки
+    if is_in_group(user, "Администратор"):
         requests = Request.objects.all()
     else:
-        # Для всех остальных пользователей, ограничьте список заявок
-        # заявками только их компании
         requests = Request.objects.filter(company=user.company)
-
-    context = {
-        'requests': requests,
-    }
+    context = {'requests': requests}
     return render(request, 'request/request_list.html', context)
-
-
 @login_required
 def request_create(request):
     if request.method == 'POST':
@@ -99,9 +91,10 @@ def request_update(request, pk):
     request_instance = get_object_or_404(Request, pk=pk)
     user = request.user
 
-    # Проверка, может ли пользователь редактировать заявку
-    can_edit = user == request_instance.requester or user == request_instance.assignee or user.is_superuser
-    can_change_status = user == request_instance.assignee or user.is_superuser
+    # Check if the user can edit the request
+    can_edit = can_edit_request(user, request_instance)
+    can_change_status = can_edit or user == request_instance.assignee
+
     if can_edit:
         if request.method == 'POST':
             form = RequestForm(request.POST, instance=request_instance)
@@ -109,7 +102,7 @@ def request_update(request, pk):
             if form.is_valid() and comment_form.is_valid():
                 form.save()
 
-                # Проверьте и обновите статус заявки
+                # Update request status based on form data
                 if request_instance.assignee:
                     status_in_work, created = Status.objects.get_or_create(name="В работе")
                     request_instance.status = status_in_work
@@ -124,7 +117,7 @@ def request_update(request, pk):
 
                 request_instance.save()
 
-                # Сохраните новый комментарий
+                # Save the new comment
                 new_comment = comment_form.save(commit=False)
                 new_comment.request = request_instance
                 new_comment.author = request.user
@@ -144,6 +137,5 @@ def request_update(request, pk):
             'comments': comments,
         })
     else:
-        # Если пользователь не имеет разрешения на редактирование этой заявки, показать сообщение об ошибке
         messages.error(request, 'У вас нет разрешения на редактирование этой заявки.')
         return redirect('request_detail', pk=pk)

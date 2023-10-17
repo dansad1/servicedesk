@@ -1,15 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Редактирование профиля</title>
-</head>
-<body>
-    <h1>Редактирование профиля</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Сохранить изменения</button>
-    </form>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Редактировать профиль</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Сохранить изменения</button>
+  </form>
+  <a href="{% if user.is_superuser %}{% url 'user_list' %}{% else %}{% url 'profile' %}{% endif %}">Назад к профилю</a>
+{% endblock %}

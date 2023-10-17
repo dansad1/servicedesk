@@ -8,7 +8,8 @@ from django.urls import reverse_lazy
 from  service.forms import *
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
-
+from service.views import profile_views
+from django.contrib.auth.models import Group
 def register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
@@ -25,21 +26,20 @@ def home(request):
 
 @login_required
 def profile(request):
-    # Получите текущего пользователя
     user = request.user
+    user_profile = CustomUser.objects.get(username=user.username)
+    is_admin = request.user.groups.filter(name='').exists()
+    return render(request, 'profile/profile.html', {'user_profile': user_profile, 'is_admin': is_admin})
 
-    try:
-        # Попробуйте найти объект CustomUser по username или id пользователя
-        user_profile = CustomUser.objects.get(username=user.username)
-    except CustomUser.DoesNotExist:
-        # Обработайте случай, если пользователь не найден
-        user_profile = None
+def edit_profile(request, pk=None):
+    if pk:
+        if request.user.groups.filter(name='Администраторы').exists():
+            user = get_object_or_404(CustomUser, pk=pk)
+        else:
+            return redirect('profile')
+    else:
+        user = request.user
 
-    return render(request, 'profile/profile.html', {'user_profile': user_profile})
-
-@login_required
-def edit_profile(request):
-    user = request.user
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST, instance=user)
         if form.is_valid():
@@ -47,5 +47,4 @@ def edit_profile(request):
             return redirect('profile')
     else:
         form = CustomUserCreationForm(instance=user)
-
     return render(request, 'profile/edit_profile.html', {'form': form})

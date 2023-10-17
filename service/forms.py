@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import CustomUser
-from .models import Company,Request,Status,Comment
+from .models import Company,Request,Status,Comment,Request_type
 from ckeditor_uploader.fields import RichTextUploadingField
 from ckeditor.widgets import CKEditorWidget
 
@@ -24,7 +24,7 @@ class RequestForm(forms.ModelForm):
         self.fields['assignee'].widget.attrs.update({'class': 'form-control'})
         self.fields['completed'].widget.attrs.update({'class': 'form-check-input'})
         self.fields['status'] = forms.ModelChoiceField(queryset=Status.objects.all(), required=False)
-        self.fields['request_type'] = forms.ModelChoiceField(queryset=RequestType.objects.all(), required=False)
+        self.fields['Request_type'] = forms.ModelChoiceField(queryset=Request_type.objects.all(), required=False)
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
