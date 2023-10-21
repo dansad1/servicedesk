@@ -4,7 +4,7 @@ from django.contrib.auth import views as auth_views
 from django.conf import settings  # Import the settings module
 from django.conf.urls.static import static  # Import static for serving media files
 from service.views.request_views import request_list, request_create, request_detail, request_update
-from service.views.company_views import create_company
+from service.views.company_views import company_create
 from service.views.profile_views import register, home, edit_profile, profile
 from service.views.user_views import user_list
 
@@ -21,7 +21,7 @@ urlpatterns = [
     path('request/request/<int:pk>/', request_detail, name='request_detail'),
     path('request/request/<int:pk>/update/', request_update, name='request_update'),
     path('profile/', profile, name='profile'),
-    path('company/create_company/', create_company, name='create_company'),
+    path('company/create_company/', company_create, name='create_company'),
     path('ckeditor/', include('ckeditor_uploader.urls')),
     path('users/', user_list, name='user_list'),  # Add this line
 ]
