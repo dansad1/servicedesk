@@ -3,6 +3,8 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from ckeditor.fields import RichTextField  # Import RichTextField
 from ckeditor_uploader.fields import RichTextUploadingField
 from ckeditor_uploader.fields import RichTextUploadingField
+from django.utils import timezone
+
 
 ROLES_CHOICES = (
     ('user', 'Пользователь'),
@@ -80,12 +82,25 @@ class Status(models.Model):
 
     def __str__(self):
         return self.name
-class Request_type(models.Model):
+class Priority(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    description = models.TextField(blank=True, null=True)
-
     def __str__(self):
         return self.name
+
+class RequestType(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    description = models.TextField(blank=True, null=True)
+    def __str__(self):
+        return self.name
+class PriorityDuration(models.Model):
+    priority = models.ForeignKey(Priority, on_delete=models.CASCADE)
+    request_type = models.ForeignKey(RequestType, on_delete=models.CASCADE)
+    duration = models.DurationField(help_text='Duration until the due date in days')
+
+    class Meta:
+        unique_together = ('priority', 'request_type')
+    def __str__(self):
+        return f"{self.priority.name} for {self.request_type.name}"
 
 class Request(models.Model):
     title = models.CharField(max_length=100)
@@ -95,7 +110,20 @@ class Request(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True)
     status = models.ForeignKey(Status, on_delete=models.SET_NULL, null=True, default=None)
     completed = models.BooleanField(default=False)
-    request_type = models.ForeignKey(Request_type, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+    priority = models.ForeignKey(Priority, on_delete=models.SET_NULL, null=True, blank=True)
+    request_type = models.ForeignKey(RequestType, on_delete=models.SET_NULL, null=True, blank=True)
+    due_date = models.DateTimeField(null=True, blank=True)
+
+    def set_due_date(self):
+        duration = PriorityDuration.objects.filter(
+            priority=self.priority,
+            request_type=self.request_type
+        ).first()
+
+        if duration:
+            self.due_date = timezone.now() + duration.duration
 
     def __str__(self):
         return self.title

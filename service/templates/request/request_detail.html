@@ -1,8 +1,15 @@
-{{% extends "base.html" %}
+{% extends "base.html" %}
+
 {% block content %}
   <h2>Заявка: {{ request_instance.title }}</h2>
   <p>Описание: {{ request_instance.description }}</p>
   <p>Статус: {{ request_instance.status }}</p>
+
+  <!-- Добавляем отображение срока выполнения (due_date) -->
+  <p>Срок выполнения: {{ request_instance.due_date|date:"d.m.Y" }}</p>
+
+  <!-- Добавляем отображение времени обновления (updated_at) -->
+  <p>Время обновления: {{ request_instance.updated_at|date:"d.m.Y H:i" }}</p>
 
   {% if can_edit %}
     <h3>Редактировать заявку</h3>

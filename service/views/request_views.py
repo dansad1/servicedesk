@@ -1,6 +1,7 @@
+from django.core.checks import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from service.models import CustomUser, Company,Request,Status,Request_type
+from service.models import CustomUser, Company,Request,Status,RequestType
 from service.forms import  CompanyForm
 from django.contrib.auth import login
 from service.forms import CustomUserCreationForm
@@ -11,7 +12,8 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required, permission_required,user_passes_test
 from service.permissions import*
 from django.contrib.auth.models import Group
-
+from django.utils import timezone
+from service.models import *
 
 
 @login_required
@@ -23,25 +25,25 @@ def request_list(request):
         requests = Request.objects.filter(company=user.company)
     context = {'requests': requests}
     return render(request, 'request/request_list.html', context)
-@login_required
 def request_create(request):
     if request.method == 'POST':
         form = RequestForm(request.POST)
         if form.is_valid():
             new_request = form.save(commit=False)
-            new_request.requester = request.user
+            priority = form.cleaned_data.get('priority')
+            request_type = form.cleaned_data.get('request_type')
 
-            # Check if the "Открыта" status exists; if not, create it
-            status, created = Status.objects.get_or_create(name='Открыта')
-            new_request.status = status
+            # Find the duration for this priority and request type
+            duration_obj = PriorityDuration.objects.filter(priority=priority, request_type=request_type).first()
+            if duration_obj:
+                new_request.due_date = timezone.now() + duration_obj.duration
 
             new_request.save()
             return redirect('request_list')
     else:
         form = RequestForm()
 
-    return render(request, 'request/request_create.html', {'form': form})
-
+    return render(request, 'create_request.html', {'form': form})
 
 @login_required
 def request_detail(request, pk):
@@ -58,6 +60,7 @@ def request_detail(request, pk):
         form = RequestForm(request.POST, instance=request_instance)
         if form.is_valid():
             form.save()
+
             # Update request status based on form data
             if request_instance.assignee:
                 status_in_work, created = Status.objects.get_or_create(name="В работе")
@@ -70,6 +73,9 @@ def request_detail(request, pk):
             if is_completed:
                 status_completed, created = Status.objects.get_or_create(name="Выполнена")
                 request_instance.status = status_completed
+
+            # Добавляем текущую дату и время в поле updated_at
+            request_instance.updated_at = timezone.now()
 
             request_instance.save()
             return redirect('request_detail', pk=pk)
@@ -84,7 +90,6 @@ def request_detail(request, pk):
     }
 
     return render(request, 'request/request_detail.html', context)
-
 
 @login_required
 def request_update(request, pk):
@@ -114,6 +119,9 @@ def request_update(request, pk):
                 if is_completed:
                     status_completed, created = Status.objects.get_or_create(name="Выполнена")
                     request_instance.status = status_completed
+
+                # Добавляем текущую дату и время в поле updated_at
+                request_instance.updated_at = timezone.now()
 
                 request_instance.save()
 
