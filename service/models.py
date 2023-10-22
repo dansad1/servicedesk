@@ -93,15 +93,15 @@ class RequestType(models.Model):
     def __str__(self):
         return self.name
 class PriorityDuration(models.Model):
-    priority = models.ForeignKey(Priority, on_delete=models.CASCADE)
     request_type = models.ForeignKey(RequestType, on_delete=models.CASCADE)
-    duration = models.DurationField(help_text='Duration until the due date in days')
+    priority = models.ForeignKey(Priority, on_delete=models.CASCADE)
+    duration_in_hours = models.IntegerField(default=0)
 
     class Meta:
         unique_together = ('priority', 'request_type')
-    def __str__(self):
-        return f"{self.priority.name} for {self.request_type.name}"
 
+    def __str__(self):
+        return f"{self.priority.name} for {self.request_type.name} : {self.duration_in_hours} hours"
 class Request(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
@@ -119,12 +119,20 @@ class Request(models.Model):
     def set_due_date(self):
         duration = PriorityDuration.objects.filter(
             priority=self.priority,
-            request_type=self.request_type
-        ).first()
+            request_type=self.request_type).first()
 
         if duration:
-            self.due_date = timezone.now() + duration.duration
+            self.due_date = timezone.now() + timezone.timedelta(hours=duration.duration_in_hours)
 
+    def save(self, *args, **kwargs):
+        if not self.id:  # только при первом сохранении
+            self.set_due_date()
+
+            # Установить статус "Открыта" по умолчанию
+            open_status = Status.objects.get_or_create(name='Открыта')[0]
+            self.status = open_status
+
+        super(Request, self).save(*args, **kwargs)
     def __str__(self):
         return self.title
 class Comment(models.Model):

@@ -24,11 +24,12 @@ def register(request):
 def home(request):
     return render(request, 'pages/home.html')
 
+
 @login_required
 def profile(request):
     user = request.user
     user_profile = CustomUser.objects.get(username=user.username)
-    is_admin = request.user.groups.filter(name='').exists()
+    is_admin = request.user.groups.filter(name='Администраторы').exists()  # Исправлено имя группы
     return render(request, 'profile/profile.html', {'user_profile': user_profile, 'is_admin': is_admin})
 
 def edit_profile(request, pk=None):

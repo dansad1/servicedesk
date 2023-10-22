@@ -14,6 +14,7 @@ from service.permissions import*
 from django.contrib.auth.models import Group
 from django.utils import timezone
 from service.models import *
+from datetime import timedelta
 
 
 @login_required
@@ -25,6 +26,9 @@ def request_list(request):
         requests = Request.objects.filter(company=user.company)
     context = {'requests': requests}
     return render(request, 'request/request_list.html', context)
+
+
+@login_required
 def request_create(request):
     if request.method == 'POST':
         form = RequestForm(request.POST)
@@ -33,17 +37,17 @@ def request_create(request):
             priority = form.cleaned_data.get('priority')
             request_type = form.cleaned_data.get('request_type')
 
-            # Find the duration for this priority and request type
             duration_obj = PriorityDuration.objects.filter(priority=priority, request_type=request_type).first()
             if duration_obj:
-                new_request.due_date = timezone.now() + duration_obj.duration
+                # Calculate the due date based on the duration_in_hours
+                new_request.due_date = timezone.now() + timedelta(hours=duration_obj.duration_in_hours)
 
             new_request.save()
             return redirect('request_list')
     else:
         form = RequestForm()
 
-    return render(request, 'create_request.html', {'form': form})
+    return render(request, 'request/request_create.html', {'form': form})
 
 @login_required
 def request_detail(request, pk):

@@ -2,15 +2,16 @@ from django.contrib import admin
 from .models import *
 from django.contrib.auth.models import Permission
 
-# Admin Actions
 def make_high_priority(modeladmin, request, queryset):
-    queryset.update(priority='High')
+    high_priority = Priority.objects.get(name='High')
+    queryset.update(priority=high_priority)
 
 def make_normal_priority(modeladmin, request, queryset):
-    queryset.update(priority='Normal')
+    normal_priority = Priority.objects.get(name='Normal')
+    queryset.update(priority=normal_priority)
 
 def change_request_type_to_bug(modeladmin, request, queryset):
-    bug_type, created = Request_type.objects.get_or_create(name='Bug')
+    bug_type, created = RequestType.objects.get_or_create(name='Bug')
     queryset.update(request_type=bug_type)
 
 # Admin Classes
@@ -20,6 +21,10 @@ class RequestAdmin(admin.ModelAdmin):
     search_fields = ('title', 'requester__username', 'assignee__username')
     actions = [make_high_priority, make_normal_priority, change_request_type_to_bug]
 
+class PriorityDurationAdmin(admin.ModelAdmin):
+    list_display = ('request_type', 'priority', 'duration_in_hours')  # Изменил 'duration' на 'duration_in_hours'
+    list_filter = ('request_type', 'priority')
+
 # Model Registrations
 admin.site.register(Company)
 admin.site.register(CustomUser)
@@ -27,6 +32,8 @@ admin.site.register(UserRole)
 admin.site.register(Request, RequestAdmin)
 admin.site.register(Status)
 admin.site.register(RequestType)
+admin.site.register(Priority)
+admin.site.register(PriorityDuration, PriorityDurationAdmin)
 
 # Permission Registration
 admin.site.register(Permission)

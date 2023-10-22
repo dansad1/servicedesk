@@ -4,13 +4,27 @@
   <h2>Создать новую заявку</h2>
   <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+
+    <!-- Render fields except 'completed' for new requests -->
+    {% for field in form.visible_fields %}
+      {% if field.name != "completed" %}
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+        </div>
+      {% endif %}
+    {% endfor %}
 
     <!-- Добавляем поле для срока выполнения (due_date) -->
     <div class="form-group">
       <label for="{{ form.due_date.id_for_label }}">Срок выполнения:</label>
       {{ form.due_date }}
     </div>
+
+    <!-- Exclude 'completed' field for new requests -->
+    {% if form.instance.pk is None %}
+      <input type="hidden" name="completed" value="False">
+    {% endif %}
 
     <button type="submit" class="btn btn-primary">Создать</button>
   </form>

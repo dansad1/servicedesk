@@ -15,25 +15,27 @@ class CompanyForm(forms.ModelForm):
         model = Company
         fields = ['name', 'address', 'description']  # Здесь перечислите поля, которые вы хотите отображать в форме
 
-
 class RequestForm(forms.ModelForm):
     class Meta:
         model = Request
-        fields = ['title', 'description', 'assignee', 'completed', 'status', 'request_type', 'due_date', 'priority']
+        fields = ['title', 'description', 'assignee', 'status', 'request_type', 'due_date', 'priority']
+
+    duration_in_hours = forms.IntegerField(required=False, widget=forms.HiddenInput())
 
     def __init__(self, *args, **kwargs):
         super(RequestForm, self).__init__(*args, **kwargs)
 
-        # Заполните поле priority данными из базы данных
+        if not self.instance.pk:  # Check if it's a new request
+            self.fields['completed'].widget = forms.HiddenInput()  # Hide 'completed' field for new requests
+
         self.fields['priority'] = forms.ModelChoiceField(queryset=Priority.objects.all(), required=True,
                                                          widget=forms.Select(attrs={'class': 'form-control'}))
 
         self.fields['assignee'].widget.attrs.update({'class': 'form-control'})
-        self.fields['completed'].widget.attrs.update({'class': 'form-check-input'})
         self.fields['status'] = forms.ModelChoiceField(queryset=Status.objects.all(), required=False)
-        self.fields['request_type'] = forms.ModelChoiceField(queryset=RequestType.objects.all(), required=False)
+        self.fields['request_type'] = forms.ModelChoiceField(queryset=RequestType.objects.all(), required=True,
+                                                             widget=forms.Select(attrs={'class': 'form-control'}))
         self.fields['due_date'].widget.attrs.update({'class': 'form-control datetimepicker-input'})
-
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
