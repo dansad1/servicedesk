@@ -17,15 +17,13 @@
   {% endif %}
 
   {% if can_mark_completed %}
-    <h3>Отметить как выполненную</h3>
-    <form method="post">
-      {% csrf_token %}
-      <input type="checkbox" name="completed" id="id_completed" {% if request_instance.completed %}checked{% endif %}>
-      <label for="id_completed">Заявка выполнена</label>
-      <button type="submit">Сохранить</button>
-    </form>
-  {% endif %}
-
+  <h3>Отметить как выполненную</h3>
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="mark_completed" value="true">
+    <button type="submit" class="btn btn-success">Отметить как выполненную</button>
+  </form>
+{% endif %}
   <h3>Комментарии</h3>
   {% if comments %}
     <ul>

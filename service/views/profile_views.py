@@ -29,12 +29,12 @@ def home(request):
 def profile(request):
     user = request.user
     user_profile = CustomUser.objects.get(username=user.username)
-    is_admin = request.user.groups.filter(name='Администраторы').exists()  # Исправлено имя группы
+    is_admin = request.user.groups.filter(name='Администратор').exists()  # Исправлено имя группы
     return render(request, 'profile/profile.html', {'user_profile': user_profile, 'is_admin': is_admin})
 
 def edit_profile(request, pk=None):
     if pk:
-        if request.user.groups.filter(name='Администраторы').exists():
+        if request.user.groups.filter(name='Администратор').exists():
             user = get_object_or_404(CustomUser, pk=pk)
         else:
             return redirect('profile')

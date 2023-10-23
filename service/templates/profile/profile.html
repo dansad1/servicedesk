@@ -14,7 +14,7 @@
         <li><a href="{% url 'request_list' %}">Список заявок</a></li>
         <li><a href="{% url 'request_create' %}">Создать заявку</a></li>
         <!-- Добавьте ссылки на другие шаблоны, если они есть -->
-        {% if user.groups.all.0.name == "Администраторы" %}
+        {% if user.groups.all.0.name == "Администратор" %}
     <a href="{% url 'user_list' %}">Список пользователей</a>
 {% endif %}
     </ul>
