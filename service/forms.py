@@ -23,8 +23,6 @@ class RequestForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(RequestForm, self).__init__(*args, **kwargs)
-        if not self.instance.pk:
-         self.fields['completed'].widget = forms.HiddenInput()
         self.fields['priority'] = forms.ModelChoiceField(queryset=Priority.objects.all(), required=True,
                                                          widget=forms.Select(attrs={'class': 'form-control'}))
 
