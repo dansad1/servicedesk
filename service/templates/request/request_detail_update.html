@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Request Detail and Update</h1>
+    
+    {% if can_edit %}
+        <!-- Update Form -->
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Update</button>
+        </form>
+    {% else %}
+        <!-- Detail View -->
+        <p>Title: {{ request_instance.title }}</p>
+        <p>Description: {{ request_instance.description }}</p>
+        <p>Status: {{ request_instance.status }}</p>
+        <!-- Add more fields as needed -->
+    {% endif %}
+    
+    {% if can_mark_completed %}
+        <!-- Mark as Completed -->
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="mark_completed" value="True">
+            <button type="submit">Mark as Completed</button>
+        </form>
+    {% endif %}
+
+    <!-- Comments Section -->
+    <h2>Comments</h2>
+    {% for comment in comments %}
+        <p>{{ comment.text }}</p>
+    {% endfor %}
+
+    <!-- Add Comment -->
+    {% if can_edit or can_mark_completed %}
+        <form method="post">
+            {% csrf_token %}
+            {{ comment_form.as_p }}
+            <button type="submit">Add Comment</button>
+        </form>
+    {% endif %}
+{% endblock %}

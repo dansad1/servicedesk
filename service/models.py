@@ -4,6 +4,7 @@ from ckeditor.fields import RichTextField  # Import RichTextField
 from ckeditor_uploader.fields import RichTextUploadingField
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.utils import timezone
+from django.contrib.auth.models import Group
 
 
 ROLES_CHOICES = (
@@ -144,5 +145,15 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'Comment by {self.author.username} on {self.request.title}'
+class StatusTransition(models.Model):
+    from_status = models.ForeignKey(Status, related_name='from_transitions', on_delete=models.CASCADE)
+    to_status = models.ForeignKey(Status, related_name='to_transitions', on_delete=models.CASCADE)
+    allowed_groups = models.ManyToManyField(Group)
+
+    class Meta:
+        unique_together = ('from_status', 'to_status')
+
+    def __str__(self):
+        return f"{self.from_status.name} -> {self.to_status.name}"
 
 

@@ -24,6 +24,13 @@ class RequestAdmin(admin.ModelAdmin):
 class PriorityDurationAdmin(admin.ModelAdmin):
     list_display = ('request_type', 'priority', 'duration_in_hours')  # Изменил 'duration' на 'duration_in_hours'
     list_filter = ('request_type', 'priority')
+class StatusTransitionAdmin(admin.ModelAdmin):
+    list_display = ['from_status', 'to_status', 'get_allowed_groups']
+
+    def get_allowed_groups(self, obj):
+        return ', '.join([group.name for group in obj.allowed_groups.all()])
+
+    get_allowed_groups.short_description = 'Allowed Groups'
 
 # Model Registrations
 admin.site.register(Company)
@@ -34,6 +41,8 @@ admin.site.register(Status)
 admin.site.register(RequestType)
 admin.site.register(Priority)
 admin.site.register(PriorityDuration, PriorityDurationAdmin)
+admin.site.register(StatusTransition, StatusTransitionAdmin)
+
 
 # Permission Registration
 admin.site.register(Permission)

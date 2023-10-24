@@ -6,7 +6,7 @@
     <ul>
       {% for request_instance in requests %}
         <li>
-          <a href="{% url 'request_detail' request_instance.pk %}">{{ request_instance.title }}</a>
+          <a href="{% url 'request_detail_update' request_instance.pk %}">{{ request_instance.title }}</a>
           <!-- Добавляем отображение срока выполнения (due_date) и времени обновления (updated_at) -->
           {% if request_instance.due_date %}
             <p>Срок выполнения: {{ request_instance.due_date|date:"d.m.Y" }}</p>
