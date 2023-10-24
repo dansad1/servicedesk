@@ -4,7 +4,7 @@ from django.contrib.auth import views as auth_views
 from django.conf import settings  # Import the settings module
 from django.conf.urls.static import static  # Import static for serving media files
 from service.views.request_views import request_list, request_create, request_detail_update
-from service.views.company_views import company_create
+from service.views.company_views import company_create,company_edit,company_detail,company_list
 from service.views.profile_views import register, home, edit_profile, profile, admin_section_view
 from service.views.user_views import user_list
 
@@ -18,12 +18,16 @@ urlpatterns = [
     re_path(r'^profile/edit/(?P<pk>\d+)?/$', edit_profile, name='edit_profile'),
     path('profile/requests/', request_list, name='request_list'),
     path('requests/request_create/', request_create, name='request_create'),
-    path('request/request/<int:pk>/', request_detail_update, name='request_detail'),
+    path('request/request/<int:pk>/', request_detail_update, name='request_detail_update'),
     path('profile/', profile, name='profile'),
     path('company/create_company/', company_create, name='create_company'),
     path('ckeditor/', include('ckeditor_uploader.urls')),
     path('user/', user_list, name='user_list'),
     path('admin_section/', admin_section_view, name='admin_section'),
+    path('company/<int:pk>/', company_detail, name='company_detail'),
+    path('company/<int:pk>/edit/', company_edit, name='company_edit'),
+    path('company/', company_list, name='company_list'),
+
 ]
 
 if settings.DEBUG:

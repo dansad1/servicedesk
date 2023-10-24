@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Профиль компании: {{ company.name }}</h2>
+  <p>Описание: {{ company.description }}</p>
+  <p>Адрес: {{ company.address }}</p>
+
+  <!-- Ссылка для редактирования -->
+  <a href="{% url 'company_edit' company.pk %}">Редактировать профиль</a>
+{% endblock %}
