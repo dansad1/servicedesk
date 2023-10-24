@@ -10,12 +10,13 @@
 
     <ul>
         <li><a href="{% url 'edit_profile' %}">Редактировать профиль</a></li>
-        <li><a href="{% url 'create_company' %}">Создать компанию</a></li>
         <li><a href="{% url 'request_list' %}">Список заявок</a></li>
         <li><a href="{% url 'request_create' %}">Создать заявку</a></li>
         <!-- Добавьте ссылки на другие шаблоны, если они есть -->
-        {% if user.groups.all.0.name == "Администратор" %}
-    <a href="{% url 'user_list' %}">Список пользователей</a>
+   {% if is_admin %}
+        <ul>
+            <li><a href="{% url 'admin_section' %}">Перейти в раздел администрирования</a></li>
+        </ul>
 {% endif %}
     </ul>
 

@@ -49,3 +49,9 @@ def edit_profile(request, pk=None):
     else:
         form = CustomUserCreationForm(instance=user)
     return render(request, 'profile/edit_profile.html', {'form': form})
+@login_required
+def admin_section_view(request):
+    if request.user.groups.filter(name='Администратор').exists():
+        return render(request, 'profile/admin_section.html')
+    else:
+        return redirect('profile')

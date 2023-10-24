@@ -8,6 +8,6 @@ def user_list(request):
     # Check if the user is in the Administrator group
     if request.user.groups.filter(name='Администратор').exists():
         users = CustomUser.objects.all()
-        return render(request, 'profile/user_list.html', {'users': users})
+        return render(request, 'user/user_list.html', {'users': users})
     else:
         return redirect('profile')
