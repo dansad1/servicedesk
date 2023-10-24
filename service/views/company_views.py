@@ -19,12 +19,19 @@ def company_create(request):
         form = CompanyForm()
 
     return render(request, 'company/company_create.html', {'form': form})
+
+
 @login_required
 def company_detail(request, pk):
     company = get_object_or_404(Company, pk=pk)
-    return render(request, 'company/company_detail.html', {'company': company})
+    employees = CustomUser.objects.filter(company=company)
+    requests = Request.objects.filter(requester__in=employees)
 
-
+    return render(request, 'company/company_detail.html', {
+        'company': company,
+        'employees': employees,
+        'requests': requests
+    })
 @login_required
 def company_edit(request, pk):
     company = get_object_or_404(Company, pk=pk)

@@ -5,6 +5,20 @@
   <p>Описание: {{ company.description }}</p>
   <p>Адрес: {{ company.address }}</p>
 
+  <h3>Заявки компании</h3>
+  <ul>
+    {% for request in requests %}
+      <li><a href="{% url 'request_detail_update' request.pk %}">{{ request.title }}</a></li>
+    {% endfor %}
+  </ul>
+
+  <h3>Сотрудники компании</h3>
+  <ul>
+    {% for employee in employees %}
+      <li><a href="{% url 'edit_profile' employee.pk %}">{{ employee.username }}</a></li>
+    {% endfor %}
+  </ul>
+
   <!-- Ссылка для редактирования -->
   <a href="{% url 'company_edit' company.pk %}">Редактировать профиль</a>
 {% endblock %}
