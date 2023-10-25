@@ -16,18 +16,89 @@ from django.utils import timezone
 from service.models import *
 from datetime import timedelta
 from ..status_logic import *
+from django.db.models import Q
+from ..models import SavedFilter
+from django.db.models import QuerySet
 
-@login_required
+
 def request_list(request):
     user = request.user
+
+    # Инициализация начального набора заявок
     if is_in_group(user, "Администратор"):
-        requests = Request.objects.all()
+        initial_requests = Request.objects.all()
     else:
-        requests = Request.objects.filter(company=user.company)
-    context = {'requests': requests}
+        initial_requests = Request.objects.filter(company=user.company)
+
+    # Удаление фильтра, если указан
+    delete_filter_id = request.GET.get('delete_filter')
+    if delete_filter_id:
+        SavedFilter.objects.filter(id=delete_filter_id, user=user).delete()
+
+    # Загрузка и применение сохраненного фильтра, если указан
+    load_filter_id = request.GET.get('load_filter')
+    if load_filter_id:
+        try:
+            saved_filter = SavedFilter.objects.get(id=load_filter_id, user=user)
+            loaded_filters = saved_filter.filter_data
+
+            # Удаление ключа 'unknown', если он присутствует
+            loaded_filters.pop('unknown', None)
+
+            # Применение фильтров
+            initial_requests = apply_filters(initial_requests, loaded_filters)
+        except SavedFilter.DoesNotExist:
+            pass
+
+    # Получение всех сохраненных фильтров для текущего пользователя
+    saved_filters = SavedFilter.objects.filter(user=user)
+
+    # Инициализация формы фильтрации
+    filter_form = RequestFilterForm(request.GET or None, initial=request.session.get('saved_filters', {}))
+
+    # Логика для сохранения фильтров
+    if 'saveFilter' in request.GET:
+        filter_name = request.GET.get('filter_name')
+        if filter_name:
+            new_filter = SavedFilter(user=user, filter_name=filter_name, filter_data=request.GET.dict())
+            new_filter.save()
+
+    # Логика применения фильтров
+    if request.method == "GET" and filter_form.is_valid():
+        filters = filter_form.cleaned_data
+
+        # Преобразование QuerySet в список
+        serializable_filters = {}
+        for key, value in filters.items():
+            if isinstance(value, QuerySet) or isinstance(value, list):
+                serializable_filters[key] = [str(v.id) for v in value]
+            elif hasattr(value, 'id'):
+                serializable_filters[key] = str(value.id)
+            else:
+                serializable_filters[key] = value
+
+        request.session['saved_filters'] = serializable_filters  # Сохраняем фильтры в сессии
+
+        if 'filter_name' in filters:
+            del filters['filter_name']  # Удаляем ключ 'filter_name'
+
+        filtered_requests = apply_filters(initial_requests, filters)  # Применяем фильтры
+    else:
+        filtered_requests = initial_requests
+
+    context = {'requests': filtered_requests, 'filter_form': filter_form, 'saved_filters': saved_filters}
     return render(request, 'request/request_list.html', context)
 
-
+def apply_filters(queryset, filters):
+    for field, value in filters.items():
+        if value:
+            if isinstance(value, list) or isinstance(value, QuerySet):  # Для полей, которые принимают несколько значений
+                queryset = queryset.filter(**{f"{field}__in": value})
+            elif isinstance(value, QuerySet) and value.count() == 1:  # Для QuerySet с одним значением
+                queryset = queryset.filter(**{field: value.first()})
+            else:  # Для всех остальных случаев
+                queryset = queryset.filter(**{field: value})
+    return queryset
 @login_required
 def request_create(request):
     if request.method == 'POST':

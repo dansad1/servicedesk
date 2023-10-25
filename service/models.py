@@ -155,5 +155,13 @@ class StatusTransition(models.Model):
 
     def __str__(self):
         return f"{self.from_status.name} -> {self.to_status.name}"
+class SavedFilter(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    filter_name = models.CharField(max_length=100)
+    # Добавьте поля для сохранения фильтров, например, JSON-поле для данных фильтра
+    filter_data = models.JSONField()
+
+    def __str__(self):
+        return self.filter_name
 
 

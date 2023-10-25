@@ -1,6 +1,36 @@
 {% extends "base.html" %}
+
 {% block content %}
   <h2>Список заявок</h2>
+
+  <!-- Кнопка для открытия фильтров -->
+  <button id="openFilters">Открыть фильтры</button>
+
+  <!-- Блок с фильтрами (изначально скрыт) -->
+  <div id="filters" style="display: none;">
+    <!-- Форма фильтрации -->
+    <form method="get" id="filterForm">
+      {{ filter_form.as_p }}
+      <button type="submit">Применить фильтры</button>
+      <button type="button" id="saveFilter">Сохранить фильтр</button>
+    </form>
+
+    <!-- Кнопка для закрытия фильтров -->
+    <button id="closeFilters">Закрыть фильтры</button>
+  </div>
+
+  <!-- Список сохраненных фильтров -->
+  <div id="savedFilters">
+    <h3>Сохраненные фильтры:</h3>
+    <ul>
+      {% for saved_filter in saved_filters %}
+        <li>
+          <a href="?load_filter={{ saved_filter.id }}">{{ saved_filter.filter_name }}</a>
+          <a href="?delete_filter={{ saved_filter.id }}" class="deleteFilter">Удалить</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
 
   {% if user.is_superuser %}
     <ul>
@@ -22,4 +52,33 @@
   {% endif %}
 
   <a href="{% url 'home' %}">На главную</a>
+</div>
+
+<script>
+  // Обработка кнопки для открытия фильтров
+  const openFiltersButton = document.getElementById('openFilters');
+  const closeFiltersButton = document.getElementById('closeFilters');
+  const filtersDiv = document.getElementById('filters');
+
+  openFiltersButton.addEventListener('click', () => {
+    filtersDiv.style.display = 'block';
+  });
+
+  closeFiltersButton.addEventListener('click', () => {
+    filtersDiv.style.display = 'none';
+  });
+
+  // Обработка кнопки для сохранения фильтра
+  const saveFilterButton = document.getElementById('saveFilter');
+  const filterForm = document.getElementById('filterForm');
+
+  saveFilterButton.addEventListener('click', () => {
+    // Добавляем параметр 'saveFilter' в GET-запрос
+    const formData = new URLSearchParams(new FormData(filterForm));
+    formData.append('saveFilter', 'true');
+
+    // Отправляем GET-запрос с текущими параметрами фильтра
+    window.location.href = '?' + formData.toString();
+  });
+</script>
 {% endblock %}
