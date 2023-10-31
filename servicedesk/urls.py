@@ -3,10 +3,12 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.conf import settings  # Import the settings module
 from django.conf.urls.static import static  # Import static for serving media files
+
+import service.models
 from service.views.request_views import request_list, request_create, request_detail_update
 from service.views.company_views import company_create,company_edit,company_detail,company_list
 from service.views.profile_views import register, home, edit_profile, profile, admin_section_view
-from service.views.user_views import user_list
+from service.views.user_views import user_list,create_user_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,6 +29,7 @@ urlpatterns = [
     path('company/<int:pk>/', company_detail, name='company_detail'),
     path('company/<int:pk>/edit/', company_edit, name='company_edit'),
     path('company/', company_list, name='company_list'),
+    path('create_user/', service.views.user_views.create_user_view, name='create_user'),
 
 ]
 

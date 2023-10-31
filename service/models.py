@@ -5,6 +5,8 @@ from ckeditor_uploader.fields import RichTextUploadingField
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.utils import timezone
 from django.contrib.auth.models import Group
+from django.contrib.auth.decorators import login_required, user_passes_test
+from .permissions import can_create_user
 
 
 ROLES_CHOICES = (
@@ -12,7 +14,7 @@ ROLES_CHOICES = (
     ('admin', 'Администратор'),
 )
 
-    # Добавьте другие статусы, если необходимо
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, email, password=None, **extra_fields):
         if not email:
@@ -34,8 +36,6 @@ class CustomUserManager(BaseUserManager):
 
         return self.create_user(username, email, password, **extra_fields)
 
-    def get_by_natural_key(self, username):
-        return self.get(username=username)
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=30, unique=True)
@@ -48,7 +48,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     company = models.ForeignKey('Company', on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Компания')
     role = models.CharField(max_length=10, choices=ROLES_CHOICES, default='user', verbose_name='Роль')
-
 
     objects = CustomUserManager()
 
