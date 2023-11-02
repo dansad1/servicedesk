@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import CustomUser, Priority, SavedFilter
-from .models import Company,Request,Status,Comment,RequestType
+from .models import Company,Request,Status,Comment,RequestType,Department
 from ckeditor_uploader.fields import RichTextUploadingField
 from ckeditor.widgets import CKEditorWidget
 
@@ -45,7 +45,6 @@ class RequestFilterForm(forms.Form):
     assignee = forms.ModelMultipleChoiceField(queryset=CustomUser.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
     company = forms.ModelMultipleChoiceField(queryset=Company.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
     status = forms.ModelMultipleChoiceField(queryset=Status.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
-    completed = forms.NullBooleanField(required=False)
     created_at = forms.DateTimeField(required=False)
     updated_at = forms.DateTimeField(required=False)
     priority = forms.ModelMultipleChoiceField(queryset=Priority.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
@@ -57,3 +56,7 @@ class SavedFilterForm(forms.ModelForm):
         model = SavedFilter
         fields = ['filter_name', 'filter_data']
 
+class DepartmentForm(forms.ModelForm):
+    class Meta:
+        model = Department
+        fields = ['name']

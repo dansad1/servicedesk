@@ -5,6 +5,15 @@
   <p>Описание: {{ company.description }}</p>
   <p>Адрес: {{ company.address }}</p>
 
+  <!-- Отображение сообщений об ошибках или успехе -->
+  {% if messages %}
+      {% for message in messages %}
+          <div class="alert alert-{{ message.tags }}">
+              {{ message }}
+          </div>
+      {% endfor %}
+  {% endif %}
+
   <h3>Заявки компании</h3>
   <ul>
     {% for request in requests %}
@@ -12,13 +21,97 @@
     {% endfor %}
   </ul>
 
-  <h3>Сотрудники компании</h3>
+  <h3>Создание нового отдела</h3>
+  <form method="post" action="{% url 'create_department' company.pk %}">
+    {% csrf_token %}
+    {{ department_form.as_p }}
+    <button type="submit">Добавить отдел</button>
+  </form>
+
+ <h3>Отделы и сотрудники компании</h3>
   <ul>
-    {% for employee in employees %}
-      <li><a href="{% url 'edit_profile' employee.pk %}">{{ employee.username }}</a></li>
+    {% for department in departments %}
+      <li>
+        <!-- Ссылка для раскрытия подотделов -->
+        <a href="#" class="toggle-department" data-department-id="{{ department.id }}">{{ department.name }}</a>
+        <ul id="subdepartments-{{ department.id }}" style="display: none;">
+          <!-- Сотрудники отдела -->
+          <li>Сотрудники отдела:
+            <ul>
+              {% for employee in department.employees.all %}
+                <li>{{ employee.username }}</li>
+              {% endfor %}
+            </ul>
+          </li>
+          <!-- Заявки созданные сотрудниками отдела -->
+          <li>Заявки отдела:
+            <ul>
+              {% for request in department.requests.all %}
+                <li>{{ request.title }}</li>
+              {% endfor %}
+            </ul>
+          </li>
+
+          {% for subdepartment in department.subdepartments.all %}
+            <li>
+              <!-- Ссылка для раскрытия подотделов второго уровня -->
+              <a href="#" class="toggle-department" data-department-id="{{ subdepartment.id }}">{{ subdepartment.name }}</a>
+              <ul id="subdepartments-{{ subdepartment.id }}" style="display: none;">
+                <!-- Сотрудники подотдела -->
+                <li>Сотрудники подотдела:
+                  <ul>
+                    {% for employee in subdepartment.employees.all %}
+                      <li>{{ employee.username }}</li>
+                    {% endfor %}
+                  </ul>
+                </li>
+                <!-- Заявки созданные сотрудниками подотдела -->
+                <li>Заявки подотдела:
+                  <ul>
+                    {% for request in subdepartment.requests.all %}
+                      <li>{{ request.title }}</li>
+                    {% endfor %}
+                  </ul>
+                </li>
+                <!-- Здесь могут быть подотделы второго уровня -->
+              </ul>
+            </li>
+          {% endfor %}
+
+          <!-- Форма для создания подотдела -->
+          <li>
+            <form method="post" action="{% url 'create_subdepartment' department.id %}">
+              {% csrf_token %}
+              {{ subdepartment_form.as_p }}
+              <button type="submit">Добавить подотдел</button>
+            </form>
+          </li>
+        </ul>
+      </li>
     {% endfor %}
   </ul>
 
+
+
   <!-- Ссылка для редактирования -->
   <a href="{% url 'company_edit' company.pk %}">Редактировать профиль</a>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const toggles = document.querySelectorAll('.toggle-department');
+
+      toggles.forEach(function(toggle) {
+        toggle.addEventListener('click', function(event) {
+          event.preventDefault();
+          const departmentId = this.dataset.departmentId;
+          const subdepartments = document.getElementById('subdepartments-' + departmentId);
+          if (subdepartments.style.display === 'none') {
+            subdepartments.style.display = 'block';
+          } else {
+            subdepartments.style.display = 'none';
+          }
+        });
+      });
+    });
+  </script>
 {% endblock %}

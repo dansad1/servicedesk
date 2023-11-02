@@ -6,7 +6,7 @@
 
     <!-- Render fields except 'completed', 'due_date', and 'status' -->
     {% for field in form.visible_fields %}
-      {% if field.name != "completed" and field.name != "due_date" and field.name != "status" %}
+      {% if  field.name != "due_date" and field.name != "status" %}
         <div class="form-group">
           <label for="{{ field.id_for_label }}">{{ field.label }}</label>
           {{ field }}

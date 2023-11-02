@@ -17,15 +17,7 @@
         <!-- Add more fields as needed -->
     {% endif %}
     
-    {% if can_mark_completed %}
-        <!-- Mark as Completed -->
-        <form method="post">
-            {% csrf_token %}
-            <input type="hidden" name="mark_completed" value="True">
-            <button type="submit">Mark as Completed</button>
-        </form>
-    {% endif %}
-
+    <!-- Comments Section -->
     <!-- Comments Section -->
     <h2>Comments</h2>
     {% for comment in comments %}
@@ -33,7 +25,7 @@
     {% endfor %}
 
     <!-- Add Comment -->
-    {% if can_edit or can_mark_completed %}
+    {% if can_edit %}
         <form method="post">
             {% csrf_token %}
             {{ comment_form.as_p }}

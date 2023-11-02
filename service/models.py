@@ -14,6 +14,21 @@ ROLES_CHOICES = (
     ('admin', 'Администратор'),
 )
 
+class Company(models.Model):
+    name = models.CharField(max_length=100, unique=True, verbose_name='Название компании')
+    address = models.CharField(max_length=255, verbose_name='Адрес')
+    description = models.TextField(blank=True, null=True, verbose_name='Описание')
+
+    def __str__(self):
+        return self.name
+class Department(models.Model):
+    name = models.CharField(max_length=200)
+    company = models.ForeignKey(Company, related_name='departments', on_delete=models.CASCADE)
+    parent_department = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='subdepartments')
+
+
+    def __str__(self):
+        return self.name
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, email, password=None, **extra_fields):
@@ -37,6 +52,9 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(username, email, password, **extra_fields)
 
 
+
+
+
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=30, unique=True)
     email = models.EmailField(unique=True)
@@ -48,6 +66,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     company = models.ForeignKey('Company', on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Компания')
     role = models.CharField(max_length=10, choices=ROLES_CHOICES, default='user', verbose_name='Роль')
+    department = models.ForeignKey(Department, null=True, blank=True, on_delete=models.SET_NULL)
 
     objects = CustomUserManager()
 
@@ -57,13 +76,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
-class Company(models.Model):
-    name = models.CharField(max_length=100, unique=True, verbose_name='Название компании')
-    address = models.CharField(max_length=255, verbose_name='Адрес')
-    description = models.TextField(blank=True, null=True, verbose_name='Описание')
 
-    def __str__(self):
-        return self.name
 class UserRole(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
@@ -109,7 +122,6 @@ class Request(models.Model):
     assignee = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_requests')
     company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True)
     status = models.ForeignKey(Status, on_delete=models.SET_NULL, null=True, default=None)
-    completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
     priority = models.ForeignKey(Priority, on_delete=models.SET_NULL, null=True, blank=True)
