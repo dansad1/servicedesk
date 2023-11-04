@@ -8,11 +8,11 @@
 <body>
     <h1>Раздел администрирования</h1>
     <ul>
-        <li><a href="{% url 'create_company' %}">Создать компанию</a></li>
         <li><a href="{% url 'user_list' %}">Список пользователей</a></li>
         <li><a href="{% url 'company_list' %}">Список компанний</a></li>
-        <li><a href="{% url 'create_user' %}">Создать пользователя</a></li>
 
     </ul>
+    <h1>Настройки</h1>
+<a href="{% url 'types_list' %}">Типы заявок</a>
 </body>
 </html>

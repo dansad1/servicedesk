@@ -60,3 +60,7 @@ class DepartmentForm(forms.ModelForm):
     class Meta:
         model = Department
         fields = ['name']
+class RequestTypeForm(forms.ModelForm):
+    class Meta:
+        model = RequestType
+        fields = ['name', 'description']

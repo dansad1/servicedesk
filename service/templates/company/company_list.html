@@ -2,6 +2,7 @@
 
 {% block content %}
   <h2>Список компаний</h2>
+ <a href="{% url 'create_company' %}">Создать компанию</a>
   <ul>
     {% for company in companies %}
       <li><a href="{% url 'company_detail' company.pk %}">{{ company.name }}</a></li>

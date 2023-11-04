@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление типами заявок</title>
+</head>
+<body>
+    <h1>Управление типами заявок</h1>
+
+    <!-- Link to create a new RequestType -->
+    <p><a href="{% url 'create_request_type' %}">Создать новый тип заявок</a></p>
+
+    <!-- List of RequestType objects -->
+    <ul>
+        {% for request_type in request_types %}
+            <li>
+                <a href="{% url 'edit_request_type' request_type.id %}">{{ request_type.name }}</a>
+            </li>
+        {% empty %}
+            <li>Нет доступных типов заявоу.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
