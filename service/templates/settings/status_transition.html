@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status Transitions</title>
+    <!-- При желании можно добавить CSS для стилизации таблицы -->
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Status Transitions</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Add Transition</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>From Status</th>
+                <th>To Status</th>
+                <th>Allowed Groups</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transition in transitions %}
+                <tr>
+                    <td>{{ transition.from_status.name }}</td>
+                    <td>{{ transition.to_status.name }}</td>
+                    <td>{{ transition.allowed_groups.all|join:", " }}</td>
+                    <td>
+                        <!-- Добавьте ссылку для редактирования перехода, если у вас есть соответствующая функция -->
+                        <a href="{% url 'edit_status_transition' transition.pk %}">Edit</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">No transitions defined.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

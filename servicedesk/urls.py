@@ -9,7 +9,8 @@ from service.views.request_views import request_list, request_create, request_de
 from service.views.company_views import company_create,company_edit,company_detail,company_list,create_department,create_subdepartment
 from service.views.profile_views import register, home, edit_profile, profile, admin_section_view
 from service.views.user_views import user_list,create_user_view
-from service.views.settings_views import types_list,create_request_type
+from service.views.settings_views import types_list,create_or_edit_request_type,create_or_edit_priority
+from service.views.settings_views import *
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', auth_views.LoginView.as_view(), name='login'),
@@ -32,9 +33,20 @@ urlpatterns = [
     path('create_user/', create_user_view, name='create_user'),
     path('company/<int:department_id>/create_subdepartment/', service.views.company_views.create_subdepartment, name='create_subdepartment'),
     path('company/<int:company_pk>/create_department/', service.views.company_views.create_department,name='create_department'),
-    path('request_type/create/', create_request_type, name='create_request_type'),
+    path('request_type/create/', create_or_edit_request_type, name='create_request_type'),
+    path('request_type/edit/<int:pk>/', create_or_edit_request_type, name='edit_request_type'),
     path('types_list/', types_list, name='types_list'),
-
+    path('priority/create/', create_or_edit_priority, name='create_priority'),
+    path('priority/edit/<int:pk>/', create_or_edit_priority, name='edit_priority'),
+    path('priority_list/', priority_list, name='priority_list'),
+    path('priority_duration/', priority_duration_list, name='priority_duration_list'),
+    path('priority_duration/create/', create_or_edit_priority_duration, name='create_priority_duration'),
+    path('priority_duration/edit/<int:pk>/', create_or_edit_priority_duration, name='edit_priority_duration'),
+    path('status/', status_list, name='status_list'),
+    path('status/create/', create_or_edit_status, name='create_status'),
+    path('status/edit/<int:pk>/', create_or_edit_status, name='edit_status'),
+    path('status_transition/', status_transition, name='status_transition'),
+    path('status_transition/edit/<int:pk>/', status_transition, name='edit_status_transition'),
 ]
 
 if settings.DEBUG:

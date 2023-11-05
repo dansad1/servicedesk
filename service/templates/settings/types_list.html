@@ -15,10 +15,10 @@
     <ul>
         {% for request_type in request_types %}
             <li>
-                <a href="{% url 'edit_request_type' request_type.id %}">{{ request_type.name }}</a>
+               <a href="{% url 'edit_request_type' request_type.id %}">{{ request_type.name }}</a>
             </li>
         {% empty %}
-            <li>Нет доступных типов заявоу.</li>
+            <li>Нет доступных типов заявок.</li>
         {% endfor %}
     </ul>
 </body>

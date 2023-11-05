@@ -118,21 +118,21 @@ def request_detail_update(request, pk):
     user = request.user
 
     can_edit = user.has_perm('change_request') or user == request_instance.requester
-
     comment_form = CommentForm()
     comments = Comment.objects.filter(request=request_instance)
 
     if request.method == 'POST':
-        form = RequestForm(request.POST, instance=request_instance)
+        form = RequestForm(request.POST, instance=request_instance, current_status=request_instance.status)
         if form.is_valid():
             form.save()
 
-            # Вызов функции для смены статусов
+            # Call function to change request statuses
             update_request_status(request_instance)
 
             return redirect('request_detail_update', pk=pk)
     else:
-        form = RequestForm(instance=request_instance)
+        # Instantiate the form with the current status to filter status choices
+        form = RequestForm(instance=request_instance, current_status=request_instance.status)
 
     context = {
         'request_instance': request_instance,
