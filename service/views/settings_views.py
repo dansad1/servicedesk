@@ -92,24 +92,29 @@ def create_or_edit_status(request, pk=None):
 
     context = {'form': form}
     return render(request, 'settings/status_create.html', context)
-def status_transition(request, pk=None):
-    if request.method == 'POST':
-        if pk:
-            # Editing an existing transition
-            transition_instance = get_object_or_404(StatusTransition, pk=pk)
-            form = StatusTransitionForm(request.POST, instance=transition_instance)
-        else:
-            # Creating a new transition
-            form = StatusTransitionForm(request.POST)
 
+
+
+def status_transition(request):
+    if request.method == 'POST':
+        # Creating a new transition
+        form = StatusTransitionForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('status_transition')  # Redirect to the same view to display the list and clear the form
+            messages.success(request, "Status transition successfully created.")
+            return redirect('status_transition')
+    else:
+        form = StatusTransitionForm()
 
-    # If not a POST request or the form is not valid, render the same page with the form errors
-    form = StatusTransitionForm()
     transitions = StatusTransition.objects.all()
-    return render(request, 'status_transition.html', {
+    return render(request, 'settings/status_transition.html', {
         'transitions': transitions,
         'form': form
     })
+
+def delete_status_transition(request, pk):
+    transition_instance = get_object_or_404(StatusTransition, pk=pk)
+    if request.method == 'POST':
+        transition_instance.delete()
+        messages.success(request, "Status transition successfully deleted.")
+        return redirect('status_transition')

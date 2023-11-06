@@ -46,7 +46,7 @@ urlpatterns = [
     path('status/create/', create_or_edit_status, name='create_status'),
     path('status/edit/<int:pk>/', create_or_edit_status, name='edit_status'),
     path('status_transition/', status_transition, name='status_transition'),
-    path('status_transition/edit/<int:pk>/', status_transition, name='edit_status_transition'),
+    path('status_transition/delete/<int:pk>/', delete_status_transition, name='delete_status_transition'),
 ]
 
 if settings.DEBUG:

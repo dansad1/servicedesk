@@ -38,22 +38,25 @@
             </tr>
         </thead>
         <tbody>
-            {% for transition in transitions %}
-                <tr>
-                    <td>{{ transition.from_status.name }}</td>
-                    <td>{{ transition.to_status.name }}</td>
-                    <td>{{ transition.allowed_groups.all|join:", " }}</td>
-                    <td>
-                        <!-- Добавьте ссылку для редактирования перехода, если у вас есть соответствующая функция -->
-                        <a href="{% url 'edit_status_transition' transition.pk %}">Edit</a>
-                    </td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="4">No transitions defined.</td>
-                </tr>
-            {% endfor %}
-        </tbody>
+    {% for transition in transitions %}
+        <tr>
+            <td>{{ transition.from_status.name }}</td>
+            <td>{{ transition.to_status.name }}</td>
+            <td>{{ transition.allowed_groups.all|join:", " }}</td>
+            <td>
+                <!-- Delete button form -->
+                <form method="post" action="{% url 'delete_status_transition' transition.pk %}">
+                  {% csrf_token %}
+              <input type="submit" value="Delete">
+            </form>
+            </td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td colspan="4">No transitions defined.</td>
+        </tr>
+    {% endfor %}
+</tbody>
     </table>
 </body>
 </html>
