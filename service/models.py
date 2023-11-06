@@ -151,6 +151,7 @@ class Comment(models.Model):
     request = models.ForeignKey(Request, on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     text = RichTextUploadingField()
+    attachment = models.FileField(upload_to='comments/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     content = RichTextUploadingField()  # Use RichTextUploadingField for rich text content
 

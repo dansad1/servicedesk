@@ -1,35 +1,46 @@
 {% extends "base.html" %}
+{% block extrahead %}
+    {{ comment_form.media }}
+{% endblock extrahead %}
+
 {% block content %}
     <h1>Request Detail and Update</h1>
-    
+
+    <!-- Request Update Form -->
     {% if can_edit %}
-        <!-- Update Form -->
-        <form method="post">
+        <form method="post" action="{% url 'request_detail_update' pk=request_instance.pk %}">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit">Update</button>
+            <button type="submit" name="submit_update">Обновить</button>
         </form>
     {% else %}
-        <!-- Detail View -->
+        <!-- Request Detail View for users without edit permission -->
         <p>Title: {{ request_instance.title }}</p>
         <p>Description: {{ request_instance.description }}</p>
         <p>Status: {{ request_instance.status }}</p>
         <!-- Add more fields as needed -->
     {% endif %}
-    
-    <!-- Comments Section -->
-    <!-- Comments Section -->
-    <h2>Comments</h2>
-    {% for comment in comments %}
-        <p>{{ comment.text }}</p>
-    {% endfor %}
 
-    <!-- Add Comment -->
+    <!-- Comments Section -->
+    <h2>Комментарии</h2>
+    <div class="comments">
+        {% for comment in comments %}
+            <div class="comment">
+                <p><strong>{{ comment.author.username }}</strong> <em>{{ comment.created_at|date:"d.m.Y H:i" }}</em></p>
+                <div>{{ comment.text|safe }}</div>
+            </div>
+        {% empty %}
+            <p>Комментариев пока нет.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Add Comment Form -->
     {% if can_edit %}
-        <form method="post">
+        <h3>Добавить комментарий</h3>
+        <form method="post" action="{% url 'request_detail_update' pk=request_instance.pk %}">
             {% csrf_token %}
             {{ comment_form.as_p }}
-            <button type="submit">Add Comment</button>
+            <button type="submit" name="submit_comment">Добавить комментарий</button>
         </form>
     {% endif %}
 {% endblock %}

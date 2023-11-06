@@ -116,23 +116,32 @@ def request_create(request):
 def request_detail_update(request, pk):
     request_instance = get_object_or_404(Request, pk=pk)
     user = request.user
-
     can_edit = user.has_perm('change_request') or user == request_instance.requester
-    comment_form = CommentForm()
     comments = Comment.objects.filter(request=request_instance)
 
     if request.method == 'POST':
-        form = RequestForm(request.POST, instance=request_instance, current_status=request_instance.status)
-        if form.is_valid():
-            form.save()
+        if 'submit_comment' in request.POST:
+            comment_form = CommentForm(request.POST)
+            if comment_form.is_valid():
+                new_comment = comment_form.save(commit=False)
+                new_comment.request = request_instance
+                new_comment.author = user
+                new_comment.save()
+                return redirect('request_detail_update', pk=pk)
+        elif 'submit_update' in request.POST:
+            form = RequestForm(request.POST, instance=request_instance)
+            if form.is_valid():
+                form.save()
+                # Call function to change request statuses
+                update_request_status(request_instance)
+                return redirect('request_detail_update', pk=pk)
+        # Reinitialize the form for a GET request or if the form is not valid.
+        form = RequestForm(instance=request_instance)
+        comment_form = CommentForm()
 
-            # Call function to change request statuses
-            update_request_status(request_instance)
-
-            return redirect('request_detail_update', pk=pk)
     else:
-        # Instantiate the form with the current status to filter status choices
-        form = RequestForm(instance=request_instance, current_status=request_instance.status)
+        form = RequestForm(instance=request_instance)
+        comment_form = CommentForm()
 
     context = {
         'request_instance': request_instance,
@@ -141,5 +150,4 @@ def request_detail_update(request, pk):
         'comment_form': comment_form,
         'comments': comments,
     }
-
     return render(request, 'request/request_detail_update.html', context)

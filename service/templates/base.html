@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Project Title</title>
     <!-- Add your CSS and JavaScript links here -->
+    {% block extrahead %}{% endblock %}  <!-- Include this block to allow child templates to add extra head content -->
 </head>
 <body>
     <!-- Header Section -->
     <header>
         <nav>
-
+            <!-- Your navigation here -->
         </nav>
     </header>
 
@@ -20,6 +21,13 @@
         <!-- This block will be overridden in child templates -->
         {% endblock %}
     </main>
+    <!-- Footer Section -->
+    <footer>
+        <!-- Your footer content here -->
+    </footer>
+</body>
+</html>
+
 
     <!-- Footer Section -->
     <footer>
