@@ -16,12 +16,13 @@ from django.utils import timezone
 from service.models import *
 from datetime import timedelta
 from ..status_logic import *
-from django.db.models import Q
 from ..models import SavedFilter
 from django.db.models import QuerySet
 import json
 from django.core.exceptions import ValidationError
 import json
+from django.contrib import messages
+
 
 # Функция для обработки и применения фильтров
 def handle_filters(request, initial_requests):
@@ -115,38 +116,54 @@ def request_create(request):
 @login_required
 def request_detail_update(request, pk):
     request_instance = get_object_or_404(Request, pk=pk)
-    user = request.user
-    can_edit = user.has_perm('change_request') or user == request_instance.requester
-    comments = Comment.objects.filter(request=request_instance)
+    original_status = request_instance.status  # Сохраняем первоначальный статус
+
+    if not request.user.has_perm('change_request') and request.user != request_instance.requester:
+        messages.error(request, "You do not have the permission to edit this request.")
+        return redirect('request_detail', pk=pk)  # Предполагается, что у вас есть такой URL
+
+    comment_form = CommentForm()
+    form = RequestForm(instance=request_instance, current_status=request_instance.status)
 
     if request.method == 'POST':
         if 'submit_comment' in request.POST:
-            comment_form = CommentForm(request.POST)
+            comment_form = CommentForm(request.POST, request.FILES)
             if comment_form.is_valid():
                 new_comment = comment_form.save(commit=False)
                 new_comment.request = request_instance
-                new_comment.author = user
+                new_comment.author = request.user
+                if 'attachment' in request.FILES:
+                    new_comment.attachment = request.FILES['attachment']
                 new_comment.save()
+                messages.success(request, "Your comment has been added.")
                 return redirect('request_detail_update', pk=pk)
-        elif 'submit_update' in request.POST:
-            form = RequestForm(request.POST, instance=request_instance)
-            if form.is_valid():
-                form.save()
-                # Call function to change request statuses
-                update_request_status(request_instance)
-                return redirect('request_detail_update', pk=pk)
-        # Reinitialize the form for a GET request or if the form is not valid.
-        form = RequestForm(instance=request_instance)
-        comment_form = CommentForm()
+            elif 'submit_update' in request.POST:
+                form = RequestForm(request.POST, request.FILES, instance=request_instance,
+                                   current_status=original_status)
+                if form.is_valid():
+                    # Сохраняем форму без коммита для дальнейшей обработки
+                    request_instance = form.save(commit=False)
 
-    else:
-        form = RequestForm(instance=request_instance)
-        comment_form = CommentForm()
+                    # Check if there is an attachment in the POST request and handle it
+                    if 'attachment' in request.FILES:
+                        request_instance.attachment = request.FILES['attachment']
 
+                    # Обновляем статус заявки, если это необходимо
+                    check_and_update_request_status(request_instance, original_status)
+
+                    # Сохраняем заявку
+                    request_instance.save()
+                    form.save_m2m()  # Необходимо для сохранения данных many-to-many полей
+
+                    messages.success(request, "The request has been updated.")
+                    return redirect('request_detail_update', pk=pk)
+                else:
+                    messages.error(request, "There was an error with the form.")
+    comments = Comment.objects.filter(request=request_instance)
     context = {
         'request_instance': request_instance,
         'form': form,
-        'can_edit': can_edit,
+        'can_edit': True,  # Вы уже проверили права доступа в начале
         'comment_form': comment_form,
         'comments': comments,
     }

@@ -5,6 +5,9 @@ from ..models import RequestType, Priority, PriorityDuration, Status, StatusTran
 
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from ..permissions import is_in_group
+from django.contrib.auth.decorators import login_required
+
 
 
 def create_or_edit_request_type(request, pk=None):
@@ -95,14 +98,24 @@ def create_or_edit_status(request, pk=None):
 
 
 
+@login_required
 def status_transition(request):
     if request.method == 'POST':
-        # Creating a new transition
         form = StatusTransitionForm(request.POST)
         if form.is_valid():
-            form.save()
+            # Сохраняем переход статуса без коммита, чтобы добавить группы отдельно
+            transition = form.save(commit=False)
+            transition.save()
+            # Получаем список групп из cleaned_data
+            groups = form.cleaned_data['allowed_groups']  # Используйте 'allowed_groups' здесь
+            # Добавляем каждую группу к переходу
+            for group in groups:
+                transition.allowed_groups.add(group)  # И здесь 'allowed_groups'
+            # transition.save() не нужно вызывать повторно, так как add() уже сохраняет связи
             messages.success(request, "Status transition successfully created.")
             return redirect('status_transition')
+        else:
+            messages.error(request, "There was an error with the form.")
     else:
         form = StatusTransitionForm()
 

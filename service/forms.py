@@ -4,7 +4,7 @@ from .models import CustomUser, Priority, SavedFilter
 from .models import Company,Request,Status,Comment,RequestType,Department,PriorityDuration,StatusTransition
 from ckeditor_uploader.fields import RichTextUploadingField
 from ckeditor.widgets import CKEditorWidget
-
+from .permissions import is_in_group
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
@@ -15,14 +15,15 @@ class CompanyForm(forms.ModelForm):
         model = Company
         fields = ['name', 'address', 'description']  # Здесь перечислите поля, которые вы хотите отображать в форме
 class RequestForm(forms.ModelForm):
+    description = forms.CharField(widget=CKEditorWidget())
+    duration_in_hours = forms.IntegerField(required=False, widget=forms.HiddenInput())
+    attachment = forms.FileField(required=False)
+
     class Meta:
         model = Request
         fields = ['title', 'description', 'assignee', 'status', 'request_type', 'due_date', 'priority']
 
-    duration_in_hours = forms.IntegerField(required=False, widget=forms.HiddenInput())
-
     def __init__(self, *args, **kwargs):
-        # Expecting 'current_status' to be passed as a keyword argument
         current_status = kwargs.pop('current_status', None)
         super(RequestForm, self).__init__(*args, **kwargs)
 
@@ -32,21 +33,24 @@ class RequestForm(forms.ModelForm):
         self.fields['request_type'].widget.attrs.update({'class': 'form-control'})
         self.fields['due_date'].widget.attrs.update({'class': 'form-control datetimepicker-input'})
 
-        # If 'current_status' is provided, filter the 'status' field queryset accordingly
+        # Установка queryset и начального значения для поля 'status'
         if current_status:
+            self.fields['status'].empty_label = current_status.name  # Отображаем текущий статус
             valid_next_statuses = StatusTransition.objects.filter(
                 from_status=current_status
             ).values_list('to_status', flat=True)
             self.fields['status'].queryset = Status.objects.filter(id__in=valid_next_statuses)
         else:
-            self.fields['status'].queryset = Status.objects.none()  # No status should be selectable by default
-
+            # Для новой заявки устанавливаем статус "Открыта" по умолчанию
+            default_status, created = Status.objects.get_or_create(name="Открыта")
+            self.fields['status'].queryset = Status.objects.filter(pk=default_status.pk)
+            self.fields['status'].initial = default_status
+            self.fields['status'].empty_label = None
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ['text']
+        fields = ['text', 'attachment']  # Добавьте 'attachment' здесь, если у вас есть такое поле
         widgets = {'text': CKEditorWidget()}
-
 class RequestFilterForm(forms.Form):
     title = forms.CharField(max_length=100, required=False)
     filter_name = forms.CharField(max_length=100, required=False)

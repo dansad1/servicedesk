@@ -51,10 +51,6 @@ class CustomUserManager(BaseUserManager):
 
         return self.create_user(username, email, password, **extra_fields)
 
-
-
-
-
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=30, unique=True)
     email = models.EmailField(unique=True)
@@ -127,6 +123,7 @@ class Request(models.Model):
     priority = models.ForeignKey(Priority, on_delete=models.SET_NULL, null=True, blank=True)
     request_type = models.ForeignKey(RequestType, on_delete=models.SET_NULL, null=True, blank=True)
     due_date = models.DateTimeField(null=True, blank=True)
+    attachment = models.FileField(upload_to='attachments/', null=True, blank=True)
 
     def set_due_date(self):
         duration = PriorityDuration.objects.filter(
