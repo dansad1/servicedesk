@@ -2,6 +2,8 @@
 {% load static %}
 
 {% block extrahead %}
+  <!-- Bootstrap CSS (ensure you have Bootstrap included in your base.html) -->
+  <link rel="stylesheet" href="{% static 'path/to/bootstrap.css' %}">
   <!-- Include CKEditor JS files and form media -->
   <script type="text/javascript" src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
   <script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
@@ -10,55 +12,69 @@
 {% endblock %}
 
 {% block content %}
-<h1>Request Detail and Update</h1>
+<div class="container mt-4">
+    <h1 class="mb-4">Request Detail and Update</h1>
 
-<!-- Request Update Form -->
-{% if can_edit %}
-    <form method="post" action="{% url 'request_detail_update' pk=request_instance.pk %}" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" name="submit_update">Update Request</button>
-    </form>
-{% else %}
-    <!-- Request Detail View for users without edit permission -->
-    <p>Title: {{ request_instance.title }}</p>
-    <p>Description: {{ request_instance.description|safe }}</p>
-    <p>Status: {{ request_instance.status }}</p>
-    <!-- Other fields can be shown here if necessary -->
-{% endif %}
-
-<!-- Attachments Section -->
-<h3>Attachments</h3>
-{% if request_instance.attachment %}
-    <p><a href="{{ request_instance.attachment.url }}">{{ request_instance.attachment.name }}</a></p>
-{% else %}
-    <p>No attachments available.</p>
-{% endif %}
-
-<!-- Comments Section -->
-<h2>Comments</h2>
-<div class="comments">
-    {% for comment in comments %}
-        <div class="comment">
-            <p><strong>{{ comment.author.username }}</strong> <em>{{ comment.created_at|date:"N d, Y H:i" }}</em></p>
-            <p>{{ comment.text|safe }}</p>
-            <!-- Display the attached file if it exists for the comment -->
-            {% if comment.attachment %}
-                <p>Attachment: <a href="{{ comment.attachment.url }}">{{ comment.attachment.name }}</a></p>
-            {% endif %}
+    <!-- Request Update Form -->
+    {% if can_edit %}
+        <div class="form-custom">
+            <form method="post" action="{% url 'request_detail_update' pk=request_instance.pk %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row">
+                    {% for field in form %}
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="alert alert-danger">{{ field.errors }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+                <button type="submit" name="submit_update" class="btn btn-primary">Update Request</button>
+            </form>
         </div>
-    {% empty %}
-        <p>No comments yet.</p>
-    {% endfor %}
-</div>
+    {% else %}
+        <div class="alert alert-info">You do not have permission to edit this request.</div>
+    {% endif %}
 
-<!-- Add Comment Form -->
-{% if can_edit %}
-    <h3>Add a Comment</h3>
-    <form method="post" action="{% url 'request_detail_update' pk=request_instance.pk %}" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ comment_form.as_p }}
-        <button type="submit" name="submit_comment">Add Comment</button>
-    </form>
-{% endif %}
+    <!-- Attachments Section -->
+    <h3 class="mb-3">Attachments</h3>
+    <div class="attachments mb-3">
+        {% if request_instance.attachment %}
+            <a href="{{ request_instance.attachment.url }}" class="btn btn-link">{{ request_instance.attachment.name }}</a>
+        {% else %}
+            <p>No attachments available.</p>
+        {% endif %}
+    </div>
+
+    <!-- Comments Section -->
+    <h2 class="mb-3">Comments</h2>
+    <div class="comments">
+        {% for comment in comments %}
+            <div class="comment mb-3">
+                <strong>{{ comment.author.username }}</strong>
+                <em class="text-muted">{{ comment.created_at|date:"N d, Y H:i" }}</em>
+                <p>{{ comment.text|safe }}</p>
+                {% if comment.attachment %}
+                    <a href="{{ comment.attachment.url }}" class="btn btn-link">{{ comment.attachment.name }}</a>
+                {% endif %}
+            </div>
+        {% empty %}
+            <p>No comments yet.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Add Comment Form -->
+    {% if can_edit %}
+        <div class="form-custom">
+            <h3 class="mb-3">Add a Comment</h3>
+            <form method="post" action="{% url 'request_detail_update' pk=request_instance.pk %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ comment_form.as_p }}
+                <button type="submit" name="submit_comment" class="btn btn-success">Add Comment</button>
+            </form>
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

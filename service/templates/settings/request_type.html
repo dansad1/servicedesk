@@ -1,11 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% if request_type %}Редактировать{% else %}Создать{% endif %} тип заявки</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block content %}
     <h1>{% if request_type %}Редактировать{% else %}Создать{% endif %} тип заявки</h1>
 
     {% if messages %}
@@ -16,12 +11,11 @@
         </ul>
     {% endif %}
 
-    <form method="post">
+    <form method="post" class="request-type-form">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">{% if request_type %}Сохранить изменения{% else %}Создать тип{% endif %}</button>
+        <button type="submit" class="btn btn-primary">{% if request_type %}Сохранить изменения{% else %}Создать тип{% endif %}</button>
     </form>
 
-    <a href="{% url 'types_list' %}">Вернуться к списку типов заявок</a>
-</body>
-</html>
+    <a href="{% url 'types_list' %}" class="btn btn-secondary">Вернуться к списку типов заявок</a>
+{% endblock %}

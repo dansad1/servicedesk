@@ -31,27 +31,62 @@
       {% endfor %}
     </ul>
   </div>
-<a href="{% url 'request_create' %}" class="button">Создать новую заявку</a>
+<div class="dashboard-container">
+  <h2>Dashboard</h2>
+
+  <!-- Button to create a new request -->
+  <div class="create-request">
+    <a href="{% url 'request_create' %}" class="button">Создать новую заявку</a>
+  </div>
+
   {% if user.is_superuser %}
-    <ul>
-      {% for request_instance in requests %}
-        <li>
-          <a href="{% url 'request_detail_update' request_instance.pk %}">{{ request_instance.title }}</a>
-          <!-- Добавляем отображение срока выполнения (due_date) и времени обновления (updated_at) -->
-          {% if request_instance.due_date %}
-            <p>Срок выполнения: {{ request_instance.due_date|date:"d.m.Y" }}</p>
-          {% endif %}
-          {% if request_instance.updated_at %}
-            <p>Время обновления: {{ request_instance.updated_at|date:"d.m.Y H:i" }}</p>
-          {% endif %}
-        </li>
-      {% endfor %}
-    </ul>
+    <!-- Displaying requests in a structured table format -->
+    <div class="requests-list">
+      <h3>Список заявок</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Название заявки</th>
+            <th>Тип </th>
+            <th>Приоритет</th>
+            <th>
+            <th>Срок выполнения</th>
+            <th>Время обновления</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for request_instance in requests %}
+            <tr>
+              <td>
+                <a href="{% url 'request_detail_update' request_instance.pk %}">{{ request_instance.title }}</a>
+              </td>
+              <td>
+                {% if request_instance.due_date %}
+                  {{ request_instance.due_date|date:"d.m.Y" }}
+                {% else %}
+                  Не указано
+                {% endif %}
+              </td>
+              <td>
+                {% if request_instance.updated_at %}
+                  {{ request_instance.updated_at|date:"d.m.Y H:i" }}
+                {% else %}
+                  Не указано
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   {% else %}
     <p>У вас нет прав на просмотр списка заявок.</p>
   {% endif %}
+</div>
 
-  <a href="{% url 'home' %}">На главную</a>
+
+
+{% endblock %}
 </div>
 
 <script>
@@ -81,4 +116,3 @@
     window.location.href = '?' + formData.toString();
   });
 </script>
-{% endblock %}

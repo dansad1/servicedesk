@@ -1,34 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Status Transitions</title>
-    <!-- При желании можно добавить CSS для стилизации таблицы -->
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block content %}
     <h1>Status Transitions</h1>
 
-    <form method="post">
+    <form method="post" class="status-transition-form">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Add Transition</button>
+        <button type="submit" class="btn btn-primary">Add Transition</button>
     </form>
 
-    <table>
+    <table class="table table-bordered">
         <thead>
             <tr>
                 <th>From Status</th>
@@ -38,25 +19,23 @@
             </tr>
         </thead>
         <tbody>
-    {% for transition in transitions %}
-        <tr>
-            <td>{{ transition.from_status.name }}</td>
-            <td>{{ transition.to_status.name }}</td>
-            <td>{{ transition.allowed_groups.all|join:", " }}</td>
-            <td>
-                <!-- Delete button form -->
-                <form method="post" action="{% url 'delete_status_transition' transition.pk %}">
-                  {% csrf_token %}
-              <input type="submit" value="Delete">
-            </form>
-            </td>
-        </tr>
-    {% empty %}
-        <tr>
-            <td colspan="4">No transitions defined.</td>
-        </tr>
-    {% endfor %}
-</tbody>
+            {% for transition in transitions %}
+                <tr>
+                    <td>{{ transition.from_status.name }}</td>
+                    <td>{{ transition.to_status.name }}</td>
+                    <td>{{ transition.allowed_groups.all|join:", " }}</td>
+                    <td>
+                        <form method="post" action="{% url 'delete_status_transition' transition.pk %}" class="inline-form">
+                            {% csrf_token %}
+                            <input type="submit" value="Delete" class="btn btn-danger">
+                        </form>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">No transitions defined.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
     </table>
-</body>
-</html>
+{% endblock %}

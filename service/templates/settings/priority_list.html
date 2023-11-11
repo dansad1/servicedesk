@@ -1,24 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Список приоритетов</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block content %}
     <h1>Список приоритетов</h1>
 
-    <p><a href="{% url 'create_priority' %}">Создать новый приоритет</a></p>
+    <p><a href="{% url 'create_priority' %}" class="btn btn-primary">Создать новый приоритет</a></p>
 
     <ul>
         {% for priority in priorities %}
             <li>
                 {{ priority.name }}
-                <a href="{% url 'edit_priority' priority.id %}">Редактировать</a>
+                <a href="{% url 'edit_priority' priority.id %}" class="btn btn-secondary">Редактировать</a>
             </li>
         {% empty %}
             <li>Нет доступных приоритетов.</li>
         {% endfor %}
     </ul>
-</body>
-</html>
+{% endblock %}

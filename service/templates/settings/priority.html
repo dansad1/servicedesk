@@ -1,11 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% if priority %}Редактировать{% else %}Создать{% endif %} приоритет</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block content %}
     <h1>{% if priority %}Редактировать{% else %}Создать{% endif %} приоритет</h1>
 
     {% if messages %}
@@ -19,9 +14,8 @@
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">{% if priority %}Сохранить изменения{% else %}Создать приоритет{% endif %}</button>
+        <button type="submit" class="btn btn-primary">{% if priority %}Сохранить изменения{% else %}Создать приоритет{% endif %}</button>
     </form>
 
-    <a href="{% url 'priority_list' %}">Вернуться к списку приоритетов</a>
-</body>
-</html>
+    <a href="{% url 'priority_list' %}" class="btn btn-secondary">Вернуться к списку приоритетов</a>
+{% endblock %}

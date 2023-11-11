@@ -27,25 +27,30 @@ class RequestForm(forms.ModelForm):
         current_status = kwargs.pop('current_status', None)
         super(RequestForm, self).__init__(*args, **kwargs)
 
+        # Styling for fields
         self.fields['priority'].widget.attrs.update({'class': 'form-control'})
         self.fields['assignee'].widget.attrs.update({'class': 'form-control'})
         self.fields['status'].widget.attrs.update({'class': 'form-control'})
         self.fields['request_type'].widget.attrs.update({'class': 'form-control'})
         self.fields['due_date'].widget.attrs.update({'class': 'form-control datetimepicker-input'})
 
-        # Установка queryset и начального значения для поля 'status'
+        # Make status field optional
+        self.fields['status'].required = False
+        self.fields['status'].empty_label = "No change"  # Label for no change option
+
+        # Set queryset and initial value for 'status' field
         if current_status:
-            self.fields['status'].empty_label = current_status.name  # Отображаем текущий статус
             valid_next_statuses = StatusTransition.objects.filter(
                 from_status=current_status
             ).values_list('to_status', flat=True)
-            self.fields['status'].queryset = Status.objects.filter(id__in=valid_next_statuses)
+            self.fields['status'].queryset = Status.objects.filter(
+                id__in=valid_next_statuses).union(Status.objects.filter(pk=current_status.pk))
+            self.fields['status'].initial = current_status
         else:
-            # Для новой заявки устанавливаем статус "Открыта" по умолчанию
+            # For a new request, set a default status if needed
             default_status, created = Status.objects.get_or_create(name="Открыта")
             self.fields['status'].queryset = Status.objects.filter(pk=default_status.pk)
             self.fields['status'].initial = default_status
-            self.fields['status'].empty_label = None
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment

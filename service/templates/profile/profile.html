@@ -1,26 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Профиль пользователя {{ user.username }}</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block content %}
     <h1>Профиль пользователя {{ user.username }}</h1>
 
     <ul>
         <li><a href="{% url 'edit_profile' %}">Редактировать профиль</a></li>
         <li><a href="{% url 'request_list' %}">Список заявок</a></li>
         <li><a href="{% url 'request_create' %}">Создать заявку</a></li>
-        <!-- Добавьте ссылки на другие шаблоны, если они есть -->
-   {% if is_admin %}
-        <ul>
+        <!-- Дополнительные ссылки -->
+        {% if is_admin %}
             <li><a href="{% url 'admin_section' %}">Перейти в раздел администрирования</a></li>
-        </ul>
-{% endif %}
+        {% endif %}
     </ul>
 
-    <!-- Здесь можно добавить информацию о пользователе, например, его имя, адрес, и так далее -->
+    <!-- Место для дополнительной информации о пользователе -->
 
-</body>
-</html>
+{% endblock %}

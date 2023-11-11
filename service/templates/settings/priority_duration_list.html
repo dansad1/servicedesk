@@ -1,22 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Список продолжительностей приоритетов</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block content %}
     <h1>Список продолжительностей приоритетов</h1>
-    <a href="{% url 'create_priority_duration' %}">Создать новую продолжительность приоритета</a>
+    <a href="{% url 'create_priority_duration' %}" class="btn btn-primary">Создать новую продолжительность приоритета</a>
     <ul>
         {% for duration in durations %}
             <li>
                 {{ duration.priority.name }} для {{ duration.request_type.name }}: {{ duration.duration_in_hours }} часов
-                <a href="{% url 'edit_priority_duration' duration.pk %}">Редактировать</a>
+                <a href="{% url 'edit_priority_duration' duration.pk %}" class="btn btn-secondary">Редактировать</a>
             </li>
         {% empty %}
             <li>Продолжительности приоритетов не найдены.</li>
         {% endfor %}
     </ul>
-</body>
-</html>
+{% endblock %}
