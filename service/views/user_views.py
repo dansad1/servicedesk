@@ -2,10 +2,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect
 from service.forms import CustomUserCreationForm  # Assuming you have this form
 from service.models import CustomUser
-from service.permissions import can_create_user  # Assuming you have this function
 
 @login_required
-@user_passes_test(can_create_user)
 def create_user_view(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)

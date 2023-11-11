@@ -35,7 +35,6 @@ class StatusTransitionAdmin(admin.ModelAdmin):
 # Model Registrations
 admin.site.register(Company)
 admin.site.register(CustomUser)
-admin.site.register(UserRole)
 admin.site.register(Request, RequestAdmin)
 admin.site.register(Status)
 admin.site.register(RequestType)

@@ -6,8 +6,6 @@ from ckeditor_uploader.fields import RichTextUploadingField
 from django.utils import timezone
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .permissions import can_create_user
-
 
 ROLES_CHOICES = (
     ('user', 'Пользователь'),
@@ -51,6 +49,7 @@ class CustomUserManager(BaseUserManager):
 
         return self.create_user(username, email, password, **extra_fields)
 
+
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=30, unique=True)
     email = models.EmailField(unique=True)
@@ -61,8 +60,11 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     company = models.ForeignKey('Company', on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Компания')
-    role = models.CharField(max_length=10, choices=ROLES_CHOICES, default='user', verbose_name='Роль')
-    department = models.ForeignKey(Department, null=True, blank=True, on_delete=models.SET_NULL)
+
+    # Replace role CharField with a Many-to-Many relationship to the Role model
+    roles = models.ManyToManyField('Role')
+
+    department = models.ForeignKey('Department', null=True, blank=True, on_delete=models.SET_NULL)
 
     objects = CustomUserManager()
 
@@ -73,17 +75,21 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.username
 
-class UserRole(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    company = models.ForeignKey(Company, on_delete=models.CASCADE)
-    role = models.CharField(max_length=10, choices=ROLES_CHOICES, default='user', verbose_name='Роль')
 
-    class Meta:
-        unique_together = ('user', 'company')
+class Permission(models.Model):
+    code_name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=255)
 
     def __str__(self):
-        return f'{self.user.username} ({self.company.name}): {self.role}'
+        return self.name
 
+
+class Role(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    permissions = models.ManyToManyField(Permission)
+
+    def __str__(self):
+        return self.name
 class Status(models.Model):
     name = models.CharField(max_length=50, unique=True)
     color = models.CharField(max_length=20, blank=True, null=True)

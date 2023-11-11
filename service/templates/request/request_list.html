@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h2>Список заявок</h2>
+  < <h2>Список заявок</h2>
 
   <!-- Кнопка для открытия фильтров -->
   <button id="openFilters">Открыть фильтры</button>
@@ -31,25 +31,21 @@
       {% endfor %}
     </ul>
   </div>
-<div class="dashboard-container">
-  <h2>Dashboard</h2>
 
-  <!-- Button to create a new request -->
-  <div class="create-request">
-    <a href="{% url 'request_create' %}" class="button">Создать новую заявку</a>
-  </div>
-
-  {% if user.is_superuser %}
-    <!-- Displaying requests in a structured table format -->
+   {% if admin %}
     <div class="requests-list">
       <h3>Список заявок</h3>
       <table>
         <thead>
           <tr>
             <th>Название заявки</th>
-            <th>Тип </th>
+            <th>Тип</th>
             <th>Приоритет</th>
-            <th>
+            {% if admin %}
+              <th>Исполнитель</th>
+              <th>Заявитель</th>
+            {% endif %}
+            <th>Статус</th>
             <th>Срок выполнения</th>
             <th>Время обновления</th>
           </tr>
@@ -57,23 +53,16 @@
         <tbody>
           {% for request_instance in requests %}
             <tr>
-              <td>
-                <a href="{% url 'request_detail_update' request_instance.pk %}">{{ request_instance.title }}</a>
-              </td>
-              <td>
-                {% if request_instance.due_date %}
-                  {{ request_instance.due_date|date:"d.m.Y" }}
-                {% else %}
-                  Не указано
-                {% endif %}
-              </td>
-              <td>
-                {% if request_instance.updated_at %}
-                  {{ request_instance.updated_at|date:"d.m.Y H:i" }}
-                {% else %}
-                  Не указано
-                {% endif %}
-              </td>
+              <td><a href="{% url 'request_detail_update' request_instance.pk %}">{{ request_instance.title }}</a></td>
+              <td>{{ request_instance.request_type }}</td>
+              <td>{{ request_instance.priority }}</td>
+              {% if admin %}
+                <td><a href="{% url 'user_profile' request_instance.assignee.id %}">{{ request_instance.assignee }}</a></td>
+                <td><a href="{% url 'user_profile' request_instance.requester.id %}">{{ request_instance.requester }}</a></td>
+              {% endif %}
+              <td>{{ request_instance.status }}</td>
+              <td>{% if request_instance.due_date %}{{ request_instance.due_date|date:"d.m.Y" }}{% else %}Не указано{% endif %}</td>
+              <td>{% if request_instance.updated_at %}{{ request_instance.updated_at|date:"d.m.Y H:i" }}{% else %}Не указано{% endif %}</td>
             </tr>
           {% endfor %}
         </tbody>
@@ -82,37 +71,35 @@
   {% else %}
     <p>У вас нет прав на просмотр списка заявок.</p>
   {% endif %}
-</div>
-
-
-
 {% endblock %}
-</div>
 
+
+{%block javascript %}
 <script>
-  // Обработка кнопки для открытия фильтров
-  const openFiltersButton = document.getElementById('openFilters');
-  const closeFiltersButton = document.getElementById('closeFilters');
-  const filtersDiv = document.getElementById('filters');
+    // Обработка кнопки для открытия фильтров
+    const openFiltersButton = document.getElementById('openFilters');
+    const closeFiltersButton = document.getElementById('closeFilters');
+    const filtersDiv = document.getElementById('filters');
 
-  openFiltersButton.addEventListener('click', () => {
-    filtersDiv.style.display = 'block';
-  });
+    openFiltersButton.addEventListener('click', () => {
+      filtersDiv.style.display = 'block';
+    });
 
-  closeFiltersButton.addEventListener('click', () => {
-    filtersDiv.style.display = 'none';
-  });
+    closeFiltersButton.addEventListener('click', () => {
+      filtersDiv.style.display = 'none';
+    });
 
-  // Обработка кнопки для сохранения фильтра
-  const saveFilterButton = document.getElementById('saveFilter');
-  const filterForm = document.getElementById('filterForm');
+    // Обработка кнопки для сохранения фильтра
+    const saveFilterButton = document.getElementById('saveFilter');
+    const filterForm = document.getElementById('filterForm');
 
-  saveFilterButton.addEventListener('click', () => {
-    // Добавляем параметр 'saveFilter' в GET-запрос
-    const formData = new URLSearchParams(new FormData(filterForm));
-    formData.append('saveFilter', 'true');
+    saveFilterButton.addEventListener('click', () => {
+      // Добавляем параметр 'saveFilter' в GET-запрос
+      const formData = new URLSearchParams(new FormData(filterForm));
+      formData.append('saveFilter', 'true');
 
-    // Отправляем GET-запрос с текущими параметрами фильтра
-    window.location.href = '?' + formData.toString();
-  });
-</script>
+      // Отправляем GET-запрос с текущими параметрами фильтра
+      window.location.href = '?' + formData.toString();
+    });
+  </script>
+{% endblock %}

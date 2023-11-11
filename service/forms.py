@@ -1,14 +1,17 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import CustomUser, Priority, SavedFilter
-from .models import Company,Request,Status,Comment,RequestType,Department,PriorityDuration,StatusTransition
+from .models import Company,Request,Status,Comment,RequestType,Department,PriorityDuration,StatusTransition,Role,Permission
 from ckeditor_uploader.fields import RichTextUploadingField
 from ckeditor.widgets import CKEditorWidget
-from .permissions import is_in_group
+from django.contrib.auth import get_user_model
+from .constraints import ACTIONS,DEPARTMENT_LEVELS,ENTITIES
+User = get_user_model()
+
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
-        fields = ('username', 'email', 'first_name', 'last_name', 'phone_number', 'address','company','role')
+        fields = ('username', 'email', 'first_name', 'last_name', 'phone_number', 'address','company','roles')
 
 class CompanyForm(forms.ModelForm):
     class Meta:
@@ -59,8 +62,8 @@ class CommentForm(forms.ModelForm):
 class RequestFilterForm(forms.Form):
     title = forms.CharField(max_length=100, required=False)
     filter_name = forms.CharField(max_length=100, required=False)
-    requester = forms.ModelMultipleChoiceField(queryset=CustomUser.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
-    assignee = forms.ModelMultipleChoiceField(queryset=CustomUser.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
+    requester = forms.ModelMultipleChoiceField(queryset=User.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
+    assignee = forms.ModelMultipleChoiceField(queryset=User.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
     company = forms.ModelMultipleChoiceField(queryset=Company.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
     status = forms.ModelMultipleChoiceField(queryset=Status.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
     created_at = forms.DateTimeField(required=False)
@@ -99,3 +102,11 @@ class StatusTransitionForm(forms.ModelForm):
     class Meta:
         model = StatusTransition
         fields = ['from_status', 'to_status', 'allowed_groups']
+class RoleForm(forms.ModelForm):
+    class Meta:
+        model = Role
+        fields = ['name', 'permissions']
+class PermissionCreationForm(forms.Form):
+    action = forms.ChoiceField(choices=[(a, a) for a in ACTIONS], label='Действие')
+    entity = forms.ChoiceField(choices=[(e, e) for e in ENTITIES], label='Сущность')
+    level = forms.ChoiceField(choices=[(l, l) for l in DEPARTMENT_LEVELS], label='Уровень доступа')

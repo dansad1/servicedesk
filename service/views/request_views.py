@@ -10,7 +10,8 @@ from  service.forms import *
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required, permission_required,user_passes_test
-from service.permissions import*
+from service.permissions import create_permission
+from service.constraints import *
 from django.contrib.auth.models import Group
 from django.utils import timezone
 from service.models import *
@@ -60,10 +61,6 @@ def handle_filters(request, initial_requests):
 def request_list(request):
     user = request.user
 
-    if is_in_group(user, "Администратор"):
-        initial_requests = Request.objects.all()
-    else:
-        initial_requests = Request.objects.filter(company=user.company)
 
     delete_filter_id = request.GET.get('delete_filter')
     if delete_filter_id:

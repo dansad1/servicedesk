@@ -5,7 +5,6 @@ from ..models import RequestType, Priority, PriorityDuration, Status, StatusTran
 
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from ..permissions import is_in_group
 from django.contrib.auth.decorators import login_required
 
 

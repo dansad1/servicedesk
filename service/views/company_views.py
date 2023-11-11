@@ -4,14 +4,13 @@ from django.urls import reverse_lazy
 from service.models import CustomUser, Company, Request, Status,Department
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required, user_passes_test
-from ..permissions import can_create_company
+from ..permissions import *
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.contrib import messages
 
 
 @login_required
-@user_passes_test(can_create_company, login_url='/not-authorized/')  # Use the can_create_company function
 def company_create(request):
     if request.method == 'POST':
         form = CompanyForm(request.POST)

@@ -10,7 +10,9 @@ from service.views.company_views import company_create,company_edit,company_deta
 from service.views.profile_views import register, home, edit_profile, profile, admin_section_view
 from service.views.user_views import user_list,create_user_view
 from service.views.settings_views import types_list,create_or_edit_request_type,create_or_edit_priority
+from service.permissions import create_permission
 from service.views.settings_views import *
+from service.permissions import *
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', auth_views.LoginView.as_view(), name='login'),
@@ -47,6 +49,8 @@ urlpatterns = [
     path('status/edit/<int:pk>/', create_or_edit_status, name='edit_status'),
     path('status_transition/', status_transition, name='status_transition'),
     path('status_transition/delete/<int:pk>/', delete_status_transition, name='delete_status_transition'),
+    path('create-permission/', service.permissions.create_permission, name='create_permission'),
+
 ]
 
 if settings.DEBUG:
