@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>{{ form.instance.pk|default:"Создание" }} роли</h2>
+<form method="post">
+    {% csrf_token %}
+    <div>
+        {{ form.name.label_tag }} {{ form.name }}
+    </div>
+    <div>
+        <label>Права:</label>
+        {% for permission in form.permissions.field.queryset %}
+            <div>
+                <label>
+                    <input type="checkbox" name="permissions" value="{{ permission.pk }}"
+                    {% if permission in form.permissions.value %} checked{% endif %}>
+                    {{ permission.name }}
+                </label>
+                <select name="access_level_{{ permission.pk }}">
+                    <option value="global">Глобально</option>
+                    <option value="company">Компания</option>
+                    <option value="department">Отдел</option>
+                    <option value="personal">Личный</option>
+                    <!-- Дополнительные уровни доступа по необходимости -->
+                </select>
+            </div>
+        {% endfor %}
+    </div>
+    <button type="submit">Сохранить</button>
+</form>
+{% endblock %}

@@ -1,41 +1,43 @@
-{% extends 'base.html' %}
+{% extends 'settings/settings_sidebar.html' %}
 
-{% block content %}
-    <h1>Status Transitions</h1>
+{% block settings_content %}
+    <div class="settings-content">
+        <h1>Переходы статусов</h1>
 
-    <form method="post" class="status-transition-form">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Add Transition</button>
-    </form>
+        <form method="post" class="status-transition-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Добавить переход</button>
+        </form>
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>From Status</th>
-                <th>To Status</th>
-                <th>Allowed Groups</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for transition in transitions %}
+        <table class="table table-bordered">
+            <thead>
                 <tr>
-                    <td>{{ transition.from_status.name }}</td>
-                    <td>{{ transition.to_status.name }}</td>
-                    <td>{{ transition.allowed_groups.all|join:", " }}</td>
-                    <td>
-                        <form method="post" action="{% url 'delete_status_transition' transition.pk %}" class="inline-form">
-                            {% csrf_token %}
-                            <input type="submit" value="Delete" class="btn btn-danger">
-                        </form>
-                    </td>
+                    <th>Из статуса</th>
+                    <th>В статус</th>
+                    <th>Разрешенные группы</th>
+                    <th>Действия</th>
                 </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="4">No transitions defined.</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for transition in transitions %}
+                    <tr>
+                        <td>{{ transition.from_status.name }}</td>
+                        <td>{{ transition.to_status.name }}</td>
+                        <td>{{ transition.allowed_groups.all|join:", " }}</td>
+                        <td>
+                            <form method="post" action="{% url 'delete_status_transition' transition.pk %}" class="inline-form">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Удалить</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4">Переходы не определены.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

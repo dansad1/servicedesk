@@ -1,119 +1,169 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Project Title</title>
-    <!-- Add your CSS and JavaScript links here -->
-    {% block extrahead %}{% endblock %}  <!-- Include this block to allow child templates to add extra head content -->
-</head>
 <style>
-   <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            padding: 20px;
-            margin: 0;
-            color: #333;
-        }
-
-        h1, h2, h3, h4, h5, h6 {
-            color: #007bff;
-            text-align: left;
-            margin-top: 20px;
-            margin-bottom: 20px;
-
-        }
-
-        a {
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-primary {
-            background-color: #007bff;
-            color: white;
-            border: none;
-        }
-
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
-
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-            border: none;
-        }
-
-        .btn-secondary:hover {
-            background-color: #545b62;
-        }
-
-        form {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            margin: 20px auto;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 8px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
-
-        table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        padding: 20px;
+        margin: 0;
+        color: #333;
     }
 
-    th, td {
-        border: 1px solid #ddd;
-        padding: 8px;
+    h1, h2, h3, h4, h5, h6 {
+        color: #007bff;
         text-align: left;
+        margin-top: 20px;
+        margin-bottom: 20px;
     }
 
-    th {
-        background-color: #f2f2f2;
+    a {
+        color: #007bff;
+        text-decoration: none;
     }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+        border: none;
+    }
+
+    .btn-secondary:hover {
+        background-color: #545b62;
+    }
+
+    /* Стили для шапки */
+   header {
+    background-color: #f4f4f4; /* Изменение цвета фона для соответствия основному стилю */
+    color: #333; /* Цвет текста */
+    padding: 10px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Добавление тени для глубины */
+}
+
+header nav {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+header nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+
+header nav ul li {
+    margin: 0 10px;
+}
+
+header nav ul li a {
+    color: #007bff; /* Синий цвет ссылок для соответствия основному стилю */
+    text-decoration: none;
+}
+
+header nav ul li a:hover {
+    text-decoration: underline;
+}
+.settings-layout {
+    display: flex;
+    flex-direction: row-reverse; /* Разместить элементы в обратном порядке */
+    justify-content: space-between;
+}
+
+.settings-content {
+    width: 80%; /* Ширина для содержимого (80% ширины экрана) */
+    padding: 20px;
+}
+
+.sidebar {
+    width: 20%; /* Ширина для боковой панели (20% ширины экрана) */
+    position: fixed;
+    right: 0; /* Разместить боковую панель справа */
+    top: 0;
+    height: 100vh;
+    background-color: #f4f4f4;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1); /* Тень слева для боковой панели */
+    padding: 20px;
+}
+
+table {
+    border-collapse: collapse; /* Убирает отступы между ячейками таблицы */
+    width: 100%; /* Ширина таблицы 100% от родительского контейнера */
+    margin-bottom: 20px; /* Отступ снизу таблицы */
+}
+
+table, th, td {
+    border: 1px solid #ddd; /* Устанавливает границу для таблицы, ячеек и заголовков */
+}
+
+th, td {
+    padding: 8px; /* Отступ внутри ячеек таблицы */
+    text-align: left; /* Выравнивание текста в ячейках таблицы */
+}
+
+/* Стиль для заголовков таблицы */
+th {
+    background-color: #f2f2f2; /* Фоновый цвет заголовков таблицы */
+    color: #333; /* Цвет текста заголовков */
+}
+tr:hover {
+    background-color: #f5f5f5; /* Фоновый цвет строки при наведении */
+}
 </style>
 <body>
-    <!-- Header Section -->
-    <header>
+   <header>
+    <!-- Общая навигация сайта -->
+    <nav>
+        <!-- Ссылки на общедоступные разделы -->
+        <ul>
+            <li><a href="{% url 'request_list' %}">Список заявок</a></li>
+            <!-- Другие общедоступные ссылки -->
+        </ul>
+    </nav>
+    {% if request.user.is_authenticated %}
         <nav>
-            <!-- Your navigation here -->
-        </nav>
-    </header>
+            <!-- Ссылки для аутентифицированных пользователей -->
+            <ul>
+                <li><a href="{% url 'profile' %}">Профиль</a></li>
+                <li><a href="{% url 'settings_sidebar' %}">Настройки</a></li>
+                <li><a href="{% url 'role_list' %}">Управление ролями</a></li>
 
-    <!-- Main Content Section -->
+                <!-- Дополнительные персональные ссылки -->
+            </ul>
+        </nav>
+    {% endif %}
+    {% if request.user.is_staff %}
+        <nav>
+            <!-- Ссылки на административный раздел -->
+            <ul>
+                <li><a href="{% url 'user_list' %}">Список пользователей</a></li>
+                <li><a href="{% url 'company_list' %}">Список компаний</a></li>
+                <!-- Дополнительные ссылки административного раздела -->
+            </ul>
+        </nav>
+    {% endif %}
+</header>
     <main>
         {% block content %}
         <!-- This block will be overridden in child templates -->

@@ -1,18 +1,18 @@
-{% extends 'base.html' %}
+{% extends 'settings/settings_sidebar.html' %}
 
-{% block content %}
-    <h1>Список приоритетов</h1>
-
-    <p><a href="{% url 'create_priority' %}" class="btn btn-primary">Создать новый приоритет</a></p>
-
-    <ul>
-        {% for priority in priorities %}
-            <li>
-                {{ priority.name }}
-                <a href="{% url 'edit_priority' priority.id %}" class="btn btn-secondary">Редактировать</a>
-            </li>
-        {% empty %}
-            <li>Нет доступных приоритетов.</li>
-        {% endfor %}
-    </ul>
+{% block settings_content %}
+    <div class="settings-content">
+        <h1>Список приоритетов</h1>
+        <p><a href="{% url 'create_priority' %}" class="btn btn-primary">Создать новый приоритет</a></p>
+        <ul>
+            {% for priority in priorities %}
+                <li>
+                    {{ priority.name }}
+                    <a href="{% url 'edit_priority' priority.id %}" class="btn btn-secondary">Редактировать</a>
+                </li>
+            {% empty %}
+                <li>Нет доступных приоритетов.</li>
+            {% endfor %}
+        </ul>
+    </div>
 {% endblock %}

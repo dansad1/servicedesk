@@ -130,3 +130,6 @@ def delete_status_transition(request, pk):
         transition_instance.delete()
         messages.success(request, "Status transition successfully deleted.")
         return redirect('status_transition')
+
+def settings_sidebar(request):
+    return render(request, 'settings/settings_sidebar.html')

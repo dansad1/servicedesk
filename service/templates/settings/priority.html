@@ -1,6 +1,6 @@
-{% extends 'base.html' %}
+{{% extends 'settings/settings_sidebar.html' %}
 
-{% block content %}
+{% block settings_content %}
     <h1>{% if priority %}Редактировать{% else %}Создать{% endif %} приоритет</h1>
 
     {% if messages %}

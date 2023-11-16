@@ -1,16 +1,34 @@
-{% extends 'base.html' %}
+{% extends 'settings/settings_sidebar.html' %}
 
-{% block content %}
-    <h1>Список продолжительностей приоритетов</h1>
-    <a href="{% url 'create_priority_duration' %}" class="btn btn-primary">Создать новую продолжительность приоритета</a>
-    <ul>
-        {% for duration in durations %}
-            <li>
-                {{ duration.priority.name }} для {{ duration.request_type.name }}: {{ duration.duration_in_hours }} часов
-                <a href="{% url 'edit_priority_duration' duration.pk %}" class="btn btn-secondary">Редактировать</a>
-            </li>
-        {% empty %}
-            <li>Продолжительности приоритетов не найдены.</li>
-        {% endfor %}
-    </ul>
+{% block settings_content %}
+    <div class="settings-content">
+        <h1>Список продолжительностей приоритетов</h1>
+        <a href="{% url 'create_priority_duration' %}" class="btn btn-primary">Создать новую продолжительность приоритета</a>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Приоритет</th>
+                    <th>Тип заявки</th>
+                    <th>Продолжительность (часы)</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for duration in durations %}
+                    <tr>
+                        <td>{{ duration.priority.name }}</td>
+                        <td>{{ duration.request_type.name }}</td>
+                        <td>{{ duration.duration_in_hours }}</td>
+                        <td>
+                            <a href="{% url 'edit_priority_duration' duration.pk %}" class="btn btn-secondary">Редактировать</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4">Продолжительности приоритетов не найдены.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

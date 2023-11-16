@@ -1,25 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Управление типами заявок</title>
-</head>
-<body>
-    <h1>Управление типами заявок</h1>
+{% extends 'settings/settings_sidebar.html' %}
 
-    <!-- Link to create a new RequestType -->
-    <p><a href="{% url 'create_request_type' %}">Создать новый тип заявок</a></p>
+{% block settings_content %}
+    <div class="settings-content">
+        <h1>Управление типами заявок</h1>
 
-    <!-- List of RequestType objects -->
-    <ul>
-        {% for request_type in request_types %}
-            <li>
-               <a href="{% url 'edit_request_type' request_type.id %}">{{ request_type.name }}</a>
-            </li>
-        {% empty %}
-            <li>Нет доступных типов заявок.</li>
-        {% endfor %}
-    </ul>
-</body>
-</html>
+        <!-- Link to create a new RequestType -->
+        <p><a href="{% url 'create_request_type' %}" class="btn btn-primary">Создать новый тип заявок</a></p>
+
+        <!-- List of RequestType objects -->
+        <ul class="list-group">
+            {% for request_type in request_types %}
+                <li class="list-group-item">
+                    <a href="{% url 'edit_request_type' request_type.id %}">{{ request_type.name }}</a>
+                </li>
+            {% empty %}
+                <li class="list-group-item">Нет доступных типов заявок.</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

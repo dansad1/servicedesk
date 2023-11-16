@@ -1,21 +1,23 @@
-{% extends 'base.html' %}
+{% extends 'settings/settings_sidebar.html' %}
 
-{% block content %}
-    <h1>{% if request_type %}Редактировать{% else %}Создать{% endif %} тип заявки</h1>
+{% block settings_content %}
+    <div class="settings-content">
+        <h1>{% if request_type %}Редактировать{% else %}Создать{% endif %} тип заявки</h1>
 
-    {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-                <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
 
-    <form method="post" class="request-type-form">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">{% if request_type %}Сохранить изменения{% else %}Создать тип{% endif %}</button>
-    </form>
+        <form method="post" class="request-type-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">{% if request_type %}Сохранить изменения{% else %}Создать тип{% endif %}</button>
+        </form>
 
-    <a href="{% url 'types_list' %}" class="btn btn-secondary">Вернуться к списку типов заявок</a>
+        <a href="{% url 'types_list' %}" class="btn btn-secondary">Вернуться к списку типов заявок</a>
+    </div>
 {% endblock %}

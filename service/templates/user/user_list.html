@@ -3,9 +3,30 @@
 {% block content %}
 <a href="{% url 'create_user' %}">Создать пользователя</a>
 <h2>Список пользователей</h2>
-  <ul>
+<table>
+  <thead>
+    <tr>
+      <th>Имя</th>
+      <th>Фамилия</th>
+      <th>Компания</th>
+      <th>Действия</th>
+    </tr>
+  </thead>
+  <tbody>
     {% for user in users %}
-      <li><a href="{% url 'edit_profile' user.id %}">{{ user.username }}</a></li>
+      <tr>
+        <td>{{ user.first_name }}</td>
+    <td>{{ user.last_name }}</td>
+    <td>
+        {% if user.profile.company %}
+            <a href="{% url 'company_edit' user.profile.company.id %}">{{ user.profile.company }}</a>
+        {% else %}
+            No Company
+        {% endif %}
+    </td>
+    <td><a href="{% url 'edit_profile' user.id %}">Редактировать</a></td>
+      </tr>
     {% endfor %}
-  </ul>
+  </tbody>
+</table>
 {% endblock %}

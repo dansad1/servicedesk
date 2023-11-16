@@ -32,7 +32,6 @@
     </ul>
   </div>
 
-   {% if admin %}
     <div class="requests-list">
       <h3>Список заявок</h3>
       <table>
@@ -56,10 +55,6 @@
               <td><a href="{% url 'request_detail_update' request_instance.pk %}">{{ request_instance.title }}</a></td>
               <td>{{ request_instance.request_type }}</td>
               <td>{{ request_instance.priority }}</td>
-              {% if admin %}
-                <td><a href="{% url 'user_profile' request_instance.assignee.id %}">{{ request_instance.assignee }}</a></td>
-                <td><a href="{% url 'user_profile' request_instance.requester.id %}">{{ request_instance.requester }}</a></td>
-              {% endif %}
               <td>{{ request_instance.status }}</td>
               <td>{% if request_instance.due_date %}{{ request_instance.due_date|date:"d.m.Y" }}{% else %}Не указано{% endif %}</td>
               <td>{% if request_instance.updated_at %}{{ request_instance.updated_at|date:"d.m.Y H:i" }}{% else %}Не указано{% endif %}</td>
@@ -68,9 +63,7 @@
         </tbody>
       </table>
     </div>
-  {% else %}
     <p>У вас нет прав на просмотр списка заявок.</p>
-  {% endif %}
 {% endblock %}
 
 

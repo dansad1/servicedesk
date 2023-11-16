@@ -1,29 +1,35 @@
-{% extends 'base.html' %}
+{% extends 'settings/settings_sidebar.html' %}
 
-{% block content %}
-<h2>Status List</h2>
-<a href="{% url 'create_status' %}">Create New Status</a>
+{% block settings_content %}
+    <div class="settings-content">
+        <h2>Список статусов</h2>
+        <a href="{% url 'create_status' %}" class="btn btn-primary">Создать новый статус</a>
 
-<table>
-  <tr>
-    <th>Name</th>
-    <th>Color</th>
-    <th>Description</th>
-    <th>Actions</th>
-  </tr>
-  {% for status in statuses %}
-  <tr>
-    <td>{{ status.name }}</td>
-    <td style="background-color:{{ status.color }};">{{ status.color }}</td>
-    <td>{{ status.description }}</td>
-    <td>
-      <a href="{% url 'edit_status' status.id %}">Edit</a>
-    </td>
-  </tr>
-  {% empty %}
-  <tr>
-    <td colspan="4">No statuses found.</td>
-  </tr>
-  {% endfor %}
-</table>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Color</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for status in statuses %}
+                <tr>
+                    <td>{{ status.name }}</td>
+                    <td style="background-color: {{ status.color }};">{{ status.color }}</td>
+                    <td>{{ status.description }}</td>
+                    <td>
+                        <a href="{% url 'edit_status' status.id %}" class="btn btn-secondary">Редактировать</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">Статусы не найдены.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

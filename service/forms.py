@@ -5,13 +5,12 @@ from .models import Company,Request,Status,Comment,RequestType,Department,Priori
 from ckeditor_uploader.fields import RichTextUploadingField
 from ckeditor.widgets import CKEditorWidget
 from django.contrib.auth import get_user_model
-from .constraints import ACTIONS,DEPARTMENT_LEVELS,ENTITIES
 User = get_user_model()
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
-        fields = ('username', 'email', 'first_name', 'last_name', 'phone_number', 'address','company','roles')
+        fields = ('username', 'email', 'first_name', 'last_name', 'phone_number', 'address','company','role')
 
 class CompanyForm(forms.ModelForm):
     class Meta:
@@ -102,11 +101,22 @@ class StatusTransitionForm(forms.ModelForm):
     class Meta:
         model = StatusTransition
         fields = ['from_status', 'to_status', 'allowed_groups']
+
+
 class RoleForm(forms.ModelForm):
     class Meta:
         model = Role
         fields = ['name', 'permissions']
-class PermissionCreationForm(forms.Form):
-    action = forms.ChoiceField(choices=[(a, a) for a in ACTIONS], label='Действие')
-    entity = forms.ChoiceField(choices=[(e, e) for e in ENTITIES], label='Сущность')
-    level = forms.ChoiceField(choices=[(l, l) for l in DEPARTMENT_LEVELS], label='Уровень доступа')
+
+    def __init__(self, *args, **kwargs):
+        super(RoleForm, self).__init__(*args, **kwargs)
+        self.fields['permissions'].queryset = Permission.objects.all()
+
+        # Динамическое добавление полей для уровней доступа
+        for permission in Permission.objects.all():
+            field_name = f'access_level_{permission.pk}'
+            self.fields[field_name] = forms.ChoiceField(
+                choices=[('global', 'Глобально'), ('company', 'Компания'), ('department', 'Отдел'), ('personal', 'Личный')],
+                label=f"Уровень доступа для {permission.name}",
+                required=False
+            )

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Список ролей</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Название</th>
+      <th>Действия</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for role in roles %}
+    <tr>
+      <td>{{ role.name }}</td>
+      <td>
+        <a href="{% url 'role_edit' role.id %}">Редактировать</a> |
+        <a href="{% url 'role_delete' role.id %}">Удалить</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<a href="{% url 'role_create' %}">Создать новую роль</a>
+{% endblock %}

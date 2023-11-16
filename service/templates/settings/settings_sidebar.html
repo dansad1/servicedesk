@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="settings-layout">
+    <div class="sidebar">
+        <h3>Настройки</h3>
+        <ul>
+            <li><a href="{% url 'types_list' %}">Типы заявок</a></li>
+            <li><a href="{% url 'priority_list' %}">Приоритеты заявок</a></li>
+            <li><a href="{% url 'priority_duration_list' %}">Продолжительности заявок</a></li>
+            <li><a href="{% url 'status_list' %}">Список статусов</a></li>
+            <li><a href="{% url 'status_transition' %}">Переходы статусов</a></li>
+        </ul>
+    </div>
+    <div class="settings-content">
+        {% block settings_content %}
+        {% endblock %}
+    </div>
+</div>
+{% endblock %}

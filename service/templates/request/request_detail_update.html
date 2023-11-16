@@ -16,7 +16,6 @@
     <h1 class="mb-4">Request Detail and Update</h1>
 
     <!-- Request Update Form -->
-    {% if can_edit %}
         <div class="form-custom">
             <form method="post" action="{% url 'request_detail_update' pk=request_instance.pk %}" enctype="multipart/form-data">
                 {% csrf_token %}
@@ -34,9 +33,8 @@
                 <button type="submit" name="submit_update" class="btn btn-primary">Update Request</button>
             </form>
         </div>
-    {% else %}
         <div class="alert alert-info">You do not have permission to edit this request.</div>
-    {% endif %}
+
 
     <!-- Attachments Section -->
     <h3 class="mb-3">Attachments</h3>
@@ -66,7 +64,6 @@
     </div>
 
     <!-- Add Comment Form -->
-    {% if can_edit %}
         <div class="form-custom">
             <h3 class="mb-3">Add a Comment</h3>
             <form method="post" action="{% url 'request_detail_update' pk=request_instance.pk %}" enctype="multipart/form-data">
@@ -75,6 +72,5 @@
                 <button type="submit" name="submit_comment" class="btn btn-success">Add Comment</button>
             </form>
         </div>
-    {% endif %}
 </div>
 {% endblock %}
