@@ -1,34 +1,34 @@
-from django.shortcuts import render, redirect
-from ..models import Role,Permission
-from ..forms import   RoleForm
-from ..permissions import *
-def role_list(request):
-    roles = Role.objects.all()
-    return render(request, 'roles/role_list.html', {'roles': roles})
+from django.core.checks import messages
+from django.shortcuts import render, redirect,get_object_or_404
+from django.contrib.auth.models import Group, Permission
+from ..forms  import GroupForm
+from ..models import GroupPermission
 
-def role_create(request):
+
+def role_create_or_edit(request, group_id=None):
+    group = get_object_or_404(Group, id=group_id) if group_id else None
     if request.method == 'POST':
-        form = RoleForm(request.POST)
+        form = GroupForm(request.POST, instance=group)
         if form.is_valid():
-            role = form.save()
-            for permission in Permission.objects.all():
-                access_level = form.cleaned_data.get(f'access_level_{permission.pk}')
-                if access_level:
-                    return redirect('role_list')
-                else:
-                    form = RoleForm()
-                return render(request, 'roles/role_create.html', {'form': form})
-def role_edit(request, pk):
-    role = Role.objects.get(pk=pk)
-    form = RoleForm(request.POST or None, instance=role)
-    if form.is_valid():
-        form.save()
-        return redirect('role_list')
-    return render(request, 'roles/role_create.html', {'form': form})
-
-def role_delete(request, pk):
-    role = Role.objects.get(pk=pk)
-    if request.method == 'POST':
-        role.delete()
-        return redirect('role_list')
-    return render(request, 'roles/role_confirm_delete.html', {'role': role})
+            saved_group = form.save()
+            # Очистите существующие связи GroupPermission
+            GroupPermission.objects.filter(group=saved_group).delete()
+            # Создание новых связей GroupPermission
+            for permission in form.cleaned_data['custompermissions']:
+                GroupPermission.objects.create(
+                    group=saved_group,
+                    permission=permission,
+                    access_level=form.cleaned_data['access_levels']
+                )
+            return redirect('role_list')
+    else:
+        form = GroupForm(instance=group)
+    return render(request, 'role/role_create_edit.html', {'form': form})
+def role_list(request):
+    groups = Group.objects.all()
+    return render(request, 'role/role_list.html', {'groups': groups})
+def role_delete(request, group_id):
+    group = get_object_or_404(Group, id=group_id)
+    group.delete()
+    messages.success(request, "Role successfully deleted.")
+    return redirect('role_list')

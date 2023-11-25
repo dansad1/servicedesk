@@ -10,8 +10,8 @@ from service.views.company_views import company_create,company_edit,company_deta
 from service.views.profile_views import register, home, edit_profile, profile, admin_section_view
 from service.views.user_views import user_list,create_user_view
 from service.views.settings_views import types_list,create_or_edit_request_type,create_or_edit_priority,settings_sidebar
-from service.views.role_views import *
 from service.views.settings_views import *
+from service.views.role_views import role_delete,role_create_or_edit,role_list
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -50,10 +50,10 @@ urlpatterns = [
     path('status_transition/', status_transition, name='status_transition'),
     path('status_transition/delete/<int:pk>/', delete_status_transition, name='delete_status_transition'),
     path('settings/', service.views.settings_views.settings_sidebar, name='settings_sidebar'),
-    path('roles/', role_list, name='role_list'),
-    path('role/create/', role_create, name='role_create'),
-    path('role/edit/<int:pk>/', role_edit, name='role_edit'),
-    path('role/delete/<int:pk>/', role_delete, name='role_delete'),
+    path('role/', service.views.role_views.role_list, name='role_list'),
+    path('role/create/', service.views.role_views.role_create_or_edit, name='role_create'),
+    path('role/<int:group_id>/edit/', service.views.role_views.role_create_or_edit, name='role_edit'),
+    path('role/<int:group_id>/delete/', service.views.role_views.role_delete, name='role_delete'),
 ]
 
 if settings.DEBUG:

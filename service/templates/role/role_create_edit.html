@@ -1,0 +1,32 @@
+<!-- role_create_edit.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>{{ role.id|default:"Создание" }} Роли</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div>
+            <label for="id_name">Название Роли:</label>
+            {{ form.name }}
+        </div>
+        <div>
+            <h3>Разрешения:</h3>
+            {% for permission in form.custompermissions.field.queryset %}
+                <div>
+                    <label>
+                        <input type="checkbox" name="permissions" value="{{ permission.id }}"
+                               {% if permission in form.permissions.value %} checked{% endif %}>
+                        {{ permission.name }}
+                    </label>
+                    <select name="access_level_{{ permission.id }}">
+                        <option value="global">Глобально</option>
+                        <option value="company">Компания</option>
+                        <option value="department">Отдел</option>
+                        <option value="personal">Личный</option>
+                    </select>
+                </div>
+            {% endfor %}
+        </div>
+        <button type="submit">Сохранить</button>
+    </form>
+{% endblock %}
