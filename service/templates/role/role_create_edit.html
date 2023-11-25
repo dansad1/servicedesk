@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>{{ group.id|default:"Создание" }} Роли</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div>
+            <label for="id_name">Название Роли:</label>
+            {{ form.name }}
+        </div>
+        <div>
+            <h3>Разрешения Действий:</h3>
+            {% for permission_field in form.action_permissions %}
+                <div>
+                    {{ permission_field.tag }}
+                    {{ permission_field.choice_label }}
+                    {% if access_levels_info[permission_field.choice_value] %}
+                        <select name="access_level_{{ permission_field.choice_value }}">
+                            {% for level, level_name in [('global', 'Глобально'), ('company', 'Компания'), ('department', 'Отдел'), ('personal', 'Личный')] %}
+                                <option value="{{ level }}"
+                                        {% if current_access_levels[permission_field.choice_value|stringformat:"s"] == level %}
+                                            selected
+                                        {% endif %}>
+                                    {{ level_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        <div>
+            <h3>Разрешения для Разделов:</h3>
+            {% for section_permission_field in form.section_permissions %}
+                <div>
+                    {{ section_permission_field.tag }}
+                    {{ section_permission_field.choice_label }}
+                </div>
+            {% endfor %}
+        </div>
+        <button type="submit">Сохранить</button>
+    </form>
+{% endblock %}

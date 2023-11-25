@@ -59,8 +59,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     address = models.CharField(max_length=255, blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True, blank=True, related_name="users")
     company = models.ForeignKey('Company', on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Компания')
-    role = models.ForeignKey('Role', on_delete=models.SET_NULL, null=True, blank=True)
     department = models.ForeignKey('Department', null=True, blank=True, on_delete=models.SET_NULL)
     objects = CustomUserManager()
 
@@ -70,24 +70,21 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
-
-class Role(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    permissions = models.ManyToManyField('Permission')
-
-    def __str__(self):
-        return self.name
-
-class Permission(models.Model):
+class CustomPermission(models.Model):
     code_name = models.CharField(max_length=100, unique=True)
     name = models.CharField(max_length=255)
+    requires_access_level = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
-class RolePermission(models.Model):
-    role = models.ForeignKey(Role, on_delete=models.CASCADE)
-    permission = models.ForeignKey(Permission, on_delete=models.CASCADE)
+
+class GroupPermission(models.Model):
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    custompermission = models.ForeignKey(CustomPermission, on_delete=models.CASCADE)
     access_level = models.CharField(max_length=50, choices=[('global', 'Global'), ('company', 'Company'), ('department', 'Department'), ('personal', 'Personal')])
+
+    def __str__(self):
+        return f"{self.group.name} - {self.custompermission.name} - {self.access_level}"
 class Status(models.Model):
     name = models.CharField(max_length=50, unique=True)
     color = models.CharField(max_length=20, blank=True, null=True)

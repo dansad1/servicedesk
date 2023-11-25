@@ -1,21 +1,23 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import CustomUser, Priority, SavedFilter
-from .models import Company,Request,Status,Comment,RequestType,Department,PriorityDuration,StatusTransition,Role,Permission
+from .models import CustomUser, Priority, SavedFilter, CustomPermission, GroupPermission
+from .models import Company,Request,Status,Comment,RequestType,Department,PriorityDuration,StatusTransition
 from ckeditor_uploader.fields import RichTextUploadingField
 from ckeditor.widgets import CKEditorWidget
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group, Permission
+
 User = get_user_model()
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
-        fields = ('username', 'email', 'first_name', 'last_name', 'phone_number', 'address','company','role')
+        fields = ('username', 'email', 'first_name', 'last_name', 'phone_number', 'address','company','group')
 
 class CompanyForm(forms.ModelForm):
     class Meta:
         model = Company
-        fields = ['name', 'address', 'description']  # Здесь перечислите поля, которые вы хотите отображать в форме
+        fields = ['name', 'address', 'description']
 class RequestForm(forms.ModelForm):
     description = forms.CharField(widget=CKEditorWidget())
     duration_in_hours = forms.IntegerField(required=False, widget=forms.HiddenInput())
@@ -103,20 +105,33 @@ class StatusTransitionForm(forms.ModelForm):
         fields = ['from_status', 'to_status', 'allowed_groups']
 
 
-class RoleForm(forms.ModelForm):
+
+class GroupForm(forms.ModelForm):
+    action_permissions = forms.ModelMultipleChoiceField(
+        queryset=CustomPermission.objects.filter(code_name__startswith='action_'),
+        widget=forms.CheckboxSelectMultiple(),
+        required=False,
+        label='Разрешения Действий'
+    )
+    section_permissions = forms.ModelMultipleChoiceField(
+        queryset=CustomPermission.objects.filter(code_name__startswith='section_'),
+        widget=forms.CheckboxSelectMultiple(),
+        required=False,
+        label='Разрешения для Разделов'
+    )
+
     class Meta:
-        model = Role
-        fields = ['name', 'permissions']
+        model = Group
+        fields = ['name']
 
     def __init__(self, *args, **kwargs):
-        super(RoleForm, self).__init__(*args, **kwargs)
-        self.fields['permissions'].queryset = Permission.objects.all()
+        super(GroupForm, self).__init__(*args, **kwargs)
 
-        # Динамическое добавление полей для уровней доступа
-        for permission in Permission.objects.all():
-            field_name = f'access_level_{permission.pk}'
-            self.fields[field_name] = forms.ChoiceField(
-                choices=[('global', 'Глобально'), ('company', 'Компания'), ('department', 'Отдел'), ('personal', 'Личный')],
-                label=f"Уровень доступа для {permission.name}",
-                required=False
-            )
+        # Динамически добавляемые поля для уровней доступа только для тех разрешений, которые их требуют
+        for permission in CustomPermission.objects.filter(code_name__startswith='action_'):
+            if permission.requires_access_level:
+                self.fields[f'access_level_{permission.id}'] = forms.ChoiceField(
+                    choices=[('global', 'Global'), ('company', 'Company'), ('department', 'Department'), ('personal', 'Personal')],
+                    required=False,
+                    label='Уровень доступа для ' + permission.name
+                )

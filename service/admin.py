@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import *
-from django.contrib.auth.models import Permission
+from .models import CustomPermission, GroupPermission
 
 def make_high_priority(modeladmin, request, queryset):
     high_priority = Priority.objects.get(name='High')
@@ -34,7 +34,6 @@ class StatusTransitionAdmin(admin.ModelAdmin):
 
 # Model Registrations
 admin.site.register(Company)
-admin.site.register(CustomUser)
 admin.site.register(Request, RequestAdmin)
 admin.site.register(Status)
 admin.site.register(RequestType)
@@ -42,6 +41,35 @@ admin.site.register(Priority)
 admin.site.register(PriorityDuration, PriorityDurationAdmin)
 admin.site.register(StatusTransition, StatusTransitionAdmin)
 
+# Кастомный админ-класс для CustomUser
+class CustomUserAdmin(admin.ModelAdmin):
+    list_display = ('username', 'email', 'first_name', 'last_name', 'group')
+    search_fields = ('username', 'email', 'first_name', 'last_name', 'group__name')
+    # Добавьте другие настройки по вашему усмотрению
 
-# Permission Registration
-admin.site.register(Permission)
+# Проверка перед регистрацией GroupPermission
+try:
+    admin.site.unregister(GroupPermission)
+except admin.sites.NotRegistered:
+    pass
+
+# Админ-классы для Permission и GroupPermission
+class CustomPermissionAdmin(admin.ModelAdmin):
+    list_display = ['name', 'code_name']
+
+class GroupPermissionAdmin(admin.ModelAdmin):
+    list_display = ['group', 'get_custom_permission_display', 'access_level']
+
+    def get_custom_permission_display(self, obj):
+        return str(obj.custompermission)
+    get_custom_permission_display.short_description = 'Custom Permission'
+# Регистрация моделей
+admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(GroupPermission, GroupPermissionAdmin)
+admin.site.register(CustomPermission, CustomPermissionAdmin)
+
+# Регистрация и настройка стандартной модели Group, если это необходимо
+try:
+    admin.site.unregister(Group)
+except admin.sites.NotRegistered:
+    pass
