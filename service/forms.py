@@ -105,6 +105,7 @@ class StatusTransitionForm(forms.ModelForm):
         fields = ['from_status', 'to_status', 'allowed_groups']
 
 
+
 class GroupForm(forms.ModelForm):
     action_permissions = forms.ModelMultipleChoiceField(
         queryset=CustomPermission.objects.filter(code_name__startswith='action_'),
@@ -125,10 +126,12 @@ class GroupForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(GroupForm, self).__init__(*args, **kwargs)
-        # Динамически добавляемые поля уровня доступа
+
+        # Динамически добавляемые поля для уровней доступа только для тех разрешений, которые их требуют
         for permission in CustomPermission.objects.filter(code_name__startswith='action_'):
-            self.fields[f'access_level_{permission.id}'] = forms.ChoiceField(
-                choices=[('global', 'Global'), ('company', 'Company'), ('department', 'Department'), ('personal', 'Personal')],
-                required=False,
-                label='Уровень доступа для ' + permission.name
-            )
+            if permission.requires_access_level:
+                self.fields[f'access_level_{permission.id}'] = forms.ChoiceField(
+                    choices=[('global', 'Global'), ('company', 'Company'), ('department', 'Department'), ('personal', 'Personal')],
+                    required=False,
+                    label='Уровень доступа для ' + permission.name
+                )

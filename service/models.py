@@ -80,16 +80,11 @@ class CustomPermission(models.Model):
 
 class GroupPermission(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
-    custom_permission = models.ForeignKey(CustomPermission, on_delete=models.CASCADE)
-    access_level = models.CharField(
-        max_length=50,
-        choices=[('global', 'Global'), ('company', 'Company'), ('department', 'Department'), ('personal', 'Personal')],
-        blank=True,  # Делаем поле необязательным
-        null=True
-    )
+    custompermission = models.ForeignKey(CustomPermission, on_delete=models.CASCADE)
+    access_level = models.CharField(max_length=50, choices=[('global', 'Global'), ('company', 'Company'), ('department', 'Department'), ('personal', 'Personal')])
 
     def __str__(self):
-        return f"{self.group.name} - {self.custom_permission.name} - {self.access_level}"
+        return f"{self.group.name} - {self.custompermission.name} - {self.access_level}"
 class Status(models.Model):
     name = models.CharField(max_length=50, unique=True)
     color = models.CharField(max_length=20, blank=True, null=True)
