@@ -4,34 +4,8 @@
     <h2>{{ group.id|default:"Создание" }} Роли</h2>
     <form method="post">
         {% csrf_token %}
-        <div>
-            <label for="id_name">Название Роли:</label>
-            {{ form.name }}
-        </div>
-        <div>
-            <h3>Разрешения Действий:</h3>
-            {% for permission_field in form.action_permissions %}
-                <div>
-                    {{ permission_field.tag }} {{ permission_field.choice_label }}
-                    <!-- Отображение выпадающего списка для разрешений действий -->
-                    <select name="access_level_{{ permission_field.choice_value }}">
-                        <option value="global">Глобально</option>
-                        <option value="company">Компания</option>
-                        <option value="department">Отдел</option>
-                        <option value="personal">Личный</option>
-                    </select>
-                </div>
-            {% endfor %}
-        </div>
-        <div>
-            <h3>Разрешения для Разделов:</h3>
-            <!-- Простой список чекбоксов для разрешений разделов -->
-            {% for section_permission_field in form.section_permissions %}
-                <div>
-                    {{ section_permission_field.tag }} {{ section_permission_field.choice_label }}
-                </div>
-            {% endfor %}
-        </div>
+        {{ form.as_p }}
+
         <button type="submit">Сохранить</button>
     </form>
 {% endblock %}

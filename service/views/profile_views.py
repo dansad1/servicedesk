@@ -32,26 +32,20 @@ def profile(request):
     is_admin = request.user.groups.filter(name='Администратор').exists()  # Исправлено имя группы
     return render(request, 'profile/profile.html', {'user_profile': user_profile, 'is_admin': is_admin})
 
+@login_required
 def edit_profile(request, pk=None):
-    if pk:
-        if request.user.groups.filter(name='Администратор').exists():
-            user = get_object_or_404(CustomUser, pk=pk)
-        else:
-            return redirect('profile')
-    else:
-        user = request.user
+    target_user = get_object_or_404(CustomUser, pk=pk) if pk else request.user
+    can_edit_profile = request.user.has_perm('service.section_edit_myself', target_user)
 
-    if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST, instance=user)
+    if request.method == 'POST' and can_edit_profile:
+        form = CustomUserEditForm(request.POST, instance=target_user)
         if form.is_valid():
             form.save()
             return redirect('profile')
     else:
-        form = CustomUserCreationForm(instance=user)
-    return render(request, 'profile/edit_profile.html', {'form': form})
-@login_required
-def admin_section_view(request):
-    if request.user.groups.filter(name='Администратор').exists():
-        return render(request, 'profile/admin_section.html')
-    else:
-        return redirect('profile')
+        form = CustomUserEditForm(instance=target_user)
+
+    return render(request, 'profile/edit_profile.html', {
+        'form': form,
+        'can_edit_profile': can_edit_profile
+    })

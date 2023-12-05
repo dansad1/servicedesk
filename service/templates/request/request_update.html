@@ -17,23 +17,22 @@
 
     <!-- Request Update Form -->
         <div class="form-custom">
-            <form method="post" action="{% url 'request_detail_update' pk=request_instance.pk %}" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="row">
-                    {% for field in form %}
-                        <div class="col-md-6 mb-3">
-                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                            {{ field }}
-                            {% if field.errors %}
-                                <div class="alert alert-danger">{{ field.errors }}</div>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                </div>
-                <button type="submit" name="submit_update" class="btn btn-primary">Update Request</button>
-            </form>
-        </div>
-        <div class="alert alert-info">You do not have permission to edit this request.</div>
+          <form method="post" {% if not is_editable %}class="read-only"{% endif %}>
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="form-group">
+        <label>{{ field.label }}</label>
+        {% if is_editable %}
+          {{ field }}
+        {% else %}
+          <p>{{ field.value }}</p>
+        {% endif %}
+      </div>
+    {% endfor %}
+    {% if is_editable %}
+      <button type="submit" name="submit_update" class="btn btn-primary">Сохранить изменения</button>
+    {% endif %}
+  </form>
 
 
     <!-- Attachments Section -->
@@ -66,7 +65,7 @@
     <!-- Add Comment Form -->
         <div class="form-custom">
             <h3 class="mb-3">Add a Comment</h3>
-            <form method="post" action="{% url 'request_detail_update' pk=request_instance.pk %}" enctype="multipart/form-data">
+            <form method="post" action="{% url 'update_request' pk=request_instance.pk %}" enctype="multipart/form-data">
                 {% csrf_token %}
                 {{ comment_form.as_p }}
                 <button type="submit" name="submit_comment" class="btn btn-success">Add Comment</button>

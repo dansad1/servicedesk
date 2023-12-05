@@ -1,7 +1,6 @@
 {% extends "base.html" %}
-
 {% block content %}
-  < <h2>Список заявок</h2>
+   <h2>Список заявок</h2>
 
   <!-- Кнопка для открытия фильтров -->
   <button id="openFilters">Открыть фильтры</button>
@@ -32,32 +31,34 @@
     </ul>
   </div>
 
-    <div class="requests-list">
-      <h3>Список заявок</h3>
-      <table>
-        <thead>
+
+  <div class="requests-list">
+    <h3>Список заявок</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Название заявки</th>
+          <th>Тип</th>
+          <th>Приоритет</th>
+            <th>Исполнитель</th>
+            <th>Заявитель</th>
+          <th>Статус</th>
+          <th>Срок выполнения</th>
+          <th>Время обновления</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in requests_with_action %}
           <tr>
-            <th>Название заявки</th>
-            <th>Тип</th>
-            <th>Приоритет</th>
-            {% if admin %}
-              <th>Исполнитель</th>
-              <th>Заявитель</th>
-            {% endif %}
-            <th>Статус</th>
-            <th>Срок выполнения</th>
-            <th>Время обновления</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for request_instance in requests %}
-            <tr>
-              <td><a href="{% url 'request_detail_update' request_instance.pk %}">{{ request_instance.title }}</a></td>
-              <td>{{ request_instance.request_type }}</td>
-              <td>{{ request_instance.priority }}</td>
-              <td>{{ request_instance.status }}</td>
-              <td>{% if request_instance.due_date %}{{ request_instance.due_date|date:"d.m.Y" }}{% else %}Не указано{% endif %}</td>
-              <td>{% if request_instance.updated_at %}{{ request_instance.updated_at|date:"d.m.Y H:i" }}{% else %}Не указано{% endif %}</td>
+            <td>
+              <!-- Ссылка на соответствующую страницу в зависимости от прав доступа -->
+              <a href="{% url 'update_request' item.request.pk %}">{{ item.request.title }}</a>
+              <td>{{ item.request.request_type }}</td>
+    <td>{{ item.request.priority }}</td>
+    <td>{{ item.request.status }}</td>
+    <td>{% if item.request.due_date %}{{ item.request.due_date|date:"d.m.Y" }}{% else %}Не указано{% endif %}</td>
+    <td>{% if item.request.updated_at %}{{ item.request.updated_at|date:"d.m.Y H:i" }}{% else %}Не указано{% endif %}</td>
+  </tr>
             </tr>
           {% endfor %}
         </tbody>
@@ -67,32 +68,27 @@
 {% endblock %}
 
 
-{%block javascript %}
 <script>
-    // Обработка кнопки для открытия фильтров
+  document.addEventListener('DOMContentLoaded', function() {
     const openFiltersButton = document.getElementById('openFilters');
     const closeFiltersButton = document.getElementById('closeFilters');
     const filtersDiv = document.getElementById('filters');
 
-    openFiltersButton.addEventListener('click', () => {
+    openFiltersButton.addEventListener('click', function() {
       filtersDiv.style.display = 'block';
     });
 
-    closeFiltersButton.addEventListener('click', () => {
+    closeFiltersButton.addEventListener('click', function() {
       filtersDiv.style.display = 'none';
     });
 
-    // Обработка кнопки для сохранения фильтра
     const saveFilterButton = document.getElementById('saveFilter');
     const filterForm = document.getElementById('filterForm');
 
-    saveFilterButton.addEventListener('click', () => {
-      // Добавляем параметр 'saveFilter' в GET-запрос
+    saveFilterButton.addEventListener('click', function() {
       const formData = new URLSearchParams(new FormData(filterForm));
       formData.append('saveFilter', 'true');
-
-      // Отправляем GET-запрос с текущими параметрами фильтра
       window.location.href = '?' + formData.toString();
     });
-  </script>
-{% endblock %}
+  });
+</script>
