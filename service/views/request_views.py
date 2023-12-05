@@ -21,7 +21,7 @@ import json
 from django.core.exceptions import ValidationError
 import json
 from django.contrib import messages
-from ..permissions import  can_view_request
+from ..permissions import can_view_request,can_edit_request
 
 
 # Функция для обработки и применения фильтров
@@ -58,20 +58,7 @@ def handle_filters(request, initial_requests):
     return filtered_requests, filter_form
 # Основная функция для отображения списка заявок
 
-def request_list(request):
 
-    filter_form = RequestFilterForm(request.GET)
-    initial_requests = Request.objects.all()  # Замените на вашу модель запросов
-
-    if filter_form.is_valid():
-        filters = filter_form.cleaned_data
-        filtered_requests = apply_filters(initial_requests, filters)
-    else:
-        filtered_requests = initial_requests
-    return render(request, 'request/request_list.html', {'requests': filtered_requests, 'filter_form': filter_form})
-
-
-# Функция для применения фильтров к QuerySet
 def apply_filters(queryset, filters):
     for field, value in filters.items():
         if value:
@@ -107,57 +94,57 @@ def request_create(request):
 
 
 @login_required
-def request_detail_update(request, pk):
+def add_comment(request, request_instance, comment_form):
+    if comment_form.is_valid():
+        new_comment = comment_form.save(commit=False)
+        new_comment.request = request_instance
+        new_comment.author = request.user
+        if 'attachment' in request.FILES:
+            new_comment.attachment = request.FILES['attachment']
+        new_comment.save()
+        messages.success(request, "Your comment has been added.")
+    else:
+        messages.error(request, "Error in comment form.")
+@login_required
+def update_request(request, pk):
     request_instance = get_object_or_404(Request, pk=pk)
-    original_status = request_instance.status  # Сохраняем первоначальный статус
+    is_editable = request.user.has_perm('service.action_edit_request', request_instance)
 
-    if not request.user.has_perm('change_request') and request.user != request_instance.requester:
-        messages.error(request, "You do not have the permission to edit this request.")
-        return redirect('request_detail', pk=pk)  # Предполагается, что у вас есть такой URL
+    if request.method == 'POST' and 'submit_update' in request.POST and is_editable:
+        form = RequestForm(request.POST, instance=request_instance)
+        if form.is_valid():
+            form.save()
+            return redirect('request_list')  # или другой URL, куда вы хотите перенаправить пользователя
+    else:
+        form = RequestForm(instance=request_instance)
 
-    comment_form = CommentForm()
-    form = RequestForm(instance=request_instance, current_status=request_instance.status)
-
-    if request.method == 'POST':
-        if 'submit_comment' in request.POST:
-            comment_form = CommentForm(request.POST, request.FILES)
-            if comment_form.is_valid():
-                new_comment = comment_form.save(commit=False)
-                new_comment.request = request_instance
-                new_comment.author = request.user
-                if 'attachment' in request.FILES:
-                    new_comment.attachment = request.FILES['attachment']
-                new_comment.save()
-                messages.success(request, "Your comment has been added.")
-                return redirect('request_detail_update', pk=pk)
-            elif 'submit_update' in request.POST:
-                form = RequestForm(request.POST, request.FILES, instance=request_instance,
-                                   current_status=original_status)
-                if form.is_valid():
-                    # Сохраняем форму без коммита для дальнейшей обработки
-                    request_instance = form.save(commit=False)
-
-                    # Check if there is an attachment in the POST request and handle it
-                    if 'attachment' in request.FILES:
-                        request_instance.attachment = request.FILES['attachment']
-
-                    # Обновляем статус заявки, если это необходимо
-                    check_and_update_request_status(request_instance, original_status)
-
-                    # Сохраняем заявку
-                    request_instance.save()
-                    form.save_m2m()  # Необходимо для сохранения данных many-to-many полей
-
-                    messages.success(request, "The request has been updated.")
-                    return redirect('request_detail_update', pk=pk)
-                else:
-                    messages.error(request, "There was an error with the form.")
-    comments = Comment.objects.filter(request=request_instance)
-    context = {
-        'request_instance': request_instance,
+    return render(request, 'request/request_update.html', {
         'form': form,
-        'can_edit': True,  # Вы уже проверили права доступа в начале
-        'comment_form': comment_form,
-        'comments': comments,
-    }
-    return render(request, 'request/request_detail_update.html', context)
+        'is_editable': is_editable,
+        'request_instance': request_instance
+    })
+@login_required
+def request_list(request):
+    filter_form = RequestFilterForm(request.GET)
+    initial_requests = Request.objects.all()
+
+    if filter_form.is_valid():
+        filters = filter_form.cleaned_data
+        filtered_requests = apply_filters(initial_requests, filters)
+    else:
+        filtered_requests = initial_requests
+
+    requests_with_action = []
+
+    for req in filtered_requests:
+        # Определение действия на основе прав доступа
+        action_url = 'view_request'  # URL страницы просмотра по умолчанию
+        if can_edit_request(request.user, req):
+            action_url = 'edit_request'  # URL страницы редактирования, если есть право на редактирование
+
+        requests_with_action.append({'request': req, 'action_url': action_url})
+
+    return render(request, 'request/request_list.html', {
+        'requests_with_action': requests_with_action,
+        'filter_form': filter_form
+    })

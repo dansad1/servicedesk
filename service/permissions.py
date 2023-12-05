@@ -1,42 +1,42 @@
-def can_view_request(user, request):
-    user_access_level = user.role.view_request_access_level
+from service.models import GroupPermission
 
-    if user_access_level == 'global':
-        return True  # Глобальный доступ
-    if user_access_level == 'company' and user.company == request.company:
-        return True  # Доступ на уровне компании
-    if user_access_level == 'department' and user.department == request.department:
-        return True  # Доступ на уровне отдела
-    if user_access_level == 'personal' and user == request.created_by:
-        return True  # Личный доступ
-    return False  # Нет доступа
 
-def can_edit_request(user, request):
-    user_access_level = user.role.edit_request_access_level
+def can_view_request(user, request_instance):
+    # Получаем все разрешения группы пользователя для просмотра
+    view_permissions = GroupPermission.objects.filter(
+        group=user.group,
+        custompermission__code_name='action_view_request'
+    )
 
-    if user_access_level == 'global':
-        return True  # Глобальный доступ на редактирование
-    if user_access_level == 'company' and user.company == request.company:
-        return True  # Доступ на уровне компании для редактирования
-    if user_access_level == 'department' and user.department == request.department:
-        return True  # Доступ на уровне отдела для редактирования
-    if user_access_level == 'personal' and user == request.created_by:
-        return True  # Личный доступ на редактирование
-    if user == request.assignee:
-        return True  # Доступ для исполнителя заявки
+    # Проверяем каждое разрешение на соответствие условиям
+    for perm in view_permissions:
+        if perm.access_level == 'global':
+            return True
+        elif perm.access_level == 'company' and user.company == request_instance.company:
+            return True
+        elif perm.access_level == 'department' and user.department == request_instance.department:
+            return True
+        elif perm.access_level == 'personal' and user == request_instance.created_by:
+            return True
 
-    return False  # Нет доступа на редактирование
+    return False
 
-def can_delete_request(user, request):
-    user_access_level = user.role.delete_request_access_level
+def can_edit_request(user, request_instance):
+    # Получаем все разрешения группы пользователя для редактирования
+    edit_permissions = GroupPermission.objects.filter(
+        group=user.group,
+        custompermission__code_name='action_edit_request'
+    )
 
-    if user_access_level == 'global':
-        return True  # Глобальный доступ на удаление заявок
-    if user_access_level == 'company' and user.company == request.company:
-        return True  # Доступ на уровне компании для удаления заявок
-    if user_access_level == 'department' and user.department == request.department:
-        return True  # Доступ на уровне отдела для удаления заявок
-    if user == request.created_by:
-        return True  # Пользователь может удалять свои заявки
+    # Проверяем каждое разрешение на соответствие условиям
+    for perm in edit_permissions:
+        if perm.access_level == 'global':
+            return True
+        elif perm.access_level == 'company' and user.company == request_instance.company:
+            return True
+        elif perm.access_level == 'department' and user.department == request_instance.department:
+            return True
+        elif perm.access_level == 'personal' and user == request_instance.created_by:
+            return True
 
-    return False  # Нет доступа на удаление заявок
+    return False

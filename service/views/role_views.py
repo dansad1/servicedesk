@@ -4,37 +4,56 @@ from django.contrib.auth.models import Group, Permission
 from ..forms  import GroupForm
 from ..models import GroupPermission, CustomPermission
 
-def role_create_or_edit(request, group_id=None):
-    group = get_object_or_404(Group, id=group_id) if group_id else None
-    form = GroupForm(request.POST or None, instance=group)
-
-    if request.method == 'POST' and form.is_valid():
-        saved_group = form.save()
-
-        # Обновляем или создаем связи GroupPermission для action_permissions
-        for permission in form.cleaned_data['action_permissions']:
-            access_level = request.POST.get(f'access_level_{permission.id}', 'personal')
-
-            group_permission, created = GroupPermission.objects.get_or_create(
-                group=saved_group,
-                custompermission=permission
-            )
-            group_permission.access_level = access_level
-            group_permission.save()
-
-        # Аналогично для section_permissions
-        for section_permission in form.cleaned_data['section_permissions']:
-            group_permission, created = GroupPermission.objects.get_or_create(
-                group=saved_group,
-                custompermission=section_permission
-            )
-            if created:
-                group_permission.access_level = None
-            group_permission.save()
-
-        return redirect('role_list')
-
+def role_create(request):
+    if request.method == 'POST':
+        form = GroupForm(request.POST)
+        if form.is_valid():
+            new_group = form.save()
+            # Сохранение уровней доступа для каждого разрешения действий
+            for permission in form.cleaned_data['action_permissions']:
+                access_level = request.POST.get(f'access_level_{permission.id}', 'personal')
+                GroupPermission.objects.create(
+                    group=new_group,
+                    custompermission=permission,
+                    access_level=access_level
+                )
+            # Сохранение разрешений для разделов
+            for section_permission in form.cleaned_data['section_permissions']:
+                GroupPermission.objects.create(
+                    group=new_group,
+                    custompermission=section_permission
+                )
+            return redirect('role_list')
+    else:
+        form = GroupForm()
     return render(request, 'role/role_create_edit.html', {'form': form})
+
+def role_edit(request, group_id):
+    group = get_object_or_404(Group, id=group_id)
+    if request.method == 'POST':
+        form = GroupForm(request.POST, instance=group)
+        if form.is_valid():
+            form.save()
+            # Удаление старых разрешений перед сохранением новых
+            GroupPermission.objects.filter(group=group).delete()
+            # Сохранение новых уровней доступа
+            for permission in form.cleaned_data['action_permissions']:
+                access_level = request.POST.get(f'access_level_{permission.id}', 'personal')
+                GroupPermission.objects.create(
+                    group=group,
+                    custompermission=permission,
+                    access_level=access_level
+                )
+            # Сохранение новых разрешений для разделов
+            for section_permission in form.cleaned_data['section_permissions']:
+                GroupPermission.objects.create(
+                    group=group,
+                    custompermission=section_permission
+                )
+            return redirect('role_list')
+    else:
+        form = GroupForm(instance=group)
+    return render(request, 'role/role_create_edit.html', {'form': form, 'group': group})
 
 def role_list(request):
     groups = Group.objects.all()

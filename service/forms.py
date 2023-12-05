@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from .models import CustomUser, Priority, SavedFilter, CustomPermission, GroupPermission
 from .models import Company,Request,Status,Comment,RequestType,Department,PriorityDuration,StatusTransition
 from ckeditor_uploader.fields import RichTextUploadingField
@@ -13,7 +13,12 @@ class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
         fields = ('username', 'email', 'first_name', 'last_name', 'phone_number', 'address','company','group')
+class CustomUserEditForm(UserChangeForm):
+    password = None
 
+    class Meta:
+        model = CustomUser
+        fields = ('username', 'email', 'first_name', 'last_name', 'phone_number', 'address', 'company', 'group')
 class CompanyForm(forms.ModelForm):
     class Meta:
         model = Company
@@ -32,34 +37,40 @@ class RequestForm(forms.ModelForm):
         super(RequestForm, self).__init__(*args, **kwargs)
 
         # Styling for fields
-        self.fields['priority'].widget.attrs.update({'class': 'form-control'})
-        self.fields['assignee'].widget.attrs.update({'class': 'form-control'})
-        self.fields['status'].widget.attrs.update({'class': 'form-control'})
-        self.fields['request_type'].widget.attrs.update({'class': 'form-control'})
+        for field_name in ['priority', 'assignee', 'status', 'request_type', 'due_date']:
+            self.fields[field_name].widget.attrs.update({'class': 'form-control'})
         self.fields['due_date'].widget.attrs.update({'class': 'form-control datetimepicker-input'})
 
-        # Make status field optional
+        # Make status field optional and set initial values
         self.fields['status'].required = False
-        self.fields['status'].empty_label = "No change"  # Label for no change option
+        self.fields['status'].empty_label = "No change"
 
-        # Set queryset and initial value for 'status' field
+        # Adjust status field based on current status
+        self.adjust_status_field(current_status)
+
+    def adjust_status_field(self, current_status):
         if current_status:
+            # Limit status choices to valid next statuses
             valid_next_statuses = StatusTransition.objects.filter(
                 from_status=current_status
             ).values_list('to_status', flat=True)
             self.fields['status'].queryset = Status.objects.filter(
-                id__in=valid_next_statuses).union(Status.objects.filter(pk=current_status.pk))
+                id__in=valid_next_statuses
+            ).union(Status.objects.filter(pk=current_status.pk))
             self.fields['status'].initial = current_status
         else:
-            # For a new request, set a default status if needed
-            default_status, created = Status.objects.get_or_create(name="Открыта")
+            # Set a default status for new requests
+            default_status, _ = Status.objects.get_or_create(name="Открыта")
             self.fields['status'].queryset = Status.objects.filter(pk=default_status.pk)
             self.fields['status'].initial = default_status
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ['text', 'attachment']  # Добавьте 'attachment' здесь, если у вас есть такое поле
-        widgets = {'text': CKEditorWidget()}
+        fields = ['text', 'attachment']  # Убедитесь, что поле 'attachment' существует в модели Comment
+        widgets = {
+            'text': CKEditorWidget()  # Использует виджет CKEditor для поля текста
+    }
+
 class RequestFilterForm(forms.Form):
     title = forms.CharField(max_length=100, required=False)
     filter_name = forms.CharField(max_length=100, required=False)
