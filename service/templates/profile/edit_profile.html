@@ -2,10 +2,21 @@
 
 {% block content %}
   <h2>Редактировать профиль</h2>
-  <form method="post">
+  <form method="post" {% if not can_edit_profile %}class="read-only"{% endif %}>
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Сохранить изменения</button>
+    {% for field in form %}
+      <div class="form-group">
+        {{ field.label_tag }}
+        {% if can_edit_profile %}
+          {{ field }}
+        {% else %}
+          <p>{{ field.value }}</p>
+        {% endif %}
+      </div>
+    {% endfor %}
+    {% if can_edit_profile %}
+      <button type="submit">Сохранить изменения</button>
+    {% endif %}
   </form>
   <a href="{% if user.is_superuser %}{% url 'user_list' %}{% else %}{% url 'profile' %}{% endif %}">Назад к профилю</a>
 {% endblock %}
