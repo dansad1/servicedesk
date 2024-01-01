@@ -1,5 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
+<link href="https://cdn.jsdelivr.net/npm/select2/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2/dist/js/select2.min.js"></script>
    <h2>Список заявок</h2>
 
   <!-- Кнопка для открытия фильтров -->
@@ -74,16 +77,21 @@
     const openFiltersButton = document.getElementById('openFilters');
     const closeFiltersButton = document.getElementById('closeFilters');
     const filtersDiv = document.getElementById('filters');
-    const modalBackdrop = document.getElementById('modalBackdrop'); // Получаем фоновую панель
+    const modalBackdrop = document.getElementById('modalBackdrop');
 
     openFiltersButton.addEventListener('click', function() {
-        modalBackdrop.style.display = 'block'; // Показываем фоновую панель
-        filtersDiv.style.display = 'block'; // Показываем модальное окно
+        modalBackdrop.style.display = 'block';
+        filtersDiv.style.display = 'block';
+        $(filtersDiv).find('.select2').select2({
+            width: '100%',
+            dropdownParent: $(filtersDiv)
+        });
     });
 
     closeFiltersButton.addEventListener('click', function() {
-        modalBackdrop.style.display = 'none'; // Скрываем фоновую панель
-        filtersDiv.style.display = 'none'; // Скрываем модальное окно
+        modalBackdrop.style.display = 'none';
+        filtersDiv.style.display = 'none';
+        $(filtersDiv).find('.select2').select2('destroy');
     });
 });
 </script>

@@ -1,5 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.forms import DateInput, SelectMultiple
+
 from .models import CustomUser, Priority, SavedFilter, CustomPermission, GroupPermission
 from .models import Company,Request,Status,Comment,RequestType,Department,PriorityDuration,StatusTransition
 from ckeditor_uploader.fields import RichTextUploadingField
@@ -71,19 +73,56 @@ class CommentForm(forms.ModelForm):
             'text': CKEditorWidget()  # Использует виджет CKEditor для поля текста
     }
 
+
 class RequestFilterForm(forms.Form):
     title = forms.CharField(max_length=100, required=False)
     filter_name = forms.CharField(max_length=100, required=False)
-    requester = forms.ModelMultipleChoiceField(queryset=User.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
-    assignee = forms.ModelMultipleChoiceField(queryset=User.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
-    company = forms.ModelMultipleChoiceField(queryset=Company.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
-    status = forms.ModelMultipleChoiceField(queryset=Status.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
-    created_at = forms.DateTimeField(required=False)
-    updated_at = forms.DateTimeField(required=False)
-    priority = forms.ModelMultipleChoiceField(queryset=Priority.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
-    request_type = forms.ModelMultipleChoiceField(queryset=RequestType.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
 
+    requester = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(),
+        widget=SelectMultiple(attrs={'class': 'select2'}),
+        required=False
+    )
 
+    assignee = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(),
+        widget=SelectMultiple(attrs={'class': 'select2'}),
+        required=False
+    )
+
+    company = forms.ModelMultipleChoiceField(
+        queryset=Company.objects.all(),
+        widget=SelectMultiple(attrs={'class': 'select2'}),
+        required=False
+    )
+
+    status = forms.ModelMultipleChoiceField(
+        queryset=Status.objects.all(),
+        widget=SelectMultiple(attrs={'class': 'select2'}),
+        required=False
+    )
+
+    created_at = forms.DateField(
+        widget=DateInput(attrs={'type': 'date'}),
+        required=False
+    )
+
+    updated_at = forms.DateField(
+        widget=DateInput(attrs={'type': 'date'}),
+        required=False
+    )
+
+    priority = forms.ModelMultipleChoiceField(
+        queryset=Priority.objects.all(),
+        widget=SelectMultiple(attrs={'class': 'select2'}),
+        required=False
+    )
+
+    request_type = forms.ModelMultipleChoiceField(
+        queryset=RequestType.objects.all(),
+        widget=SelectMultiple(attrs={'class': 'select2'}),
+        required=False
+    )
 class SavedFilterForm(forms.ModelForm):
     class Meta:
         model = SavedFilter
