@@ -52,17 +52,16 @@
       <tbody>
         {% for item in requests_with_action %}
           <tr>
-            <td>
-              <!-- Ссылка на соответствующую страницу в зависимости от прав доступа -->
-              <a href="{% url 'update_request' item.request.pk %}">{{ item.request.title }}</a>
-              <td>{{ item.request.request_type }}</td>
-    <td>{{ item.request.priority }}</td>
-    <td>{{ item.request.status }}</td>
-    <td>{% if item.request.due_date %}{{ item.request.due_date|date:"d.m.Y" }}{% else %}Не указано{% endif %}</td>
-    <td>{% if item.request.updated_at %}{{ item.request.updated_at|date:"d.m.Y H:i" }}{% else %}Не указано{% endif %}</td>
-  </tr>
-            </tr>
-          {% endfor %}
+            <td><a href="{% url 'update_request' item.request.pk %}">{{ item.request.title }}</a></td>
+            <td>{{ item.request.request_type }}</td>
+            <td>{{ item.request.priority }}</td>
+            <td>{{ item.request.assignee }}</td>
+            <td>{{ item.request.requester }}</td>
+            <td>{{ item.request.status }}</td>
+            <td>{% if item.request.due_date %}{{ item.request.due_date|date:"d.m.Y" }}{% else %}Не указано{% endif %}</td>
+            <td>{% if item.request.updated_at %}{{ item.request.updated_at|date:"d.m.Y H:i" }}{% else %}Не указано{% endif %}</td>
+          </tr>
+        {% endfor %}
         </tbody>
       </table>
     </div>
