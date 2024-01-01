@@ -5,8 +5,10 @@
   <!-- Кнопка для открытия фильтров -->
   <button id="openFilters">Открыть фильтры</button>
 
+<!-- Фоновая панель для модального окна -->
+<div id="modalBackdrop" class="modal-backdrop">
   <!-- Блок с фильтрами (изначально скрыт) -->
-  <div id="filters" style="display: none;">
+  <div id="filters" class="modal">
     <!-- Форма фильтрации -->
     <form method="get" id="filterForm">
       {{ filter_form.as_p }}
@@ -16,21 +18,21 @@
 
     <!-- Кнопка для закрытия фильтров -->
     <button id="closeFilters">Закрыть фильтры</button>
-  </div>
 
-  <!-- Список сохраненных фильтров -->
-  <div id="savedFilters">
-    <h3>Сохраненные фильтры:</h3>
-    <ul>
-      {% for saved_filter in saved_filters %}
-        <li>
-          <a href="?load_filter={{ saved_filter.id }}">{{ saved_filter.filter_name }}</a>
-          <a href="?delete_filter={{ saved_filter.id }}" class="deleteFilter">Удалить</a>
-        </li>
-      {% endfor %}
-    </ul>
+    <!-- Список сохраненных фильтров -->
+    <div id="savedFilters">
+      <h3>Сохраненные фильтры:</h3>
+      <ul>
+        {% for saved_filter in saved_filters %}
+          <li>
+            <a href="?load_filter={{ saved_filter.id }}">{{ saved_filter.filter_name }}</a>
+            <a href="?delete_filter={{ saved_filter.id }}" class="deleteFilter">Удалить</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
   </div>
-
+</div>
 
   <div class="requests-list">
     <h3>Список заявок</h3>
@@ -65,30 +67,63 @@
       </table>
     </div>
     <p>У вас нет прав на просмотр списка заявок.</p>
-{% endblock %}
+
 
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+ document.addEventListener('DOMContentLoaded', function() {
     const openFiltersButton = document.getElementById('openFilters');
     const closeFiltersButton = document.getElementById('closeFilters');
     const filtersDiv = document.getElementById('filters');
+    const modalBackdrop = document.getElementById('modalBackdrop'); // Получаем фоновую панель
 
     openFiltersButton.addEventListener('click', function() {
-      filtersDiv.style.display = 'block';
+        modalBackdrop.style.display = 'block'; // Показываем фоновую панель
+        filtersDiv.style.display = 'block'; // Показываем модальное окно
     });
 
     closeFiltersButton.addEventListener('click', function() {
-      filtersDiv.style.display = 'none';
+        modalBackdrop.style.display = 'none'; // Скрываем фоновую панель
+        filtersDiv.style.display = 'none'; // Скрываем модальное окно
     });
-
-    const saveFilterButton = document.getElementById('saveFilter');
-    const filterForm = document.getElementById('filterForm');
-
-    saveFilterButton.addEventListener('click', function() {
-      const formData = new URLSearchParams(new FormData(filterForm));
-      formData.append('saveFilter', 'true');
-      window.location.href = '?' + formData.toString();
-    });
-  });
+});
 </script>
+<style>
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  z-index: 10;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  z-index: 11;
+  display: none;
+  max-width: 90%; /* Максимальная ширина */
+  max-height: 90%; /* Максимальная высота */
+  overflow-y: auto; /* Добавление прокрутки при необходимости */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* Медиа-запросы для мобильных устройств */
+@media (max-width: 600px) {
+  .modal {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+  }
+}
+</style>
+{% endblock %}
