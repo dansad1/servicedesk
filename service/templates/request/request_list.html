@@ -3,11 +3,13 @@
 <link href="https://cdn.jsdelivr.net/npm/select2/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2/dist/js/select2.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
    <h2>Список заявок</h2>
 
   <!-- Кнопка для открытия фильтров -->
   <button id="openFilters">Открыть фильтры</button>
-
+<button id="exportPdf">Экспорт в PDF</button>
 <!-- Фоновая панель для модального окна -->
 <div id="modalBackdrop" class="modal-backdrop">
   <!-- Блок с фильтрами (изначально скрыт) -->
@@ -79,6 +81,7 @@
     const filtersDiv = document.getElementById('filters');
     const modalBackdrop = document.getElementById('modalBackdrop');
 
+    // Инициализация Select2
     openFiltersButton.addEventListener('click', function() {
         modalBackdrop.style.display = 'block';
         filtersDiv.style.display = 'block';
@@ -93,6 +96,18 @@
         filtersDiv.style.display = 'none';
         $(filtersDiv).find('.select2').select2('destroy');
     });
+
+    // Инициализация DataTables
+    $('#myTable').DataTable({
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Russian.json" // Подключение русского языка
+        }
+    });
+});
+</script>
+<script>
+document.getElementById('exportPdf').addEventListener('click', function() {
+    window.location.href = '{% url "export_pdf" %}';
 });
 </script>
 <style>
