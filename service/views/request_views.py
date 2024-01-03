@@ -1,6 +1,9 @@
 from django.core.checks import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from reportlab.pdfbase import pdfmetrics
+from reportlab.platypus import SimpleDocTemplate, TableStyle,Table
+
 from service.models import CustomUser, Company,Request,Status,RequestType
 from service.forms import  CompanyForm
 from django.contrib.auth import login
@@ -22,9 +25,13 @@ from django.core.exceptions import ValidationError
 import json
 from django.contrib import messages
 from ..permissions import can_view_request,can_edit_request
+from django.http import HttpResponse
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.pdfbase.ttfonts import TTFont
+from django.utils.formats import date_format
 
-
-# Функция для обработки и применения фильтров
 def handle_filters(request, initial_requests):
     load_filter_id = request.GET.get('load_filter')
     loaded_filters = {}
@@ -148,3 +155,54 @@ def request_list(request):
         'requests_with_action': requests_with_action,
         'filter_form': filter_form
     })
+
+
+pdfmetrics.registerFont(
+    TTFont('Arial', 'staticfiles/fonts/ArialRegular.ttf'))  # Убедитесь, что файл шрифта находится в указанной директории
+
+
+def export_requests_pdf(request):
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="requests.pdf"'
+
+    doc = SimpleDocTemplate(response, pagesize=letter)
+    elements = []
+
+    data = [
+        ["Название заявки", "Статус", "Приоритет", "Исполнитель", "Заявитель", "Срок выполнения", "Время обновления"]]
+
+    # Добавление данных из объектов Request
+    for req in Request.objects.all():
+        row = [
+            req.title,
+            req.status,
+            req.priority,
+            req.assignee.username if req.assignee else 'Не назначен',
+            req.requester.username if req.requester else 'Не указано',
+            date_format(req.due_date, "d.m.Y") if req.due_date else 'Не указано',
+            date_format(req.updated_at, "d.m.Y H:i") if req.updated_at else 'Не указано',
+        ]
+        data.append(row)
+
+    # Создание таблицы ReportLab
+    table = Table(data)
+
+    # Стиль таблицы
+    style = TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#f2f2f2")),  # Заголовок
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor("#333333")),  # Цвет текста заголовка
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),  # Выравнивание текста
+        ('FONTNAME', (0, 0), (-1, -1), 'Arial'),  # Шрифт для всей таблицы
+        ('FONTSIZE', (0, 0), (-1, -1), 10),  # Размер шрифта для всей таблицы
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),  # Отступ снизу
+        ('TOPPADDING', (0, 0), (-1, -1), 8),  # Отступ сверху
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor("#dddddd")),  # Границы
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor("#f5f5f5")]),  # Цвет фона строк
+    ])
+
+    table.setStyle(style)
+
+    elements.append(table)
+    doc.build(elements)
+
+    return response

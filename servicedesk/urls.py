@@ -5,7 +5,7 @@ from django.conf import settings  # Import the settings module
 from django.conf.urls.static import static  # Import static for serving media files
 
 import service.models
-from service.views.request_views import request_list, request_create, add_comment,update_request
+from service.views.request_views import request_list, request_create, add_comment,update_request,export_requests_pdf
 from service.views.company_views import company_create,company_edit,company_detail,company_list,create_department,create_subdepartment
 from service.views.profile_views import register, home, edit_profile, profile
 from service.views.user_views import user_list,create_user_view
@@ -54,6 +54,8 @@ urlpatterns = [
     path('role/create/', service.views.role_views.role_create, name='role_create'),
     path('role/<int:group_id>/edit/', service.views.role_views.role_edit, name='role_edit'),
     path('role/<int:group_id>/delete/', service.views.role_views.role_delete, name='role_delete'),
+    path('export_pdf/', service.views.request_views.export_requests_pdf, name='export_pdf'),
+
 ]
 
 if settings.DEBUG:
