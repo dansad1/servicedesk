@@ -20,28 +20,31 @@ class CustomUserEditForm(UserChangeForm):
 
     class Meta:
         model = CustomUser
-        fields = ('username', 'email', 'first_name', 'last_name', 'phone_number', 'address', 'company', 'group')
+        fields = ('username', 'email', 'first_name', 'last_name', 'phone_number', 'address', 'company', 'group',)
 class CompanyForm(forms.ModelForm):
     class Meta:
         model = Company
         fields = ['name', 'address', 'description']
+
 class RequestForm(forms.ModelForm):
     description = forms.CharField(widget=CKEditorWidget())
     duration_in_hours = forms.IntegerField(required=False, widget=forms.HiddenInput())
     attachment = forms.FileField(required=False)
+    request_type = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly': 'readonly'}))
 
     class Meta:
         model = Request
-        fields = ['title', 'description', 'assignee', 'status', 'request_type', 'due_date', 'priority']
+        # Исключаем 'request_type' из списка отображаемых полей
+        fields = ['title', 'description', 'assignee', 'status', 'due_date', 'priority','request_type']
 
     def __init__(self, *args, **kwargs):
         current_status = kwargs.pop('current_status', None)
         super(RequestForm, self).__init__(*args, **kwargs)
 
         # Styling for fields
-        for field_name in ['priority', 'assignee', 'status', 'request_type', 'due_date']:
+        for field_name in ['priority', 'assignee', 'status', 'due_date']:
             self.fields[field_name].widget.attrs.update({'class': 'form-control'})
-        self.fields['due_date'].widget.attrs.update({'class': 'form-control datetimepicker-input'})
+        self.fields['due_date'].widget.attrs.update({'class': 'form_control datetimepicker-input'})
 
         # Make status field optional and set initial values
         self.fields['status'].required = False
@@ -65,6 +68,7 @@ class RequestForm(forms.ModelForm):
             default_status, _ = Status.objects.get_or_create(name="Открыта")
             self.fields['status'].queryset = Status.objects.filter(pk=default_status.pk)
             self.fields['status'].initial = default_status
+
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment

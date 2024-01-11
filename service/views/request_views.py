@@ -76,30 +76,37 @@ def apply_filters(queryset, filters):
             else:
                 queryset = queryset.filter(**{field: value})
     return queryset
-
+def select_request_type(request):
+    types = RequestType.objects.all()
+    return render(request, 'request/select_request_type.html', {'types': types})
 @login_required
-def request_create(request):
+def request_create(request, type_id):
+    # Получение типа заявки или возврат ошибки 404, если таковой не найден
+    request_type = get_object_or_404(RequestType, pk=type_id)
+
     if request.method == 'POST':
-        form = RequestForm(request.POST)
+        form = RequestForm(request.POST, request.FILES)
         if form.is_valid():
             new_request = form.save(commit=False)
             new_request.requester = request.user
-            priority = form.cleaned_data.get('priority')
-            request_type = form.cleaned_data.get('request_type')
+            new_request.request_type = request_type
 
+            priority = form.cleaned_data.get('priority')
             duration_obj = PriorityDuration.objects.filter(priority=priority, request_type=request_type).first()
             if duration_obj:
-                # Calculate the due date based on the duration_in_hours
                 new_request.due_date = timezone.now() + timedelta(hours=duration_obj.duration_in_hours)
 
             new_request.save()
+            form.save_m2m()
             return redirect('request_list')
     else:
         form = RequestForm()
 
-    return render(request, 'request/request_create.html', {'form': form})
-
-
+    context = {
+        'form': form,
+        'request_type': request_type
+    }
+    return render(request, 'request/request_create.html', context)
 @login_required
 def add_comment(request, request_instance, comment_form):
     if comment_form.is_valid():

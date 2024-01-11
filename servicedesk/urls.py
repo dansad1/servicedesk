@@ -5,7 +5,7 @@ from django.conf import settings  # Import the settings module
 from django.conf.urls.static import static  # Import static for serving media files
 
 import service.models
-from service.views.request_views import request_list, request_create, add_comment,update_request,export_requests_pdf
+from service.views.request_views import request_list, request_create, add_comment,update_request,export_requests_pdf,select_request_type
 from service.views.company_views import company_create,company_edit,company_detail,company_list,create_department,create_subdepartment
 from service.views.profile_views import register, home, edit_profile, profile
 from service.views.user_views import user_list,create_user_view
@@ -22,9 +22,11 @@ urlpatterns = [
     path('profile/edit/', edit_profile, name='edit_own_profile'),
     re_path(r'^profile/edit/(?P<pk>\d+)?/$', edit_profile, name='edit_profile'),
     path('profile/requests/', request_list, name='request_list'),
-    path('requests/create/', request_create, name='request_create'),
-    path('requests/<int:pk>/update/', update_request, name='update_request'),
-    path('requests/<int:pk>/comment/', add_comment, name='add_comment'),
+    path('select_request_type/', select_request_type, name='select_request_type'),
+    path('select_request_type/', select_request_type, name='select_request_type'),
+    path('request/create/<int:type_id>/', request_create, name='request_create'),
+    path('request/update/<int:pk>/', update_request, name='update_request'),
+    path('request/<int:pk>/comment/', add_comment, name='add_comment'),
     path('profile/', profile, name='profile'),
     path('company/create/', company_create, name='create_company'),
     path('ckeditor/', include('ckeditor_uploader.urls')),
