@@ -1,52 +1,48 @@
 {% extends "base.html" %}
 {% load static %}
-
-{% block extrahead %}
+{% block content %}
   <!-- Bootstrap CSS (ensure you have Bootstrap included in your base.html) -->
-  <link rel="stylesheet" href="{% static 'path/to/bootstrap.css' %}">
-  <!-- Include CKEditor JS files and form media -->
-  <script type="text/javascript" src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
-  <script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
+<script type="text/javascript" src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
+<script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
   {{ form.media }}
   {{ comment_form.media }}
-{% endblock %}
 
-{% block content %}
 <div class="container mt-4">
-    <h1 class="mb-4">Request Detail and Update</h1>
+    <h1 class="mb-4">Обновление заявки</h1>
 
-    <!-- Request Update Form -->
-        <div class="form-custom">
-          <form method="post" {% if not is_editable %}class="read-only"{% endif %}>
-    {% csrf_token %}
-    {% for field in form %}
-      <div class="form-group">
-        <label>{{ field.label }}</label>
-        {% if is_editable %}
-          {{ field }}
-        {% else %}
-          <p>{{ field.value }}</p>
+    <form method="post" {% if not is_editable %}class="read-only"{% endif %}>
+        {% csrf_token %}
+
+        {% for field in form %}
+        {% if field.name != "duration_in_hours" and field.name != "due_date" %}
+            <div class="form-group">
+                <label>{{ field.label }}</label>
+                {% if is_editable %}
+                    {{ field }}
+                {% else %}
+                    <p>{{ field.value }}</p>
+                {% endif %}
+            </div>
         {% endif %}
-      </div>
     {% endfor %}
-    {% if is_editable %}
-      <button type="submit" name="submit_update" class="btn btn-primary">Сохранить изменения</button>
-    {% endif %}
-  </form>
 
-
-    <!-- Attachments Section -->
-    <h3 class="mb-3">Attachments</h3>
-    <div class="attachments mb-3">
-        {% if request_instance.attachment %}
-            <a href="{{ request_instance.attachment.url }}" class="btn btn-link">{{ request_instance.attachment.name }}</a>
+    <!-- Отображение даты окончания заявки в той же строке -->
+    <div class="form-group">
+        <label>Срок выполнения:</label>
+        {% if due_date %}
+            <span>{{ due_date|date:"d M Y H:i" }}</span>
         {% else %}
-            <p>No attachments available.</p>
+            <span>Не установлен</span>
         {% endif %}
     </div>
 
-    <!-- Comments Section -->
-    <h2 class="mb-3">Comments</h2>
+    {% if is_editable %}
+        <button type="submit" name="submit_update" class="btn btn-primary">Сохранить изменения</button>
+    {% endif %}
+</form>
+</div>
+    <!-- Раздел комментариев -->
+    <h2 class="mb-3">Комментарии</h2>
     <div class="comments">
         {% for comment in comments %}
             <div class="comment mb-3">
@@ -62,14 +58,17 @@
         {% endfor %}
     </div>
 
-    <!-- Add Comment Form -->
-        <div class="form-custom">
-            <h3 class="mb-3">Add a Comment</h3>
-            <form method="post" action="{% url 'update_request' pk=request_instance.pk %}" enctype="multipart/form-data">
-                {% csrf_token %}
-                {{ comment_form.as_p }}
-                <button type="submit" name="submit_comment" class="btn btn-success">Add Comment</button>
-            </form>
-        </div>
+    <!-- Форма добавления комментария -->
+    <div class="form-custom mt-4">
+        <h3 class="mb-3">Добавить комментарий</h3>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ comment_form.as_p }}
+            <button type="submit" name="submit_comment" class="btn btn-success">Добавить комментарий</button>
+        </form>
+    </div>
+
+
+<a href="{% url 'request_list' %}" class="btn btn-secondary">Вернуться к списку заявок</a>
 </div>
 {% endblock %}

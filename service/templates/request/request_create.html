@@ -1,12 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
+{% load static %}
+ <script type="text/javascript" src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
+    <script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
   <h2>Создать новую заявку</h2>
+  <div class="form-group">
+    <label for="requestType">Тип заявки</label>
+    <input type="text" id="requestType" class="form-control" value="{{ request_type.name }}" readonly>
+  </div>
+
   <form method="post">
     {% csrf_token %}
-
-    <!-- Render fields except 'completed', 'due_date', and 'status' -->
     {% for field in form.visible_fields %}
-      {% if  field.name != "due_date" and field.name != "status" %}
+      {% if field.name != "due_date" and field.name != "status" and field.name != "request_type" %}
         <div class="form-group">
           <label for="{{ field.id_for_label }}">{{ field.label }}</label>
           {{ field }}
