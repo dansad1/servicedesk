@@ -72,11 +72,11 @@ class RequestForm(forms.ModelForm):
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ['text', 'attachment']  # Убедитесь, что поле 'attachment' существует в модели Comment
+        fields = ['text', 'attachment']  # Предполагается, что поля 'text' и 'attachment' определены в модели Comment
         widgets = {
-            'text': CKEditorWidget()  # Использует виджет CKEditor для поля текста
-    }
-
+            'text': CKEditorWidget(),  # Использует виджет CKEditor для поля 'text'
+            # Для поля 'attachment' будет использоваться виджет по умолчанию, если не указано иное
+        }
 
 class RequestFilterForm(forms.Form):
     title = forms.CharField(max_length=100, required=False)
