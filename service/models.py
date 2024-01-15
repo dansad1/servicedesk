@@ -177,5 +177,16 @@ class SavedFilter(models.Model):
 
     def __str__(self):
         return self.filter_name
+class EmailSettings(models.Model):
+    server = models.CharField(max_length=255)
+    port = models.IntegerField()
+    login = models.EmailField()
+    password = models.CharField(max_length=255)
+    use_tls = models.BooleanField(default=True)
+    use_ssl = models.BooleanField(default=False)
+    email_from = models.EmailField()
+
+    def __str__(self):
+        return self.server
 
 

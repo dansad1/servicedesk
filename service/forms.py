@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.forms import DateInput, SelectMultiple
 
 from .models import CustomUser, Priority, SavedFilter, CustomPermission, GroupPermission
-from .models import Company,Request,Status,Comment,RequestType,Department,PriorityDuration,StatusTransition
+from .models import Company,Request,Status,Comment,RequestType,Department,PriorityDuration,StatusTransition,EmailSettings
 from ckeditor_uploader.fields import RichTextUploadingField
 from ckeditor.widgets import CKEditorWidget
 from django.contrib.auth import get_user_model
@@ -204,3 +204,12 @@ class GroupForm(forms.ModelForm):
                 access_level = group.grouppermission_set.filter(custompermission=permission).first()
                 if access_level:
                     self.initial[field_name] = access_level.access_level
+class EmailSettingsForm(forms.ModelForm):
+    test_email_to = forms.EmailField(required=False, help_text="Введите адрес для тестового письма")
+
+    class Meta:
+        model = EmailSettings
+        fields = '__all__'
+        widgets = {
+            'password': forms.PasswordInput(),  # Скрыть ввод пароля
+        }

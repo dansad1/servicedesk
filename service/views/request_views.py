@@ -112,20 +112,18 @@ def add_comment(request, request_pk):
     request_instance = get_object_or_404(Request, pk=request_pk)
 
     if request.method == 'POST':
-        comment_form = CommentForm(request.POST, request.FILES)
+        comment_form = CommentForm(request.POST)
         if comment_form.is_valid():
             new_comment = comment_form.save(commit=False)
             new_comment.request = request_instance
             new_comment.author = request.user
             new_comment.save()
             messages.success(request, "Комментарий добавлен.")
-            return redirect('update_request', pk=request_pk)  # Перенаправление обратно к странице заявки
+            return redirect('update_request', pk=request_pk)
         else:
-            messages.error(request, "Ошибка в форме комментария.")
-    else:
             comment_form = CommentForm()
-# Предполагается, что у вас есть шаблон для добавления комментариев
-    return render(request, 'request/add_comment.html', {
+    return render(request, 'request/add_comment.html',
+{
     'comment_form': comment_form,
     'request_instance': request_instance
 })
