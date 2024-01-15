@@ -12,7 +12,7 @@ from service.views.user_views import user_list,create_user_view
 from service.views.settings_views import types_list,create_or_edit_request_type,create_or_edit_priority,settings_sidebar
 from service.views.settings_views import *
 from service.views.role_views import role_delete,role_edit,role_create,role_list
-
+from service.views.email_notification_views import email_settings_view
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', auth_views.LoginView.as_view(), name='login'),
@@ -57,6 +57,8 @@ urlpatterns = [
     path('role/<int:group_id>/edit/', service.views.role_views.role_edit, name='role_edit'),
     path('role/<int:group_id>/delete/', service.views.role_views.role_delete, name='role_delete'),
     path('export_pdf/', service.views.request_views.export_requests_pdf, name='export_pdf'),
+    path('email-settings/',service.views.email_notification_views.email_settings_view, name='email_settings'),
+    path('send-test-email/', service.views.email_notification_views.send_test_email, name='send_test_email'),
 
 ]
 

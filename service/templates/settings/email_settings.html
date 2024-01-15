@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<main>
+    <h1>Настройки электронной почты</h1>
+    <form method="post" id="emailSettingsForm">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Сохранить настройки</button>
+    </form>
+
+    <!-- Дополнительная кнопка для отправки тестового письма -->
+    <button type="button" class="btn btn-secondary" onclick="sendTestEmail()">Отправить тестовое письмо</button>
+</main>
+
+<script>
+    function sendTestEmail() {
+        var testEmail = document.getElementsByName('test_email_to')[0].value;
+        if (!testEmail) {
+            alert('Пожалуйста, введите адрес электронной почты для теста.');
+            return;
+        }
+
+        var data = new FormData(document.getElementById('emailSettingsForm'));
+        fetch('{% url 'send_test_email' %}', {
+            method: 'POST',
+            body: data,
+            credentials: 'same-origin',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+.then(data => {
+if (data.success) {
+alert('Тестовое письмо успешно отправлено.');
+}
+ else {
+alert('Ошибка при отправке письма: ' + data.error);
+}
+})
+.catch(error => {
+alert('Произошла ошибка: ' + error);
+});
+}
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        let cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            let cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}
+
