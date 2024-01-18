@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect
+from django.views.decorators.http import require_http_methods
+
 from service.forms import CompanyForm,DepartmentForm
 from django.urls import reverse_lazy
 from service.models import CustomUser, Company, Request, Status,Department
@@ -86,3 +88,9 @@ def create_subdepartment(request, department_id):
             new_subdepartment.save()
             return redirect('company_detail', pk=parent_department.company.pk)
     return redirect('company_detail', pk=parent_department.company.pk)
+@require_http_methods(["POST"])
+def company_delete(request, pk):
+    company = get_object_or_404(Company, pk=pk)
+    company.delete()
+    messages.success(request, "Компания успешно удалена.")
+    return redirect('company_list')

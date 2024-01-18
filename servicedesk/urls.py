@@ -5,10 +5,10 @@ from django.conf import settings  # Import the settings module
 from django.conf.urls.static import static  # Import static for serving media files
 
 import service.models
-from service.views.request_views import request_list, request_create, add_comment,update_request,export_requests_pdf,select_request_type
-from service.views.company_views import company_create,company_edit,company_detail,company_list,create_department,create_subdepartment
+from service.views.request_views import request_list, request_create, add_comment,update_request,export_requests_pdf,select_request_type,delete_request
+from service.views.company_views import company_create,company_edit,company_detail,company_list,create_department,create_subdepartment,company_delete
 from service.views.profile_views import register, home, edit_profile, profile
-from service.views.user_views import user_list,create_user_view
+from service.views.user_views import user_list,create_user_view,user_delete
 from service.views.settings_views import types_list,create_or_edit_request_type,create_or_edit_priority,settings_sidebar
 from service.views.settings_views import *
 from service.views.role_views import role_delete,role_edit,role_create,role_list
@@ -21,11 +21,13 @@ urlpatterns = [
     path('', home, name='home'),
     path('profile/edit/', edit_profile, name='edit_own_profile'),
     re_path(r'^profile/edit/(?P<pk>\d+)?/$', edit_profile, name='edit_profile'),
+    path('users/<int:pk>/delete/', user_delete, name='user_delete'),
     path('profile/requests/', request_list, name='request_list'),
     path('select_request_type/', select_request_type, name='select_request_type'),
     path('select_request_type/', select_request_type, name='select_request_type'),
     path('request/create/<int:type_id>/', request_create, name='request_create'),
     path('request/update/<int:pk>/', update_request, name='update_request'),
+    path('requests/<int:pk>/delete/', delete_request, name='delete_request'),
     path('request/<int:pk>/comment/', add_comment, name='add_comment'),
     path('profile/', profile, name='profile'),
     path('company/create/', company_create, name='create_company'),
@@ -34,6 +36,7 @@ urlpatterns = [
     path('company/<int:pk>/', company_detail, name='company_detail'),
     path('company/<int:pk>/edit/', company_edit, name='company_edit'),
     path('company/', company_list, name='company_list'),
+path('company/<int:pk>/delete/', company_delete, name='company_delete'),
     path('create_user/', create_user_view, name='create_user'),
     path('company/<int:department_id>/create_subdepartment/', service.views.company_views.create_subdepartment, name='create_subdepartment'),
     path('company/<int:company_pk>/create_department/', service.views.company_views.create_department,name='create_department'),
