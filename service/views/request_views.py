@@ -171,6 +171,16 @@ def request_list(request):
         'requests_with_action': requests_with_action,
         'filter_form': filter_form
     })
+def delete_request(request, pk):
+    request_instance = get_object_or_404(Request, pk=pk)
+
+    if request.method == 'POST':
+        request_instance.delete()
+        messages.success(request, "Заявка успешно удалена.")
+        return redirect('request_list')
+
+    # Нет необходимости в отдельном шаблоне для подтверждения удаления
+    return redirect('request_list')
 
 
 pdfmetrics.registerFont(

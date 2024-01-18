@@ -1,6 +1,6 @@
 from absl.flags import ValidationError
 from django.contrib import messages
-from django.core.mail import send_mail,BadHeaderError
+from django.core.mail import send_mail, BadHeaderError, get_connection, EmailMessage
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
@@ -20,6 +20,7 @@ def email_settings_view(request):
         else:
             # В случае ошибок, форма будет отображена снова с сохраненными данными
             messages.error(request, 'Пожалуйста, исправьте ошибки в форме.')
+
     else:
         form = EmailSettingsForm()  # Пустая форма для GET запроса
 
@@ -36,22 +37,26 @@ def send_test_email(request):
         if not test_email:
             return JsonResponse({'success': False, 'error': 'Не указан адрес электронной почты для теста'})
 
-        # Отправка тестового письма
-        send_mail(
-            subject="Тестовое письмо",
-            message="Это тестовое сообщение от вашего Django-приложения.",
-            from_email=email_settings.email_from,
-            recipient_list=[test_email],
-            fail_silently=False,
-            auth_user=email_settings.login,
-            auth_password=email_settings.password,
-            use_tls=email_settings.use_tls,
-            use_ssl=email_settings.use_ssl,
+        # Создание настраиваемого подключения на основе сохраненных настроек
+        connection = get_connection(
             host=email_settings.server,
             port=email_settings.port,
+            username=email_settings.login,
+            password=email_settings.password,
+            use_tls=email_settings.use_tls,
+            use_ssl=email_settings.use_ssl,
+            fail_silently=False,
         )
+
+        # Создание и отправка электронного письма
+        email = EmailMessage(
+            subject="Тестовое письмо",
+            body="Это тестовое сообщение от вашего Django-приложения.",
+            from_email=email_settings.email_from,
+            to=[test_email],
+            connection=connection
+        )
+        email.send()
         return JsonResponse({'success': True})
-    except BadHeaderError as e:
-        return JsonResponse({'success': False, 'error': f'Неверный заголовок письма: {e}'})
-    except Exception as e:
+    except Exception as e:  # Это поймает любые исключения, включая BadHeaderError
         return JsonResponse({'success': False, 'error': f'Ошибка отправки письма: {e}'})

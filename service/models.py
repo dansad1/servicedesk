@@ -1,3 +1,4 @@
+from absl.flags import ValidationError
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from ckeditor.fields import RichTextField  # Import RichTextField
@@ -83,7 +84,7 @@ class GroupPermission(models.Model):
     access_level = models.CharField(
         max_length=50,
         choices=[('global', 'Global'), ('company', 'Company'), ('department', 'Department'), ('personal', 'Personal')],
-        blank=True,  # Делаем поле необязательным
+        blank=True,
         null=True
     )
 
@@ -177,16 +178,40 @@ class SavedFilter(models.Model):
 
     def __str__(self):
         return self.filter_name
+
+
 class EmailSettings(models.Model):
+    CONNECTION_TYPE_CHOICES = [
+        ('tls', 'TLS'),
+        ('ssl', 'SSL'),
+    ]
+
     server = models.CharField(max_length=255)
     port = models.IntegerField()
     login = models.EmailField()
     password = models.CharField(max_length=255)
-    use_tls = models.BooleanField(default=True)
-    use_ssl = models.BooleanField(default=False)
     email_from = models.EmailField()
+    connection_type = models.CharField(
+        max_length=3,
+        choices=CONNECTION_TYPE_CHOICES,
+        default='tls',
+    )
 
     def __str__(self):
         return self.server
 
+    @property
+    def use_tls(self):
+        return self.connection_type == 'tls'
+
+    @property
+    def use_ssl(self):
+        return self.connection_type == 'ssl'
+class GroupEventNotification(models.Model):
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='event_notifications')
+    event = models.CharField(max_length=255)
+    email_template = models.TextField()
+
+    def __str__(self):
+        return f"Уведомление для группы '{self.group.name}' на событие '{self.event}'"
 

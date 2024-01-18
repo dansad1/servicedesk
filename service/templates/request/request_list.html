@@ -39,7 +39,7 @@
   </div>
 </div>
 
-  <div class="requests-list">
+<div class="requests-list">
     <h3>Список заявок</h3>
     <table>
       <thead>
@@ -47,16 +47,16 @@
           <th>Название заявки</th>
           <th>Тип</th>
           <th>Приоритет</th>
-            <th>Исполнитель</th>
-            <th>Заявитель</th>
+          <th>Исполнитель</th>
+          <th>Заявитель</th>
           <th>Статус</th>
           <th>Срок выполнения</th>
           <th>Время обновления</th>
         </tr>
       </thead>
       <tbody>
-        {% for item in requests_with_action %}
-          <tr>
+    {% for item in requests_with_action %}
+        <tr>
             <td><a href="{% url 'update_request' item.request.pk %}">{{ item.request.title }}</a></td>
             <td>{{ item.request.request_type }}</td>
             <td>{{ item.request.priority }}</td>
@@ -65,14 +65,22 @@
             <td>{{ item.request.status }}</td>
             <td>{% if item.request.due_date %}{{ item.request.due_date|date:"d.m.Y" }}{% else %}Не указано{% endif %}</td>
             <td>{% if item.request.updated_at %}{{ item.request.updated_at|date:"d.m.Y H:i" }}{% else %}Не указано{% endif %}</td>
-          </tr>
-        {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    <p>У вас нет прав на просмотр списка заявок.</p>
+            <!-- Кнопка удаления теперь в своей ячейке -->
+            <td>
+                <form action="{% url 'delete_request' item.request.pk %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="delete-btn">Удалить</button>
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+</tbody>
+    </table>
+</div>
 
-
+{% if not requests_with_action %}
+  <p>У вас нет прав на просмотр списка заявок.</p>
+{% endif %}
 
 <script>
  document.addEventListener('DOMContentLoaded', function() {
@@ -109,6 +117,15 @@
 document.getElementById('exportPdf').addEventListener('click', function() {
     window.location.href = '{% url "export_pdf" %}';
 });
+</script>
+<script>
+    document.querySelectorAll('.delete-btn').forEach(function(button) {
+        button.addEventListener('click', function(event) {
+            if (!confirm('Вы уверены, что хотите удалить эту заявку?')) {
+                event.preventDefault();
+            }
+        });
+    });
 </script>
 <style>
 .modal-backdrop {
