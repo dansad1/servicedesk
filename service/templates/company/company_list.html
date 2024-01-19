@@ -1,9 +1,10 @@
-{% extends "base.html" %}
+{{% extends "base.html" %}
 
 {% block content %}
+<div class="container mt-3">
   <h2>Список компаний</h2>
-  <a href="{% url 'create_company' %}">Создать компанию</a>
-  <table>
+  <a href="{% url 'create_company' %}" class="btn btn-primary mb-3">Создать компанию</a>
+  <table class="table">
     <thead>
       <tr>
         <th>Название</th>
@@ -14,14 +15,14 @@
     <tbody>
       {% for company in companies %}
         <tr>
-          <td><a href="{% url 'company_detail' company.pk %}">{{ company.name }}</a></td>
+          <td><a href="{% url 'company_edit' company.pk %}">{{ company.name }}</a></td>
           <td>{{ company.address }}</td>
           <td>
-            <a href="{% url 'company_edit' company.pk %}">Редактировать</a>
+            <a href="{% url 'company_edit' company.pk %}" class="btn btn-secondary btn-sm">Редактировать</a>
             <form action="{% url 'company_delete' company.pk %}" method="post" style="display: inline;">
               {% csrf_token %}
               <input type="hidden" name="next" value="{{ request.path }}">
-              <button type="submit" onclick="return confirm('Вы уверены, что хотите удалить эту компанию?');">Удалить</button>
+              <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Вы уверены, что хотите удалить эту компанию?');">Удалить</button>
             </form>
           </td>
         </tr>
@@ -31,4 +32,5 @@
   {% if not companies %}
     <p>Компаний не найдено.</p>
   {% endif %}
+</div>
 {% endblock %}

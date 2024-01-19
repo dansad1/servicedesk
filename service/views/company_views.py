@@ -28,39 +28,31 @@ def company_create(request):
 @login_required
 def company_edit(request, pk):
     company = get_object_or_404(Company, pk=pk)
+    form = CompanyForm(instance=company)
+    employees = CustomUser.objects.filter(company=company)
+    requests = Request.objects.filter(requester__in=employees)
+    departments = Department.objects.filter(company=company, parent_department__isnull=True)
 
     if request.method == 'POST':
         form = CompanyForm(request.POST, instance=company)
         if form.is_valid():
             form.save()
-            return redirect('company_detail', pk=company.pk)
-    else:
-        form = CompanyForm(instance=company)
+            messages.success(request, "Информация о компании обновлена.")
+            return redirect('company_edit', pk=company.pk)  # Или перенаправление на список компаний
 
-    return render(request, 'company/company_edit.html', {'form': form})
+    context = {
+        'form': form,
+        'company': company,
+        'employees': employees,
+        'requests': requests,
+        'departments': departments,
+    }
+    return render(request, 'company/company_edit.html', context)
 @login_required
 def company_list(request):
     companies = Company.objects.all()
     return render(request, 'company/company_list.html', {'companies': companies})
 
-@login_required
-def company_detail(request, pk):
-    company = get_object_or_404(Company, pk=pk)
-    employees = CustomUser.objects.filter(company=company)
-    requests = Request.objects.filter(requester__in=employees)
-    departments = Department.objects.filter(company=company, parent_department__isnull=True)
-
-    department_form = DepartmentForm()  # Пустая форма для создания отдела
-    subdepartment_form = DepartmentForm()  # Пустая форма для создания подотдела
-
-    return render(request, 'company/company_detail.html', {
-        'company': company,
-        'employees': employees,
-        'requests': requests,
-        'departments': departments,
-        'department_form': department_form,
-        'subdepartment_form': subdepartment_form
-    })
 @login_required
 def create_department(request, company_pk):
     company = get_object_or_404(Company, pk=company_pk)
