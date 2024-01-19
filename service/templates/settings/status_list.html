@@ -22,6 +22,11 @@
                     <td>{{ status.description }}</td>
                     <td>
                         <a href="{% url 'edit_status' status.id %}" class="btn btn-secondary">Редактировать</a>
+                        <!-- Добавляем кнопку для удаления -->
+                        <form action="{% url 'delete_status' status.id %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Вы уверены, что хотите удалить этот статус?');">Удалить</button>
+                        </form>
                     </td>
                 </tr>
                 {% empty %}

@@ -9,7 +9,7 @@ from service.views.request_views import request_list, request_create, add_commen
 from service.views.company_views import company_create,company_edit,company_detail,company_list,create_department,create_subdepartment,company_delete
 from service.views.profile_views import register, home, edit_profile, profile
 from service.views.user_views import user_list,create_user_view,user_delete
-from service.views.settings_views import types_list,create_or_edit_request_type,create_or_edit_priority,settings_sidebar
+from service.views.settings_views import types_list,create_or_edit_request_type,create_or_edit_priority,settings_sidebar,delete_status
 from service.views.settings_views import *
 from service.views.role_views import role_delete,role_edit,role_create,role_list
 from service.views.email_notification_views import email_settings_view
@@ -43,14 +43,17 @@ path('company/<int:pk>/delete/', company_delete, name='company_delete'),
     path('request_type/create/', create_or_edit_request_type, name='create_request_type'),
     path('request_type/edit/<int:pk>/', create_or_edit_request_type, name='edit_request_type'),
     path('types_list/', types_list, name='types_list'),
+    path('request-type/delete/<int:pk>/', delete_request_type, name='delete_request_type'),
     path('priority/create/', create_or_edit_priority, name='create_priority'),
     path('priority/edit/<int:pk>/', create_or_edit_priority, name='edit_priority'),
+    path('priority/delete/<int:pk>/', delete_priority, name='delete_priority'),
     path('priority_list/', priority_list, name='priority_list'),
     path('priority_duration/', priority_duration_list, name='priority_duration_list'),
     path('priority_duration/create/', create_or_edit_priority_duration, name='create_priority_duration'),
     path('priority_duration/edit/<int:pk>/', create_or_edit_priority_duration, name='edit_priority_duration'),
     path('status/', status_list, name='status_list'),
     path('status/create/', create_or_edit_status, name='create_status'),
+    path('status/<int:pk>/delete/', delete_status, name='delete_status'),
     path('status/edit/<int:pk>/', create_or_edit_status, name='edit_status'),
     path('status_transition/', status_transition, name='status_transition'),
     path('status_transition/delete/<int:pk>/', delete_status_transition, name='delete_status_transition'),
