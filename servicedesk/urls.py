@@ -6,7 +6,7 @@ from django.conf.urls.static import static  # Import static for serving media fi
 
 import service.models
 from service.views.request_views import request_list, request_create, add_comment,update_request,export_requests_pdf,select_request_type,delete_request
-from service.views.company_views import company_create,company_edit,company_detail,company_list,create_department,create_subdepartment,company_delete
+from service.views.company_views import company_create,company_edit ,company_list,create_department,create_subdepartment,company_delete
 from service.views.profile_views import register, home, edit_profile, profile
 from service.views.user_views import user_list,create_user_view,user_delete
 from service.views.settings_views import types_list,create_or_edit_request_type,create_or_edit_priority,settings_sidebar,delete_status
@@ -33,10 +33,9 @@ urlpatterns = [
     path('company/create/', company_create, name='create_company'),
     path('ckeditor/', include('ckeditor_uploader.urls')),
     path('user/', user_list, name='user_list'),
-    path('company/<int:pk>/', company_detail, name='company_detail'),
     path('company/<int:pk>/edit/', company_edit, name='company_edit'),
     path('company/', company_list, name='company_list'),
-path('company/<int:pk>/delete/', company_delete, name='company_delete'),
+    path('company/<int:pk>/delete/', company_delete, name='company_delete'),
     path('create_user/', create_user_view, name='create_user'),
     path('company/<int:department_id>/create_subdepartment/', service.views.company_views.create_subdepartment, name='create_subdepartment'),
     path('company/<int:company_pk>/create_department/', service.views.company_views.create_department,name='create_department'),

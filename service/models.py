@@ -7,16 +7,40 @@ from ckeditor_uploader.fields import RichTextUploadingField
 from django.utils import timezone
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.utils.translation import gettext_lazy as _
 
-ROLES_CHOICES = (
-    ('user', 'Пользователь'),
-    ('admin', 'Администратор'),
-)
+from servicedesk import settings
+
 
 class Company(models.Model):
-    name = models.CharField(max_length=100, unique=True, verbose_name='Название компании')
-    address = models.CharField(max_length=255, verbose_name='Адрес')
-    description = models.TextField(blank=True, null=True, verbose_name='Описание')
+    # Общие данные
+    name = models.CharField(_("Название компании"), max_length=255, unique=True)
+    region = models.CharField(_("Регион"), max_length=255)
+
+    # Контактные данные
+    address = models.CharField(_("Адрес"), max_length=1024, blank=True)
+    phone = models.CharField(_("Телефон"), max_length=20, blank=True)
+    email = models.EmailField(_("Электронная почта"), blank=True)
+    website = models.URLField(_("Веб-сайт"), blank=True)
+
+    # Дополнительные данные
+    description = models.TextField(_("Описание"), blank=True)
+
+    # Новые поля
+    ceo = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='company_ceo',
+                            on_delete=models.SET_NULL, null=True, blank=True,
+                            verbose_name=_("Генеральный директор"))
+    deputy = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='company_deputy',
+                               on_delete=models.SET_NULL, null=True, blank=True,
+                               verbose_name=_("Заместитель генерального директора"))
+    contact_person = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='company_contact_person',
+                                       on_delete=models.SET_NULL, null=True, blank=True,
+                                       verbose_name=_("Контактное лицо"))
+    timezone = models.CharField(_("Часовой пояс"), max_length=50, default='UTC')
+
+    class Meta:
+        verbose_name = _("компания")
+        verbose_name_plural = _("компании")
 
     def __str__(self):
         return self.name

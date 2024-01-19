@@ -8,6 +8,7 @@ from ckeditor_uploader.fields import RichTextUploadingField
 from ckeditor.widgets import CKEditorWidget
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
+from pytz import all_timezones
 
 User = get_user_model()
 
@@ -24,7 +25,24 @@ class CustomUserEditForm(UserChangeForm):
 class CompanyForm(forms.ModelForm):
     class Meta:
         model = Company
-        fields = ['name', 'address', 'description']
+        fields = ['name', 'region', 'address', 'phone', 'email', 'website', 'description', 'ceo', 'deputy', 'contact_person', 'timezone']
+
+    REGION_CHOICES = [
+        ('spb', 'Санкт-Петербург'),
+        ('moscow', 'Москва')
+    ]
+    region = forms.ChoiceField(choices=REGION_CHOICES, label='Регион')
+
+    def __init__(self, *args, **kwargs):
+        super(CompanyForm, self).__init__(*args, **kwargs)
+        # Например, вы можете установить кастомный класс CSS для поля 'name'
+        self.fields['name'].widget.attrs.update({'class': 'form-control'})
+
+        # Или установить кастомный виджет для поля 'ceo'
+        self.fields['ceo'].widget = forms.Select(attrs={'class': 'form-control'})
+        self.fields['deputy'].widget = forms.Select(attrs={'class': 'form-control'})
+        self.fields['contact_person'].widget = forms.Select(attrs={'class': 'form-control'})
+        self.fields['timezone'].widget = forms.Select(choices=[(tz, tz) for tz in all_timezones], attrs={'class': 'form-control'})
 
 class RequestForm(forms.ModelForm):
     description = forms.CharField(widget=CKEditorWidget())
