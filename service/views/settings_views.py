@@ -1,5 +1,7 @@
 # views.py
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.http import require_POST
+
 from ..forms import RequestTypeForm, PriorityForm, PriorityDurationForm, StatusForm, StatusTransitionForm
 from ..models import RequestType, Priority, PriorityDuration, Status, StatusTransition
 
@@ -33,6 +35,13 @@ def create_or_edit_request_type(request, pk=None):
 def types_list(request):
     request_types = RequestType.objects.all()
     return render(request, 'settings/types_list.html', {'request_types': request_types})
+@login_required
+@require_POST
+def delete_request_type(request, pk):
+    request_type = get_object_or_404(RequestType, pk=pk)
+    request_type.delete()
+    messages.success(request, "Тип заявки успешно удален.")
+    return redirect('types_list')
 def create_or_edit_priority(request, pk=None):
     if pk:
         priority = get_object_or_404(Priority, pk=pk)
@@ -55,6 +64,13 @@ def create_or_edit_priority(request, pk=None):
 def priority_list(request):
     priorities = Priority.objects.all().order_by('name')
     return render(request, 'settings/priority_list.html', {'priorities': priorities})
+@login_required
+@require_POST
+def delete_priority(request, pk):
+    priority = get_object_or_404(Priority, pk=pk)
+    priority.delete()
+    messages.success(request, "Приоритет успешно удален.")
+    return redirect('priority_list')
 def priority_duration_list(request):
     durations = PriorityDuration.objects.all()
     return render(request, 'settings/priority_duration_list.html', {'durations': durations})
@@ -94,6 +110,13 @@ def create_or_edit_status(request, pk=None):
 
     context = {'form': form}
     return render(request, 'settings/status_create.html', context)
+@login_required
+@require_POST  # Убедитесь, что запрос на удаление выполняется через POST
+def delete_status(request, pk):
+    status = get_object_or_404(Status, pk=pk)
+    status.delete()
+    messages.success(request, "Статус успешно удален.")
+    return redirect('status_list')
 
 
 
