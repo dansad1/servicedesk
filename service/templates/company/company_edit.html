@@ -1,80 +1,138 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-3">
-  <h2>Редактировать профиль компании</h2>
-  <form method="post" class="mt-3">
+<style>
+  .container {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+  }
+
+  .form-group {
+    flex: 1;
+    margin-right: 10px;
+  }
+
+  .form-group:last-child {
+    margin-right: 0;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="url"],
+  select,
+  textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  textarea {
+    height: 100px;
+  }
+
+  button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  button:hover {
+    background-color: #0056b3;
+  }
+</style>
+
+<div class="container">
+  <h2 style="font-size: 1.5em;">Редактировать профиль компании</h2>
+  <form method="post">
     {% csrf_token %}
-    {% if form.non_field_errors %}
-      <div class="alert alert-danger">
-        {{ form.non_field_errors }}
+    <div class="row">
+      <div class="form-group">
+        {{ form.name.label_tag }}
+        {{ form.name }}
+        {{ form.name.errors }}
       </div>
-    {% endif %}
-    {% for field in form %}
-      <div class="mb-3">
-        {{ field.label_tag }} {{ field }}
-        {% if field.help_text %}
-          <small class="form-text text-muted">{{ field.help_text }}</small>
-        {% endif %}
-        {% for error in field.errors %}
-          <div class="alert alert-danger">{{ error }}</div>
-        {% endfor %}
+      <div class="form-group">
+        {{ form.region.label_tag }}
+        {{ form.region }}
+        {{ form.region.errors }}
       </div>
-    {% endfor %}
+    </div>
+    <div class="row">
+      <div class="form-group">
+        {{ form.address.label_tag }}
+        {{ form.address }}
+        {{ form.address.errors }}
+      </div>
+      <div class="form-group">
+        {{ form.phone.label_tag }}
+        {{ form.phone }}
+        {{ form.phone.errors }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-group">
+        {{ form.email.label_tag }}
+        {{ form.email }}
+        {{ form.email.errors }}
+      </div>
+      <div class="form-group">
+        {{ form.website.label_tag }}
+        {{ form.website }}
+        {{ form.website.errors }}
+      </div>
+    </div>
+    <div class="full-width-group">
+      {{ form.description.label_tag }}
+      {{ form.description }}
+      {{ form.description.errors }}
+    </div>
+    <div class="row">
+      <div class="form-group">
+        {{ form.ceo.label_tag }}
+        {{ form.ceo }}
+        {{ form.ceo.errors }}
+      </div>
+      <div class="form-group">
+        {{ form.deputy.label_tag }}
+        {{ form.deputy }}
+        {{ form.deputy.errors }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-group">
+        {{ form.contact_person.label_tag }}
+        {{ form.contact_person }}
+        {{ form.contact_person.errors }}
+      </div>
+      <div class="form-group">
+        {{ form.timezone.label_tag }}
+        {{ form.timezone }}
+        {{ form.timezone.errors }}
+      </div>
+    </div>
     <button type="submit" class="btn btn-primary">Сохранить изменения</button>
-    <a href="{% url 'company_list' %}" class="btn btn-secondary">Назад к списку компаний</a>
   </form>
 </div>
-  <style>
-    .container {
-      max-width: 600px; /* Ограничение ширины контейнера */
-      margin-top: 20px;
-      padding: 20px;
-      background-color: #f9f9f9; /* Цвет фона */
-      border-radius: 8px; /* Скругление углов */
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Тень */
-    }
-
-    .form-group {
-      margin-bottom: 15px;
-    }
-
-    .form-label {
-      font-weight: bold;
-      display: block; /* Убедитесь, что метка отображается на отдельной строке */
-      margin-bottom: 5px;
-    }
-
-    .form-control {
-      width: 100%; /* Полная ширина */
-      padding: 8px 12px;
-      border: 1px solid #ddd; /* Граница поля */
-      border-radius: 4px; /* Скругление углов поля */
-      box-sizing: border-box; /* Размеры включают padding и border */
-    }
-
-    .btn-primary {
-      background-color: #007bff;
-      border-color: #007bff;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    .btn-primary:hover {
-      background-color: #0056b3;
-    }
-
-    .alert-danger {
-      color: #721c24;
-      background-color: #f8d7da;
-      border-color: #f5c6cb;
-      padding: 10px;
-      border-radius: 4px;
-      margin-top: 10px;
-    }
-  </style>
-
 {% endblock %}
