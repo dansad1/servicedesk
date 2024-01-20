@@ -35,8 +35,8 @@ class CompanyForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(CompanyForm, self).__init__(*args, **kwargs)
-        # Например, вы можете установить кастомный класс CSS для поля 'name'
-        self.fields['name'].widget.attrs.update({'class': 'form-control'})
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
 
         # Или установить кастомный виджет для поля 'ceo'
         self.fields['ceo'].widget = forms.Select(attrs={'class': 'form-control'})
