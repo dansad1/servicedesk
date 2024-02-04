@@ -65,6 +65,19 @@
 
 <div class="container">
   <h2 style="font-size: 1.5em;">Редактировать профиль компании</h2>
+   <ul class="nav nav-tabs" id="companyTabs" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="edit-company-tab" data-toggle="tab" href="#edit-company" role="tab" aria-controls="edit-company" aria-selected="true">Общие</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="users-tab" data-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="false">Пользователи</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="requests-tab" data-toggle="tab" href="#requests" role="tab" aria-controls="requests" aria-selected="false">Заявки</a>
+    </li>
+  </ul>
+  <div class="tab-content" id="companyTabsContent">
+    <div class="tab-pane fade show active" id="edit-company" role="tabpanel" aria-labelledby="edit-company-tab">
   <form method="post">
     {% csrf_token %}
     <div class="row">
@@ -135,4 +148,78 @@
     <button type="submit" class="btn btn-primary">Сохранить изменения</button>
   </form>
 </div>
+    <div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">
+        <h3>Пользователи компании</h3>
+       <table class="table">
+    <thead>
+      <tr>
+        <th>Имя</th>
+        <th>Логин</th>
+        <th>Email</th>
+        <th>Телефон</th>
+        <th>Отдел</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in employees %}
+      <tr>
+        <td>{{ user.first_name }} {{ user.last_name }}</td>
+        <td>{{ user.username }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.phone_number|default:"Нет данных" }}</td>
+        <td>{{ user.department.name|default:"Нет отдела" }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5">Нет сотрудников для отображения.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+    </div>
+     <div class="tab-pane fade" id="requests" role="tabpanel" aria-labelledby="requests-tab">
+    <h3>Заявки компании</h3>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Название</th>
+        <th>Тип</th>
+        <th>Приоритет</th>
+        <th>Исполнитель</th>
+        <th>Заявитель</th>
+        <th>Статус</th>
+        <th>Срок выполнения</th>
+        <th>Последнее обновление</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for request in requests %}
+      <tr>
+        <td>{{ request.title }}</td>
+        <td>{{ request.request_type.name|default:"Тип не указан" }}</td>
+        <td>{{ request.priority.name|default:"Приоритет не указан" }}</td>
+        <td>{{ request.assignee.get_full_name|default:"Исполнитель не назначен" }}</td>
+        <td>{{ request.requester.get_full_name }}</td>
+        <td>{{ request.status.name|default:"Статус не указан" }}</td>
+        <td>{{ request.due_date|date:"d.m.Y H:i"|default:"Не указано" }}</td>
+        <td>{{ request.updated_at|date:"d.m.Y H:i" }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="8">Нет заявок для отображения.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+  // Bootstrap tab activation
+  $('#companyTabs a').on('click', function (e) {
+    e.preventDefault()
+    $(this).tab('show')
+  })
+</script>
 {% endblock %}

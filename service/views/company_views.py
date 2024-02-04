@@ -30,8 +30,8 @@ def company_edit(request, pk):
     company = get_object_or_404(Company, pk=pk)
     form = CompanyForm(instance=company)
     employees = CustomUser.objects.filter(company=company)
-    requests = Request.objects.filter(requester__in=employees)
     departments = Department.objects.filter(company=company, parent_department__isnull=True)
+    company_requests = Request.objects.filter(company=company)
 
     if request.method == 'POST':
         form = CompanyForm(request.POST, instance=company)
@@ -44,7 +44,7 @@ def company_edit(request, pk):
         'form': form,
         'company': company,
         'employees': employees,
-        'requests': requests,
+        'requests': company_requests,  # Обновите здесь
         'departments': departments,
     }
     return render(request, 'company/company_edit.html', context)
