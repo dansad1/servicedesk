@@ -28,24 +28,22 @@ def company_create(request):
 @login_required
 def company_edit(request, pk):
     company = get_object_or_404(Company, pk=pk)
-    form = CompanyForm(instance=company)
-    employees = CustomUser.objects.filter(company=company)
-    departments = Department.objects.filter(company=company, parent_department__isnull=True)
-    company_requests = Request.objects.filter(company=company)
+    form = CompanyForm(instance=company, company_id=company.pk)  # Добавлено company_id
+    employees = company.customuser_set.all()
+    company_requests = Request.objects.filter(requester__in=employees).select_related('requester', 'assignee', 'status', 'priority', 'request_type')
 
     if request.method == 'POST':
-        form = CompanyForm(request.POST, instance=company)
+        form = CompanyForm(request.POST, instance=company, company_id=company.pk)
         if form.is_valid():
             form.save()
             messages.success(request, "Информация о компании обновлена.")
-            return redirect('company_edit', pk=company.pk)  # Или перенаправление на список компаний
+            return redirect('company_edit', pk=company.pk)
 
     context = {
         'form': form,
         'company': company,
         'employees': employees,
-        'requests': company_requests,  # Обновите здесь
-        'departments': departments,
+        'requests': company_requests,
     }
     return render(request, 'company/company_edit.html', context)
 @login_required
