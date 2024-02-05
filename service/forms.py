@@ -34,15 +34,20 @@ class CompanyForm(forms.ModelForm):
     region = forms.ChoiceField(choices=REGION_CHOICES, label='Регион')
 
     def __init__(self, *args, **kwargs):
+        company_id = kwargs.pop('company_id', None)  # Извлекаем company_id из аргументов
         super(CompanyForm, self).__init__(*args, **kwargs)
+
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
 
-        # Или установить кастомный виджет для поля 'ceo'
-        self.fields['ceo'].widget = forms.Select(attrs={'class': 'form-control'})
-        self.fields['deputy'].widget = forms.Select(attrs={'class': 'form-control'})
-        self.fields['contact_person'].widget = forms.Select(attrs={'class': 'form-control'})
-        self.fields['timezone'].widget = forms.Select(choices=[(tz, tz) for tz in all_timezones], attrs={'class': 'form-control'})
+        if company_id:
+            employees_queryset = CustomUser.objects.filter(company_id=company_id)
+            self.fields['ceo'].queryset = employees_queryset
+            self.fields['deputy'].queryset = employees_queryset
+            self.fields['contact_person'].queryset = employees_queryset
+
+        self.fields['timezone'].widget = forms.Select(choices=[(tz, tz) for tz in all_timezones],
+                                                      attrs={'class': 'form-control'})
 
 class RequestForm(forms.ModelForm):
     description = forms.CharField(widget=CKEditorWidget())

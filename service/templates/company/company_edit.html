@@ -163,7 +163,7 @@
     <tbody>
       {% for user in employees %}
       <tr>
-        <td>{{ user.first_name }} {{ user.last_name }}</td>
+    <td><a href="{% url 'edit_profile' user.pk %}">{{ user.first_name }} {{ user.last_name }}</a></td>
         <td>{{ user.username }}</td>
         <td>{{ user.email }}</td>
         <td>{{ user.phone_number|default:"Нет данных" }}</td>
@@ -178,41 +178,41 @@
   </table>
     </div>
      <div class="tab-pane fade" id="requests" role="tabpanel" aria-labelledby="requests-tab">
-    <h3>Заявки компании</h3>
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Название</th>
-        <th>Тип</th>
-        <th>Приоритет</th>
-        <th>Исполнитель</th>
-        <th>Заявитель</th>
-        <th>Статус</th>
-        <th>Срок выполнения</th>
-        <th>Последнее обновление</th>
-      </tr>
-    </thead>
-    <tbody>
-    {% for request in requests %}
-      <tr>
-        <td>{{ request.title }}</td>
-        <td>{{ request.request_type.name|default:"Тип не указан" }}</td>
-        <td>{{ request.priority.name|default:"Приоритет не указан" }}</td>
-        <td>{{ request.assignee.get_full_name|default:"Исполнитель не назначен" }}</td>
-        <td>{{ request.requester.get_full_name }}</td>
-        <td>{{ request.status.name|default:"Статус не указан" }}</td>
-        <td>{{ request.due_date|date:"d.m.Y H:i"|default:"Не указано" }}</td>
-        <td>{{ request.updated_at|date:"d.m.Y H:i" }}</td>
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="8">Нет заявок для отображения.</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+   <h3>Заявки компании</h3>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Название</th>
+                    <th>Тип</th>
+                    <th>Приоритет</th>
+                    <th>Исполнитель</th>
+                    <th>Заявитель</th>
+                    <th>Статус</th>
+                    <th>Срок выполнения</th>
+                    <th>Последнее обновление</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in requests %}
+                <tr>
+    <td><a href="{% url 'update_request' request.pk %}">{{ request.title }}</a></td>
+                    <td>{{ request.request_type.name|default:"Тип не указан" }}</td>
+                    <td>{{ request.priority.name|default:"Приоритет не указан" }}</td>
+                    <td>{{ request.assignee.get_full_name|default:"Исполнитель не назначен" }}</td>
+                    <td>{{ request.requester.get_full_name }}</td>
+                    <td>{{ request.status.name|default:"Статус не указан" }}</td>
+                    <td>{{ request.due_date|date:"d.m.Y H:i"|default:"Не указано" }}</td>
+                    <td>{{ request.updated_at|date:"d.m.Y H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8">Нет заявок для отображения.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-  </div>
 </div>
 
     <script type="text/javascript">
