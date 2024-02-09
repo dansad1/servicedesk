@@ -13,6 +13,7 @@ from service.views.settings_views import types_list,create_or_edit_request_type,
 from service.views.settings_views import *
 from service.views.role_views import role_delete,role_edit,role_create,role_list
 from service.views.email_notification_views import email_settings_view
+from service.views.perform_views import *
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', auth_views.LoginView.as_view(), name='login'),
@@ -64,7 +65,10 @@ urlpatterns = [
     path('export_pdf/', service.views.request_views.export_requests_pdf, name='export_pdf'),
     path('email-settings/',service.views.email_notification_views.email_settings_view, name='email_settings'),
     path('send-test-email/', service.views.email_notification_views.send_test_email, name='send_test_email'),
-
+    path('groups/', performer_group_list, name='performer_group_list'),
+    path('groups/create/', performer_group_create, name='performer_group_create'),
+    path('groups/<int:pk>/update/', performer_group_update, name='performer_group_update'),
+    path('groups/<int:pk>/delete/', performer_group_delete, name='performer_group_delete'),
 ]
 
 if settings.DEBUG:

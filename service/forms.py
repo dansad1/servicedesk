@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.forms import DateInput, SelectMultiple
 
-from .models import CustomUser, Priority, SavedFilter, CustomPermission, GroupPermission
+from .models import CustomUser, Priority, SavedFilter, CustomPermission, GroupPermission, PerformerGroup
 from .models import Company,Request,Status,Comment,RequestType,Department,PriorityDuration,StatusTransition,EmailSettings
 from ckeditor_uploader.fields import RichTextUploadingField
 from ckeditor.widgets import CKEditorWidget
@@ -258,3 +258,7 @@ class EmailSettingsForm(forms.ModelForm):
              cleaned_data['use_tls'] = False
              cleaned_data['use_ssl'] = True
          return cleaned_data
+class PerformerGroupForm(forms.ModelForm):
+    class Meta:
+        model = PerformerGroup
+        fields = ['name', 'description', ]

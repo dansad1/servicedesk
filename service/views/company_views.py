@@ -18,7 +18,7 @@ def company_create(request):
         form = CompanyForm(request.POST)
         if form.is_valid():
             new_company = form.save()
-            return redirect('company_detail', pk=new_company.pk)
+            return redirect('company_edit', pk=new_company.pk)
     else:
         form = CompanyForm()
 
