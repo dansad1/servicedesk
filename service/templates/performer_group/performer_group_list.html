@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-3">
+    <h2>Список групп исполнителей</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Название группы</th>
+                <th>Описание</th>
+                <th>Пользователи</th>
+                <th>Компании</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for group in groups %}
+            <tr>
+                <td>{{ group.name }}</td>
+                <td>{{ group.description }}</td>
+                <td>
+                    {% for user in group.members.all %}
+                    {{ user.username }}
+                    {% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for company in group.companies.all %}
+                    {{ company.name }}
+                    {% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+                <td>
+                    <a href="{% url 'performer_group_update' group.pk %}" class="btn btn-primary">Редактировать</a>
+                    <a href="{% url 'performer_group_delete' group.pk %}" class="btn btn-danger">Удалить</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+function confirmDelete(groupId) {
+  const isConfirmed = confirm('Вы уверены, что хотите удалить эту группу?');
+  if (isConfirmed) {
+    document.getElementById('delete-form-' + groupId).submit();
+  }
+}
+</script>
+{% endblock %}

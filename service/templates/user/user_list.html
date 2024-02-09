@@ -1,9 +1,11 @@
 {% extends "base.html" %}
-
 {% block content %}
-<a href="{% url 'create_user' %}">Создать пользователя</a>
+<div class="actions">
+    <a href="{% url 'create_user' %}" class="btn btn-primary">Создать пользователя</a>
+    <a href="{% url 'performer_group_list' %}" class="btn btn-secondary">Список групп исполнителей</a>
+</div>
 <h2>Список пользователей</h2>
-<table>
+<table class="table">
   <thead>
     <tr>
       <th>Имя</th>
@@ -21,14 +23,14 @@
             {% if user.company %}
                 <a href="{% url 'company_edit' user.company.id %}">{{ user.company.name }}</a>
             {% else %}
-                No Company
+                Нет компании
             {% endif %}
         </td>
         <td>
-            <a href="{% url 'edit_profile' user.id %}">Редактировать</a>
+            <a href="{% url 'edit_profile' user.id %}" class="btn btn-sm btn-info">Редактировать</a>
             <form action="{% url 'user_delete' user.pk %}" method="post" style="display: inline;">
                 {% csrf_token %}
-                <button type="submit" onclick="return confirm('Вы уверены, что хотите удалить этого пользователя?');">Удалить</button>
+                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Вы уверены, что хотите удалить этого пользователя?');">Удалить</button>
             </form>
         </td>
       </tr>

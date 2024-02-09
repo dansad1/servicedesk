@@ -17,39 +17,4 @@
             window.location.href = `{% url 'request_create' 0 %}`.replace('/0/', `/${typeId}/`);
         }
     </script>
-<style>
-    .type-container {
-        margin: 20px 0;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-around;
-    }
-
-    .type-item {
-        margin: 10px;
-        padding: 20px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        text-align: center;
-        width: 200px;
-        transition: all 0.3s ease;
-    }
-
-    .type-item:hover {
-        background-color: #f8f8f8;
-        border-color: #007bff;
-        cursor: pointer;
-    }
-
-    .type-item a {
-        text-decoration: none;
-        color: inherit;
-    }
-
-    .type-item h3 {
-        margin: 0 0 10px;
-        color: #007bff;
-    }
-</style>
-
 {% endblock %}

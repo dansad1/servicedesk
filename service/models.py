@@ -238,4 +238,13 @@ class GroupEventNotification(models.Model):
 
     def __str__(self):
         return f"Уведомление для группы '{self.group.name}' на событие '{self.event}'"
+class PerformerGroup(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    members = models.ManyToManyField(CustomUser, related_name='performer_groups')
+    companies = models.ManyToManyField(Company, related_name='service_groups')
+
+    def __str__(self):
+        return self.name
+
 

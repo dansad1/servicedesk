@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-3">
+    <h2>Создать новую группу исполнителей</h2>
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <h3>Выберите пользователей</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Выбор</th>
+                    <th>Имя пользователя</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in custom_users %}
+                <tr>
+                    <td><input type="checkbox" name="members" value="{{ user.id }}" {% if user.id in form.members.value|default_if_none:'' %} checked {% endif %}></td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h3>Выберите компании</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Выбор</th>
+                    <th>Название компании</th>
+                    <th>Адрес</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for company in companies %}
+                <tr>
+                    <td><input type="checkbox" name="companies" value="{{ company.id }}" {% if company.id in form.companies.value|default_if_none:'' %} checked {% endif %}></td>
+                    <td>{{ company.name }}</td>
+                    <td>{{ company.address }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn btn-primary">Создать группу</button>
+        <a href="{% url 'performer_group_list' %}" class="btn btn-secondary">Назад к списку</a>
+    </form>
+</div>
+{% endblock %}
