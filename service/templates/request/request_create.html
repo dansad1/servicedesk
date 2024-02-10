@@ -1,26 +1,37 @@
 {% extends "base.html" %}
 {% block content %}
 {% load static %}
- <script type="text/javascript" src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
-    <script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
-  <h2>Создать новую заявку</h2>
+<script type="text/javascript" src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
+<script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
+<h2>Создать новую заявку</h2>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
   <div class="form-group">
     <label for="requestType">Тип заявки</label>
     <input type="text" id="requestType" class="form-control" value="{{ request_type.name }}" readonly>
   </div>
 
-  <form method="post">
-    {% csrf_token %}
-    {% for field in form.visible_fields %}
-      {% if field.name != "due_date" and field.name != "status" and field.name != "request_type" %}
-        <div class="form-group">
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {{ field }}
-        </div>
-      {% endif %}
-    {% endfor %}
+  {% for field in form.visible_fields %}
+    {% if field.name != "due_date" and field.name != "status" and field.name != "request_type" %}
+    <div class="form-group">
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {{ field }}
+    </div>
+    {% endif %}
+  {% endfor %}
 
-    <button type="submit" class="btn btn-primary">Создать</button>
-  </form>
-  <a href="{% url 'request_list' %}" class="btn btn-secondary">Вернуться к списку заявок</a>
+  <button type="submit" name="action" value="save" class="btn btn-primary">Сохранить</button>
+  <button type="submit" name="action" value="save_and_close" class="btn btn-secondary">Сохранить и закрыть</button>
+</form>
+
+{% if comment_form %}
+<h3>Добавить комментарий к заявке</h3>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ comment_form.as_p }}
+    <button type="submit" class="btn btn-success">Добавить комментарий</button>
+</form>
+{% endif %}
+
+<a href="{% url 'request_list' %}" class="btn btn-secondary">Вернуться к списку заявок</a>
 {% endblock %}
