@@ -25,7 +25,7 @@ from django.core.exceptions import ValidationError
 import json
 from django.contrib import messages
 from ..permissions import can_view_request,can_edit_request
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
@@ -79,13 +79,14 @@ def apply_filters(queryset, filters):
 def select_request_type(request):
     types = RequestType.objects.all()
     return render(request, 'request/select_request_type.html', {'types': types})
+
 @login_required
 def request_create(request, type_id):
-    # Получение типа заявки или возврат ошибки 404, если таковой не найден
     request_type = get_object_or_404(RequestType, pk=type_id)
+    form = RequestForm(request.POST or None, request.FILES or None)
+    comment_form = CommentForm(request.POST or None, request.FILES or None)
 
     if request.method == 'POST':
-        form = RequestForm(request.POST, request.FILES)
         if form.is_valid():
             new_request = form.save(commit=False)
             new_request.requester = request.user
@@ -98,35 +99,51 @@ def request_create(request, type_id):
 
             new_request.save()
             form.save_m2m()
-            return redirect('request_list')
-    else:
-        form = RequestForm()
+
+            if comment_form.is_valid():
+                new_comment = comment_form.save(commit=False)
+                new_comment.request = new_request
+                new_comment.author = request.user
+                new_comment.save()
+
+            # Определяем, какая кнопка была нажата
+            if 'save_and_close' in request.POST:
+                messages.success(request, "Заявка успешно создана.")
+                return redirect('request_list')
+            else:
+                messages.success(request, "Заявка создана. Вы можете продолжить редактирование.")
+                return redirect('request_edit', pk=new_request.pk)
 
     context = {
         'form': form,
+        'comment_form': comment_form,
         'request_type': request_type
     }
     return render(request, 'request/request_create.html', context)
 @login_required
-def add_comment(request, request_pk):
-    request_instance = get_object_or_404(Request, pk=request_pk)
-
+def add_comment(request, pk):
+    request_instance = get_object_or_404(Request, pk=pk)
     if request.method == 'POST':
-        comment_form = CommentForm(request.POST)
+        comment_form = CommentForm(request.POST, request.FILES)
         if comment_form.is_valid():
             new_comment = comment_form.save(commit=False)
             new_comment.request = request_instance
             new_comment.author = request.user
             new_comment.save()
-            messages.success(request, "Комментарий добавлен.")
-            return redirect('update_request', pk=request_pk)
-        else:
-            comment_form = CommentForm()
-    return render(request, 'request/add_comment.html',
-{
-    'comment_form': comment_form,
-    'request_instance': request_instance
-})
+            messages.success(request, "Комментарий успешно добавлен.")
+            return HttpResponseRedirect(request.path_info)  # Остаться на текущей странице
+    else:
+        comment_form = CommentForm()
+
+    # Возвращаем форму создания заявки для отображения вместе с формой комментариев
+    form = RequestForm()
+    context = {
+        'form': form,
+        'comment_form': comment_form,
+        'request_instance': request_instance,
+        'request_type': request_instance.request_type  # Или другой контекст, необходимый для шаблона
+    }
+    return render(request, 'request/request_create.html', context)
 @login_required
 def update_request(request, pk):
     request_instance = get_object_or_404(Request, pk=pk)

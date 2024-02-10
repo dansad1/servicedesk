@@ -69,6 +69,7 @@ urlpatterns = [
     path('groups/create/', performer_group_create, name='performer_group_create'),
     path('groups/<int:pk>/update/', performer_group_update, name='performer_group_update'),
     path('groups/<int:pk>/delete/', performer_group_delete, name='performer_group_delete'),
+
 ]
 
 if settings.DEBUG:
