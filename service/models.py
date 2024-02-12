@@ -247,4 +247,40 @@ class PerformerGroup(models.Model):
     def __str__(self):
         return self.name
 
+class AssetType(models.Model):
+    name = models.CharField(max_length=255)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
+
+class Attribute(models.Model):
+    TEXT = 'text'
+    NUMBER = 'number'
+    DATE = 'date'
+    ASSET_REFERENCE = 'asset_ref'
+    ATTRIBUTE_REFERENCE = 'attr_ref'
+
+    ATTRIBUTE_TYPES = [
+        (TEXT, 'Text'),
+        (NUMBER, 'Number'),
+        (DATE, 'Date'),
+        (ASSET_REFERENCE, 'Asset Reference'),
+        (ATTRIBUTE_REFERENCE, 'Attribute Reference'),
+    ]
+
+    name = models.CharField(max_length=255)
+    attribute_type = models.CharField(max_length=50, choices=ATTRIBUTE_TYPES)
+    asset_types = models.ManyToManyField(AssetType, related_name='attributes')
+
+class Asset(models.Model):
+    asset_type = models.ForeignKey(AssetType, on_delete=models.CASCADE)
+    parent_asset = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='components')
+
+class AssetAttribute(models.Model):
+    asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name='attributes')
+    attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE)
+    value_text = models.TextField(null=True, blank=True)
+    value_number = models.FloatField(null=True, blank=True)
+    value_date = models.DateField(null=True, blank=True)
+    value_asset_reference = models.ForeignKey(Asset, null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
+    value_attribute_reference = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
+
 

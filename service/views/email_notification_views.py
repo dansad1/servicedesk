@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_http_methods
 
 from servicedesk import settings
-from ..forms  import EmailSettingsForm
+from service.forms.Emai_forms import *
 from ..models import EmailSettings
 
 def email_settings_view(request):
