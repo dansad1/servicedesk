@@ -1,4 +1,4 @@
-from service.forms import PerformerGroupForm
+from service.forms.Performer_forms import *
 from service.models import PerformerGroup, Company, CustomUser
 from django.shortcuts import render, redirect, get_object_or_404
 

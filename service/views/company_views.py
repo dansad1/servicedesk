@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
-
-from service.forms import CompanyForm,DepartmentForm
+from service.forms.Company_forms import CompanyForm,DepartmentForm
 from django.urls import reverse_lazy
 from service.models import CustomUser, Company, Request, Status,Department
 from django.contrib.auth.models import Group

@@ -2,7 +2,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 
-from ..forms import RequestTypeForm, PriorityForm, PriorityDurationForm, StatusForm, StatusTransitionForm
+from service.forms.Settings_forms import RequestTypeForm, PriorityForm, PriorityDurationForm, StatusForm, StatusTransitionForm
 from ..models import RequestType, Priority, PriorityDuration, Status, StatusTransition
 
 from django.shortcuts import render, redirect

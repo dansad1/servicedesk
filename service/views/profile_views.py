@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from service.models import CustomUser, Company,Request,Status
-from service.forms import  CompanyForm
+from service.forms.Company_forms import  CompanyForm
 from django.contrib.auth import login
-from service.forms import CustomUserCreationForm
+from service.forms.User_forms import CustomUserCreationForm
 from django.urls import reverse_lazy
 from  service.forms import *
 from django.shortcuts import get_object_or_404

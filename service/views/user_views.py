@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
-from service.forms import CustomUserCreationForm, User  # Assuming you have this form
+from service.forms.User_forms import CustomUserCreationForm, User  # Assuming you have this form
 from service.models import CustomUser
 
 @login_required
