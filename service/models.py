@@ -271,16 +271,28 @@ class Attribute(models.Model):
     asset_types = models.ManyToManyField(AssetType, related_name='attributes')
 
 class Asset(models.Model):
-    asset_type = models.ForeignKey(AssetType, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255, default='Default Name')
+    asset_type = models.ForeignKey(AssetType, on_delete=models.CASCADE, related_name='assets')
     parent_asset = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='components')
 
+    def __str__(self):
+        return self.name
 class AssetAttribute(models.Model):
-    asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name='attributes')
+    asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name='asset_attributes')
     attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE)
     value_text = models.TextField(null=True, blank=True)
     value_number = models.FloatField(null=True, blank=True)
     value_date = models.DateField(null=True, blank=True)
-    value_asset_reference = models.ForeignKey(Asset, null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
-    value_attribute_reference = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
-
-
+    value_asset_reference = models.ForeignKey(Asset, null=True, blank=True, related_name='referenced_by', on_delete=models.SET_NULL)
+    value_attribute_reference = models.ForeignKey('self', null=True, blank=True, related_name='referenced_attributes', on_delete=models.SET_NULL)
+    def __str__(self):
+        return f"{self.attribute.name} for {self.asset.name}: {self.get_value()}"
+def get_value(self):
+    value_mapping = {
+        Attribute.TEXT: self.value_text,
+        Attribute.NUMBER: self.value_number,
+        Attribute.DATE: str(self.value_date) if self.value_date else None,
+        Attribute.ASSET_REFERENCE: self.value_asset_reference.name if self.value_asset_reference else None,
+        Attribute.ATTRIBUTE_REFERENCE: self.value_attribute_reference.value_text if self.value_attribute_reference else None,
+    }
+    return value_mapping.get(self.attribute.attribute_type)

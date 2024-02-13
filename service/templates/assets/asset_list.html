@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Список активов</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Название</th>
+                <th>Тип актива</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for asset in assets %}
+                <tr>
+                    <td>{{ asset.name }}</td>
+                    <td>{{ asset.asset_type.name }}</td>
+                    <td>
+                        <a href="{% url 'edit_asset' asset.pk %}">Редактировать</a> |
+                        <a href="{% url 'delete_asset' asset.pk %}">Удалить</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

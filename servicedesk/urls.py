@@ -5,6 +5,9 @@ from django.conf import settings  # Import the settings module
 from django.conf.urls.static import static  # Import static for serving media files
 
 import service.models
+from service.views.asset_type_views import create_asset_type, edit_asset_type, delete_asset_type, asset_type_list
+from service.views.asset_views import create_asset, edit_asset, delete_asset, asset_list
+from service.views.attribute_views import attribute_create, attribute_delete, attribute_edit
 from service.views.request_views import request_list, request_create, add_comment,update_request,export_requests_pdf,select_request_type,delete_request
 from service.views.company_views import company_create,company_edit ,company_list,create_department,create_subdepartment,company_delete
 from service.views.profile_views import register, home, edit_profile, profile
@@ -69,8 +72,23 @@ urlpatterns = [
     path('groups/create/', performer_group_create, name='performer_group_create'),
     path('groups/<int:pk>/update/', performer_group_update, name='performer_group_update'),
     path('groups/<int:pk>/delete/', performer_group_delete, name='performer_group_delete'),
+    path('assets/create/', create_asset, name='create_asset'),
+    path('assets/edit/<int:pk>/', edit_asset, name='edit_asset'),
+    path('assets/delete/<int:pk>/', delete_asset, name='delete_asset'),
+    path('assets/', asset_list, name='asset_list'),
 
+    # Маршруты для типов активов
+    path('asset_types/create/', create_asset_type, name='create_asset_type'),
+    path('asset_types/edit/<int:pk>/', edit_asset_type, name='edit_asset_type'),
+    path('asset_types/delete/<int:pk>/', delete_asset_type, name='delete_asset_type'),
+    path('asset_types/', asset_type_list, name='asset_type_list'),
+
+    # Маршруты для атрибутов
+    path('attributes/create/', attribute_create, name='attribute_create'),
+    path('attributes/edit/<int:pk>/', attribute_edit, name='attribute_edit'),
+    path('attributes/delete/<int:pk>/', attribute_delete, name='attribute_delete'),
 ]
+
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
