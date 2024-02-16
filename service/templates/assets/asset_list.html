@@ -1,7 +1,12 @@
 {% extends 'base.html' %}
-
 {% block content %}
     <h2>Список активов</h2>
+    <!-- Ссылки на создание нового типа актива и создание нового актива -->
+    <a href="{% url 'asset_type_create' %}" class="btn btn-primary">Создать новый тип актива</a>
+    <a href="{% url 'create_asset' %}" class="btn btn-secondary">Создать новый актив</a>
+    <!-- Ссылка на список типов активов -->
+    <a href="{% url 'asset_type_list' %}" class="btn btn-info"> Типы активов</a>
+
     <table>
         <thead>
             <tr>

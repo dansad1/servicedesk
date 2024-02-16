@@ -5,7 +5,7 @@ from django.conf import settings  # Import the settings module
 from django.conf.urls.static import static  # Import static for serving media files
 
 import service.models
-from service.views.asset_type_views import create_asset_type, edit_asset_type, delete_asset_type, asset_type_list
+from service.views.asset_type_views import *
 from service.views.asset_views import create_asset, edit_asset, delete_asset, asset_list
 from service.views.attribute_views import attribute_create, attribute_delete, attribute_edit
 from service.views.request_views import request_list, request_create, add_comment,update_request,export_requests_pdf,select_request_type,delete_request
@@ -78,9 +78,9 @@ urlpatterns = [
     path('assets/', asset_list, name='asset_list'),
 
     # Маршруты для типов активов
-    path('asset_types/create/', create_asset_type, name='create_asset_type'),
-    path('asset_types/edit/<int:pk>/', edit_asset_type, name='edit_asset_type'),
-    path('asset_types/delete/<int:pk>/', delete_asset_type, name='delete_asset_type'),
+    path('asset_types/create/', create_asset_type, name='asset_type_create'),
+    path('asset_types/edit/<int:pk>/', edit_asset_type, name='asset_type_edit'),
+    path('asset_types/delete/<int:pk>/', asset_type_delete, name='asset_type_delete'),
     path('asset_types/', asset_type_list, name='asset_type_list'),
 
     # Маршруты для атрибутов

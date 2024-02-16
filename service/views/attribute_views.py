@@ -15,7 +15,7 @@ def attribute_create(request, asset_type_id):
             return redirect('asset_type_attributes', asset_type_id=asset_type.pk)
     else:
         form = AttributeForm()
-    return render(request, 'attributes/attribute_create.html', {'form': form, 'asset_type': asset_type})
+    return render(request, 'attributes/attribute_create.html', {'form': form, 'asset_types': asset_type})
 
 def attribute_edit(request, pk):
     attribute = get_object_or_404(Attribute, pk=pk)

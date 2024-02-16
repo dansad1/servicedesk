@@ -287,12 +287,17 @@ class AssetAttribute(models.Model):
     value_attribute_reference = models.ForeignKey('self', null=True, blank=True, related_name='referenced_attributes', on_delete=models.SET_NULL)
     def __str__(self):
         return f"{self.attribute.name} for {self.asset.name}: {self.get_value()}"
+
+
 def get_value(self):
+    """Возвращает значение атрибута в зависимости от его типа."""
     value_mapping = {
-        Attribute.TEXT: self.value_text,
-        Attribute.NUMBER: self.value_number,
-        Attribute.DATE: str(self.value_date) if self.value_date else None,
-        Attribute.ASSET_REFERENCE: self.value_asset_reference.name if self.value_asset_reference else None,
-        Attribute.ATTRIBUTE_REFERENCE: self.value_attribute_reference.value_text if self.value_attribute_reference else None,
+        'text': self.value_text,
+        'number': self.value_number,
+        'date': str(self.value_date) if self.value_date else None,
+        'asset_ref': self.value_asset_reference.name if self.value_asset_reference else None,
+        'attr_ref': self.value_attribute_reference.value_text if self.value_attribute_reference else None,
     }
     return value_mapping.get(self.attribute.attribute_type)
+
+

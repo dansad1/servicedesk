@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name='asset',
-            name='asset_type',
+            name='asset_types',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='assets', to='service.assettype'),
         ),
         migrations.AlterField(

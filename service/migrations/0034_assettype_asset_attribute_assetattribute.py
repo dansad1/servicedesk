@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('parent_asset', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='components', to='service.asset')),
-                ('asset_type', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='service.assettype')),
+                ('asset_types', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='service.assettype')),
             ],
         ),
         migrations.CreateModel(
