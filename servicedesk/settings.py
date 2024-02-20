@@ -140,11 +140,6 @@ CKEDITOR_RESTRICT_BY_USER = True    # Limit file access to the user's uploaded f
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
-# EMAIL_HOST = "smtp.gmail.com"
-# EMAIL_HOST_USER = "sidorov.egor.main@gmail.com"
-# EMAIL_HOST_PASSWORD = "hyxp iurm iklk tmbd"
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 
