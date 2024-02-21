@@ -44,6 +44,8 @@ class Company(models.Model):
 
     def __str__(self):
         return self.name
+    
+
 class Department(models.Model):
     name = models.CharField(max_length=200)
     company = models.ForeignKey(Company, related_name='departments', on_delete=models.CASCADE)
@@ -95,12 +97,16 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
+    
+
+
 class CustomPermission(models.Model):
     code_name = models.CharField(max_length=100, unique=True)
     name = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name
+
 
 class GroupPermission(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
@@ -114,6 +120,8 @@ class GroupPermission(models.Model):
 
     def __str__(self):
         return f"{self.group.name} - {self.custom_permission.name} - {self.access_level}"
+    
+
 class Status(models.Model):
     name = models.CharField(max_length=50, unique=True)
     color = models.CharField(max_length=20, blank=True, null=True)
@@ -121,6 +129,8 @@ class Status(models.Model):
 
     def __str__(self):
         return self.name
+    
+
 class Priority(models.Model):
     name = models.CharField(max_length=50, unique=True)
     def __str__(self):
@@ -131,6 +141,8 @@ class RequestType(models.Model):
     description = models.TextField(blank=True, null=True)
     def __str__(self):
         return self.name
+
+
 class PriorityDuration(models.Model):
     request_type = models.ForeignKey(RequestType, on_delete=models.CASCADE)
     priority = models.ForeignKey(Priority, on_delete=models.CASCADE)
@@ -141,6 +153,8 @@ class PriorityDuration(models.Model):
 
     def __str__(self):
         return f"{self.priority.name} for {self.request_type.name} : {self.duration_in_hours} hours"
+
+
 class Request(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
@@ -174,6 +188,8 @@ class Request(models.Model):
         super(Request, self).save(*args, **kwargs)
     def __str__(self):
         return self.title
+    
+
 class Comment(models.Model):
     request = models.ForeignKey(Request, on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -184,6 +200,8 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'Comment by {self.author.username} on {self.request.title}'
+    
+
 class StatusTransition(models.Model):
     from_status = models.ForeignKey(Status, related_name='from_transitions', on_delete=models.CASCADE)
     to_status = models.ForeignKey(Status, related_name='to_transitions', on_delete=models.CASCADE)
@@ -194,6 +212,8 @@ class StatusTransition(models.Model):
 
     def __str__(self):
         return f"{self.from_status.name} -> {self.to_status.name}"
+    
+
 class SavedFilter(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     filter_name = models.CharField(max_length=100)
@@ -231,6 +251,8 @@ class EmailSettings(models.Model):
     @property
     def use_ssl(self):
         return self.connection_type == 'ssl'
+    
+
 class GroupEventNotification(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='event_notifications')
     event = models.CharField(max_length=255)
@@ -238,6 +260,8 @@ class GroupEventNotification(models.Model):
 
     def __str__(self):
         return f"Уведомление для группы '{self.group.name}' на событие '{self.event}'"
+    
+
 class PerformerGroup(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
@@ -247,9 +271,13 @@ class PerformerGroup(models.Model):
     def __str__(self):
         return self.name
 
+
+
 class AssetType(models.Model):
     name = models.CharField(max_length=255)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
+
+
 
 class Attribute(models.Model):
     TEXT = 'text'
@@ -270,6 +298,8 @@ class Attribute(models.Model):
     attribute_type = models.CharField(max_length=50, choices=ATTRIBUTE_TYPES)
     asset_types = models.ManyToManyField(AssetType, related_name='attributes')
 
+
+
 class Asset(models.Model):
     name = models.CharField(max_length=255, default='Default Name')
     asset_type = models.ForeignKey(AssetType, on_delete=models.CASCADE, related_name='assets')
@@ -277,6 +307,8 @@ class Asset(models.Model):
 
     def __str__(self):
         return self.name
+
+
 class AssetAttribute(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name='asset_attributes')
     attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE)
@@ -287,6 +319,7 @@ class AssetAttribute(models.Model):
     value_attribute_reference = models.ForeignKey('self', null=True, blank=True, related_name='referenced_attributes', on_delete=models.SET_NULL)
     def __str__(self):
         return f"{self.attribute.name} for {self.asset.name}: {self.get_value()}"
+
 
 
 def get_value(self):

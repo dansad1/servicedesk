@@ -3,7 +3,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from service.forms.Asset_Forms import AttributeForm
 from service.models import Attribute, AssetType
 
-
+# Создание атрибута
 def attribute_create(request, asset_type_id):
     asset_type = get_object_or_404(AssetType, pk=asset_type_id)
     if request.method == 'POST':
@@ -17,6 +17,7 @@ def attribute_create(request, asset_type_id):
         form = AttributeForm()
     return render(request, 'attributes/attribute_create.html', {'form': form, 'asset_types': asset_type})
 
+# Редактирование атрибута
 def attribute_edit(request, pk):
     attribute = get_object_or_404(Attribute, pk=pk)
     if request.method == 'POST':
@@ -29,6 +30,8 @@ def attribute_edit(request, pk):
     else:
         form = AttributeForm(instance=attribute)
     return render(request, 'attributes/attribute_edit.html', {'form': form})
+
+# Удаление атрибута
 def attribute_delete(request, pk):
     attribute = get_object_or_404(Attribute, pk=pk)
     if request.method == 'POST':
