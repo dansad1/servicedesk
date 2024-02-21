@@ -17,6 +17,8 @@ from service.views.settings_views import *
 from service.views.role_views import role_delete,role_edit,role_create,role_list
 from service.views.email_notification_views import email_settings_view
 from service.views.perform_views import *
+from service.views.file_views import *
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', auth_views.LoginView.as_view(), name='login'),
@@ -33,6 +35,7 @@ urlpatterns = [
     path('request/update/<int:pk>/', update_request, name='update_request'),
     path('requests/<int:pk>/delete/', delete_request, name='delete_request'),
     path('request/<int:pk>/comment/', add_comment, name='add_comment'),
+    #path('request/create/<int:type_id>/', add_comment, name='add_comment'),
     path('profile/', profile, name='profile'),
     path('company/create/', company_create, name='create_company'),
     path('ckeditor/', include('ckeditor_uploader.urls')),
@@ -87,6 +90,9 @@ urlpatterns = [
     path('attributes/create/', attribute_create, name='attribute_create'),
     path('attributes/edit/<int:pk>/', attribute_edit, name='attribute_edit'),
     path('attributes/delete/<int:pk>/', attribute_delete, name='attribute_delete'),
+
+    path('file/<path:file_path>/', file_view, name='file_view'),
+    path('file/', file_view, name='file_view'),
 ]
 
 

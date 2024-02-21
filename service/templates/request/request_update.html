@@ -40,13 +40,20 @@
     {% endif %}
 </form>
 </div>
+
     <h2 class="mb-3">Комментарии</h2>
     <div class="comments">
         {% for comment in comments %}
             <div class="comment mb-3">
-                <strong>{{ comment.author.username }}</strong>
-                <em>{{ comment.created_at|date:"N d, Y H:i" }}</em>
+                <strong>{{comment.label}}</strong>
+                
+                <p><strong>{{ comment.author.username }}</strong></p>
+                
+                <p><em>{{ comment.created_at|date:"N d, Y H:i" }}</em></p>
                 <p>{{ comment.text|safe }}</p>
+                {% if comment.attachment and comment.attachment.url %}
+                <p>Attachment: <a href="{% url 'file_view' comment.attachment.url %}" target="_blank">{{ comment.attachment.name }}</a></p>
+                {% endif %}
             </div>
         {% empty %}
             <p>Комментариев пока нет.</p>
@@ -59,7 +66,7 @@
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {{ comment_form.as_p }}
-            <button type="submit" class="btn btn-success">Добавить комментарий</button>
+            <button type="submit" name="add_comment" value="add_comment" class="btn btn-success">Добавить комментарий</button>
         </form>
     </div>
 

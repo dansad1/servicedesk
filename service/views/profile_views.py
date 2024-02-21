@@ -10,6 +10,10 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from service.views import profile_views
 from django.contrib.auth.models import Group
+
+
+
+# Регистрация пользователя
 def register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
@@ -21,10 +25,11 @@ def register(request):
         form = CustomUserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
 
+# Домашняя страница
 def home(request):
     return render(request, 'pages/home.html')
 
-
+# Вывод профиля пользователя
 @login_required
 def profile(request):
     user = request.user
@@ -32,6 +37,8 @@ def profile(request):
     is_admin = request.user.groups.filter(name='Администратор').exists()  # Исправлено имя группы
     return render(request, 'profile/profile.html', {'user_profile': user_profile, 'is_admin': is_admin})
 
+
+# Редактирование пользователя
 @login_required
 def edit_profile(request, pk=None):
     target_user = get_object_or_404(CustomUser, pk=pk) if pk else request.user

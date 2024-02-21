@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.contrib import messages
 
-
+# Создание компании
 @login_required
 def company_create(request):
     if request.method == 'POST':
@@ -23,7 +23,7 @@ def company_create(request):
 
     return render(request, 'company/company_create.html', {'form': form})
 
-
+# Редактирование компании
 @login_required
 def company_edit(request, pk):
     company = get_object_or_404(Company, pk=pk)
@@ -45,11 +45,16 @@ def company_edit(request, pk):
         'requests': company_requests,
     }
     return render(request, 'company/company_edit.html', context)
+
+
+# Вывод списка компаний
 @login_required
 def company_list(request):
     companies = Company.objects.all()
     return render(request, 'company/company_list.html', {'companies': companies})
 
+
+# Создание департамента
 @login_required
 def create_department(request, company_pk):
     company = get_object_or_404(Company, pk=company_pk)
@@ -65,6 +70,9 @@ def create_department(request, company_pk):
             # Если форма не валидна, добавляем сообщение об ошибке
             messages.error(request, 'Ошибка при создании отдела. Пожалуйста, проверьте введенные данные.')
     return redirect('company_detail', pk=company.pk)
+
+
+# создание подепартамента
 @login_required
 def create_subdepartment(request, department_id):
     parent_department = get_object_or_404(Department, pk=department_id)
@@ -77,6 +85,9 @@ def create_subdepartment(request, department_id):
             new_subdepartment.save()
             return redirect('company_detail', pk=parent_department.company.pk)
     return redirect('company_detail', pk=parent_department.company.pk)
+
+
+
 @require_http_methods(["POST"])
 def company_delete(request, pk):
     company = get_object_or_404(Company, pk=pk)

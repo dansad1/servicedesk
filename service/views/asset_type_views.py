@@ -6,6 +6,7 @@ from django.views.decorators.http import require_POST
 from service.models import AssetType
 from service.forms.Asset_Forms import AssetTypeForm  # Предполагается, что у вас есть форма для модели AssetType
 
+# Создание типа актива
 def create_asset_type(request):
     if request.method == 'POST':
         form = AssetTypeForm(request.POST)
@@ -15,6 +16,9 @@ def create_asset_type(request):
     else:
         form = AssetTypeForm()
     return render(request, 'asset_types/asset_type_create.html', {'form': form})
+
+
+# Редактирование типа актива
 def edit_asset_type(request, pk):
     asset_type = AssetType.objects.get(pk=pk)
     if request.method == 'POST':
@@ -25,9 +29,15 @@ def edit_asset_type(request, pk):
     else:
         form = AssetTypeForm(instance=asset_type)
     return render(request, 'asset_types/asset_type_edit.html', {'form': form})
+
+
+# Вывод списка типов актива
 def asset_type_list(request):
     asset_types = AssetType.objects.all()
     return render(request, 'asset_types/asset_type_list.html', {'asset_types': asset_types})
+
+
+# Удаление типа актива
 def asset_type_delete(request, pk):
     if request.method == 'POST':
         asset_type = get_object_or_404(AssetType, pk=pk)

@@ -32,9 +32,16 @@ def create_or_edit_request_type(request, pk=None):
         'request_type': request_type
     }
     return render(request, 'settings/request_type.html', context)
+
+
+
+# Вывод списка типов заявок
 def types_list(request):
     request_types = RequestType.objects.all()
     return render(request, 'settings/types_list.html', {'request_types': request_types})
+
+
+# Удаление типа заявки
 @login_required
 @require_POST
 def delete_request_type(request, pk):
@@ -42,6 +49,9 @@ def delete_request_type(request, pk):
     request_type.delete()
     messages.success(request, "Тип заявки успешно удален.")
     return redirect('types_list')
+
+
+# Создание или редактирование приоритета заявок
 def create_or_edit_priority(request, pk=None):
     if pk:
         priority = get_object_or_404(Priority, pk=pk)
@@ -61,9 +71,15 @@ def create_or_edit_priority(request, pk=None):
     }
     return render(request, 'settings/priority.html', context)
 
+
+# Вывод списка приоритетов заявок
 def priority_list(request):
     priorities = Priority.objects.all().order_by('name')
     return render(request, 'settings/priority_list.html', {'priorities': priorities})
+
+
+
+# Удаление приоритета
 @login_required
 @require_POST
 def delete_priority(request, pk):
@@ -71,10 +87,16 @@ def delete_priority(request, pk):
     priority.delete()
     messages.success(request, "Приоритет успешно удален.")
     return redirect('priority_list')
+
+
+
+# Вывод списка продолжительности приоритетов
 def priority_duration_list(request):
     durations = PriorityDuration.objects.all()
     return render(request, 'settings/priority_duration_list.html', {'durations': durations})
 
+
+# Создание или редактирование продолжительности приоритетов
 def create_or_edit_priority_duration(request, pk=None):
     if pk:
         duration = get_object_or_404(PriorityDuration, pk=pk)
@@ -91,11 +113,15 @@ def create_or_edit_priority_duration(request, pk=None):
         'form': form
     }
     return render(request, 'settings/priority_duration.html', context)
+
+
+
+# Вывод списка статусов
 def status_list(request):
     statuses = Status.objects.all()
     return render(request, 'settings/status_list.html', {'statuses': statuses})
 
-# Create and edit view for statuses
+# Редактирование или создание статусов
 def create_or_edit_status(request, pk=None):
     if pk:
         status = get_object_or_404(Status, pk=pk)
@@ -110,6 +136,9 @@ def create_or_edit_status(request, pk=None):
 
     context = {'form': form}
     return render(request, 'settings/status_create.html', context)
+
+
+# Удаление статуса
 @login_required
 @require_POST  # Убедитесь, что запрос на удаление выполняется через POST
 def delete_status(request, pk):
@@ -119,7 +148,7 @@ def delete_status(request, pk):
     return redirect('status_list')
 
 
-
+# Удлаить статус перехода
 @login_required
 def status_transition(request):
     if request.method == 'POST':
@@ -147,6 +176,7 @@ def status_transition(request):
         'form': form
     })
 
+# Удалить статус перехода
 def delete_status_transition(request, pk):
     transition_instance = get_object_or_404(StatusTransition, pk=pk)
     if request.method == 'POST':
@@ -154,5 +184,7 @@ def delete_status_transition(request, pk):
         messages.success(request, "Status transition successfully deleted.")
         return redirect('status_transition')
 
+
+# Вывод боковой панели настроек 
 def settings_sidebar(request):
     return render(request, 'settings/settings_sidebar.html')

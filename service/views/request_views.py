@@ -18,7 +18,7 @@ from django.utils import timezone
 from service.models import *
 from datetime import timedelta
 
-from ..forms.Request_forns import RequestFilterForm, CommentForm, RequestForm
+from ..forms.Request_forms import RequestFilterForm, CommentForm, RequestForm
 from ..status_logic import *
 from ..models import SavedFilter
 from django.db.models import QuerySet
@@ -34,6 +34,7 @@ from reportlab.lib import colors
 from reportlab.pdfbase.ttfonts import TTFont
 from django.utils.formats import date_format
 
+# Обработка фильтров
 def handle_filters(request, initial_requests):
     load_filter_id = request.GET.get('load_filter')
     loaded_filters = {}
@@ -67,7 +68,7 @@ def handle_filters(request, initial_requests):
     return filtered_requests, filter_form
 # Основная функция для отображения списка заявок
 
-
+# TODO посмотреть что там с фильтрами
 def apply_filters(queryset, filters):
     for field, value in filters.items():
         if value:
@@ -82,13 +83,21 @@ def select_request_type(request):
     types = RequestType.objects.all()
     return render(request, 'request/select_request_type.html', {'types': types})
 
+
+# TODO посмотреть, возможно починить логику
 @login_required
 def request_create(request, type_id):
+    
     request_type = get_object_or_404(RequestType, pk=type_id)
     form = RequestForm(request.POST or None, request.FILES or None)
     comment_form = CommentForm(request.POST or None, request.FILES or None)
-
+    
     if request.method == 'POST':
+        comment_data = {"attachment": request.POST['attachment'], "text": request.POST['text']}
+        print(comment_data)
+        form = RequestForm(request.POST or None, request.FILES or None)
+        comment_form = CommentForm(comment_data or None, request.FILES or None)
+        print(comment_form.is_valid())
         if form.is_valid():
             new_request = form.save(commit=False)
             new_request.requester = request.user
@@ -101,20 +110,22 @@ def request_create(request, type_id):
 
             new_request.save()
             form.save_m2m()
-
+            print(comment_form.is_valid())
             if comment_form.is_valid():
                 new_comment = comment_form.save(commit=False)
                 new_comment.request = new_request
                 new_comment.author = request.user
                 new_comment.save()
 
-            # Определяем, какая кнопка была нажата
-            if 'save_and_close' in request.POST:
+            if 'save_and_close' in request.POST['action']:
+                print("redirect request list")
                 messages.success(request, "Заявка успешно создана.")
                 return redirect('request_list')
+            # Определяем, какая кнопка была нажата
             else:
                 messages.success(request, "Заявка создана. Вы можете продолжить редактирование.")
-                return redirect('request_edit', pk=new_request.pk)
+                return redirect('update_request', pk=new_request.pk)
+
 
     context = {
         'form': form,
@@ -122,11 +133,15 @@ def request_create(request, type_id):
         'request_type': request_type
     }
     return render(request, 'request/request_create.html', context)
+
+# TODO удалить или оформить по-другому
 @login_required
 def add_comment(request, pk):
     request_instance = get_object_or_404(Request, pk=pk)
     if request.method == 'POST':
         comment_form = CommentForm(request.POST, request.FILES)
+        print(comment_form.data)
+        print(comment_form.is_valid)
         if comment_form.is_valid():
             new_comment = comment_form.save(commit=False)
             new_comment.request = request_instance
@@ -146,25 +161,45 @@ def add_comment(request, pk):
         'request_type': request_instance.request_type  # Или другой контекст, необходимый для шаблона
     }
     return render(request, 'request/request_create.html', context)
+
+# Редактирование заявки
 @login_required
 def update_request(request, pk):
     request_instance = get_object_or_404(Request, pk=pk)
+    comment_instances = Comment.objects.filter(request_id=pk)
     is_editable = request.user.has_perm('service.action_edit_request', request_instance)
-
+    
     if request.method == 'POST' and 'submit_update' in request.POST and is_editable:
         form = RequestForm(request.POST, instance=request_instance)
         if form.is_valid():
             form.save()
             return redirect('request_list')  # или другой URL, куда вы хотите перенаправить пользователя
-    else:
+    elif request.method == "POST" and "add_comment" in request.POST:
+        comment_form = CommentForm(request.POST, request.FILES)
+        if comment_form.is_valid():
+            new_comment = comment_form.save(commit=False)
+            new_comment.request = request_instance
+            new_comment.author = request.user
+            new_comment.save()
+        comment_instances = Comment.objects.filter(request_id=pk)
         form = RequestForm(instance=request_instance)
 
+    else:
+        form = RequestForm(instance=request_instance)
+        comment_form = CommentForm(instance=request_instance)
+        print(request.POST)
+        
     return render(request, 'request/request_update.html', {
         'form': form,
         'is_editable': is_editable,
+        'comments': comment_instances,
+        "comment_form": comment_form,  
         'request_instance': request_instance,
         'due_date': request_instance.due_date
     })
+
+
+# Вывод списка заявок
 @login_required
 def request_list(request):
     filter_form = RequestFilterForm(request.GET)
@@ -190,6 +225,8 @@ def request_list(request):
         'requests_with_action': requests_with_action,
         'filter_form': filter_form
     })
+
+# Удаление заявки
 def delete_request(request, pk):
     request_instance = get_object_or_404(Request, pk=pk)
 
@@ -201,11 +238,11 @@ def delete_request(request, pk):
     # Нет необходимости в отдельном шаблоне для подтверждения удаления
     return redirect('request_list')
 
-
+# INFO почему это здесь? 
 pdfmetrics.registerFont(
     TTFont('Arial', 'staticfiles/fonts/ArialRegular.ttf'))  # Убедитесь, что файл шрифта находится в указанной директории
 
-
+# Экспортировать заявки pdf
 def export_requests_pdf(request):
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="requests.pdf"'

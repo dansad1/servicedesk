@@ -3,6 +3,10 @@ from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth.models import Group, Permission
 from ..models import GroupPermission, CustomPermission
 from service.forms.Role_forms import *
+
+
+
+# Создание роли 
 def role_create(request):
     if request.method == 'POST':
         form = GroupForm(request.POST)
@@ -27,6 +31,9 @@ def role_create(request):
         form = GroupForm()
     return render(request, 'role/role_create_edit.html', {'form': form})
 
+
+
+# Редактирование роли
 def role_edit(request, group_id):
     group = get_object_or_404(Group, id=group_id)
     if request.method == 'POST':
@@ -54,9 +61,16 @@ def role_edit(request, group_id):
         form = GroupForm(instance=group)
     return render(request, 'role/role_create_edit.html', {'form': form, 'group': group})
 
+
+
+# Вывод списка ролей
 def role_list(request):
     groups = Group.objects.all()
     return render(request, 'role/role_list.html', {'groups': groups})
+
+
+
+# Удаление ролей
 def role_delete(request, group_id):
     group = get_object_or_404(Group, id=group_id)
     group.delete()

@@ -10,6 +10,7 @@ from servicedesk import settings
 from service.forms.Emai_forms import *
 from ..models import EmailSettings
 
+# Вывод настроек для почты
 def email_settings_view(request):
     if request.method == 'POST':
         form = EmailSettingsForm(request.POST)
@@ -27,6 +28,7 @@ def email_settings_view(request):
 
     return render(request, 'settings/email_settings.html', {'form': form})
 
+# Отправка тестового письма
 @require_POST
 def send_test_email(request):
     try:
@@ -60,6 +62,7 @@ def send_test_email(request):
             connection=connection
         )
         email.send()
+        
         return JsonResponse({'success': True})
     except Exception as e:  # Это поймает любые исключения, включая BadHeaderError
         return JsonResponse({'success': False, 'error': f'Ошибка отправки письма: {e}, {email_settings.email_from, email_settings.login, email_settings.password}'})
