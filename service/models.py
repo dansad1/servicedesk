@@ -5,7 +5,7 @@ from ckeditor.fields import RichTextField  # Import RichTextField
 from ckeditor_uploader.fields import RichTextUploadingField
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.utils import timezone
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, Permission
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.translation import gettext_lazy as _
 
@@ -73,8 +73,18 @@ class CustomUserManager(BaseUserManager):
             raise ValueError('Superuser must have is_staff=True.')
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
+        
+        user = self.create_user(username, email, password, **extra_fields)
 
-        return self.create_user(username, email, password, **extra_fields)
+        superuser_group, created = Group.objects.get_or_create(name="SuperUsers")
+
+        user.group = superuser_group
+        user.save()
+        
+        all_permissions = Permission.objects.all()
+        superuser_group.permissions.set(all_permissions)
+
+        return user
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
