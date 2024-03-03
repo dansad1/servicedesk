@@ -20,6 +20,7 @@ pytz = "^2024.1"
 reportlab = "^4.1.0"
 sqlparse = "^0.4.4"
 tzdata = "^2024.1"
+graphviz = "^0.20.1"
 
 [tool.poetry.group.dev.dependencies]
 Django = "^5.0.2"
