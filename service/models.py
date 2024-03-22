@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.translation import gettext_lazy as _
-
+from model_utils import FieldTracker
 from servicedesk import settings
 
 
@@ -154,6 +154,7 @@ class Request(models.Model):
     request_type = models.ForeignKey(RequestType, on_delete=models.SET_NULL, null=True, blank=True)
     due_date = models.DateTimeField(null=True, blank=True)
     attachment = models.FileField(upload_to='attachments/', null=True, blank=True)
+    tracker = FieldTracker(fields=['assignee', 'status'])
 
     def set_due_date(self):
         duration = PriorityDuration.objects.filter(
