@@ -4,6 +4,10 @@ class RequestTypeForm(forms.ModelForm):
     class Meta:
         model = RequestType
         fields = ['name', 'description']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control'}),
+        }
 class PriorityForm(forms.ModelForm):
     class Meta:
         model = Priority

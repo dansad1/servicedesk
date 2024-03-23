@@ -72,23 +72,24 @@ def delete_priority(request, pk):
     messages.success(request, "Приоритет успешно удален.")
     return redirect('priority_list')
 def priority_duration_list(request):
-    durations = PriorityDuration.objects.all()
-    return render(request, 'settings/priority_duration_list.html', {'durations': durations})
+    durations = PriorityDuration.objects.select_related('priority', 'request_type').all()
+    return render(request, 'settings/types_list.html', {'durations': durations})
 
 def create_or_edit_priority_duration(request, pk=None):
     if pk:
         duration = get_object_or_404(PriorityDuration, pk=pk)
-        form = PriorityDurationForm(request.POST or None, instance=duration)
     else:
-        form = PriorityDurationForm(request.POST or None)
+        duration = None
+    form = PriorityDurationForm(request.POST or None, instance=duration)
 
     if request.method == 'POST' and form.is_valid():
         form.save()
         messages.success(request, "Продолжительность приоритета успешно сохранена.")
-        return redirect('priority_duration_list')
+        return redirect('types_list')  # Используйте имя URL-паттерна здесь
 
     context = {
-        'form': form
+        'form': form,
+        'duration': duration
     }
     return render(request, 'settings/priority_duration.html', context)
 def status_list(request):
