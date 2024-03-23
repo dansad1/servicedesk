@@ -1,18 +1,74 @@
-<!-- group_list.html -->
 {% extends 'base.html' %}
 
 {% block content %}
-    <h2>Список Ролей</h2>
-    <a href="{% url 'role_create' %}">Создать Новую Роль</a>
-    <ul>
-        {% for group in groups %}
-            <li>
-                {{ group.name }}
-                <a href="{% url 'role_edit' group.id %}">Редактировать</a> |
-                <a href="{% url 'role_delete' group.id %}" onclick="return confirm('Вы уверены, что хотите удалить эту роль?');">Удалить</a>
-            </li>
-        {% empty %}
-            <li>Роли не найдены.</li>
-        {% endfor %}
-    </ul>
+    <div class="container mt-4">
+        <h2>Список Ролей</h2>
+        <a href="{% url 'role_create' %}" class="btn btn-primary btn-block mb-2">Создать Новую Роль</a>
+        <div class="list-group">
+            {% for group in groups %}
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ group.name }}
+                    <div>
+                        <a href="{% url 'role_edit' group.id %}" class="btn btn-secondary btn-sm mr-2">Редактировать</a>
+                        <form action="{% url 'role_delete' group.id %}" method="post" class="d-inline" onsubmit="return confirm('Вы уверены, что хотите удалить эту роль?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+                        </form>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="list-group-item">Роли не найдены.</div>
+            {% endfor %}
+        </div>
+    </div>
+<style>
+.list-group-item {
+    background-color: #f9f9f9; /* Светлый фон для элементов списка */
+    border: 1px solid #eaeaea; /* Тонкая граница вокруг элементов списка */
+}
+
+.btn-sm {
+    padding: .25rem .5rem; /* Меньше паддинг для маленьких кнопок */
+    font-size: .875rem; /* Меньше шрифт для маленьких кнопок */
+    line-height: 1.5;
+    border-radius: .2rem; /* Скругление углов кнопок */
+}
+
+/* Стилизация кнопки "Создать Новую Роль" */
+.btn-primary {
+    color: #fff; /* Белый текст для кнопок основного действия */
+    background-color: #007bff; /* Синий фон */
+    border-color: #007bff; /* Синяя граница */
+}
+
+.btn-primary:hover {
+    background-color: #0069d9; /* Темно-синий фон при наведении */
+    border-color: #0062cc; /* Темно-синяя граница при наведении */
+}
+
+/* Стили для кнопки "Редактировать" */
+.btn-secondary {
+    color: #fff;
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+/* Стили для кнопки "Удалить" */
+.btn-danger {
+    color: #fff;
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+</style>
 {% endblock %}
+

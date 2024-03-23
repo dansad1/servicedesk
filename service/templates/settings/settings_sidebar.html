@@ -4,19 +4,64 @@
 <div class="settings-layout">
     <div class="sidebar">
         <h3>Настройки</h3>
-        <ul>
-            <li><a href="{% url 'types_list' %}">Типы заявок</a></li>
-            <li><a href="{% url 'priority_list' %}">Приоритеты заявок</a></li>
-            <li><a href="{% url 'priority_duration_list' %}">Продолжительности заявок</a></li>
-            <li><a href="{% url 'status_list' %}">Список статусов</a></li>
-            <li><a href="{% url 'status_transition' %}">Переходы статусов</a></li>
-            <li><a href="{% url 'email_settings' %}">Настройки SMTP</a></li>
-
+        <ul class="nav flex-column">
+            <li class="nav-item"><button class="btn btn-link nav-link" onclick="location.href='{% url 'types_list' %}'">Типы заявок</button></li>
+            <li class="nav-item"><button class="btn btn-link nav-link" onclick="location.href='{% url 'priority_list' %}'">Приоритеты заявок</button></li>
+            <li class="nav-item"><button class="btn btn-link nav-link" onclick="location.href='{% url 'status_list' %}'">Список статусов</button></li>
+            <li class="nav-item"><button class="btn btn-link nav-link" onclick="location.href='{% url 'status_transition' %}'">Переходы статусов</button></li>
+            <li class="nav-item"><button class="btn btn-link nav-link" onclick="location.href='{% url 'email_settings' %}'">Настройки SMTP</button></li>
         </ul>
     </div>
     <div class="settings-content">
         {% block settings_content %}
+        <!-- Содержимое настроек будет вставлено здесь -->
         {% endblock %}
     </div>
 </div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .sidebar {
+        background-color: #f8f9fa; /* Светлый фон для sidebar */
+        padding: 15px;
+        width: 250px; /* Задаем ширину sidebar */
+        min-height: 100vh; /* Полная высота */
+    }
+
+    .sidebar h3 {
+        margin-bottom: 15px;
+    }
+
+    .sidebar .nav {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .sidebar .nav-item {
+        margin-bottom: 5px;
+    }
+
+    .sidebar .nav-link.full-width {
+        display: block;
+        width: 100%; /* Кнопки на всю ширину сайдбара */
+        text-align: left; /* Выравнивание текста по левому краю */
+        padding: 10px; /* Отступ внутри кнопок */
+        border-radius: 0; /* Убрать скругление */
+        border: none; /* Убрать границу */
+        background-color: transparent; /* Прозрачный фон */
+        color: #007bff; /* Синий цвет текста, как у других кнопок */
+    }
+
+    .sidebar .nav-link.full-width:hover, .sidebar .nav-link.full-width:focus {
+        color: #0056b3; /* Темно-синий цвет текста при наведении */
+        background-color: #e9ecef; /* Светло-серый фон при наведении */
+        text-decoration: none; /* Убрать подчеркивание текста */
+    }
+
+    .settings-content {
+        padding-left: 270px; /* Отступ для основного контента */
+    }
+
+</style>
 {% endblock %}

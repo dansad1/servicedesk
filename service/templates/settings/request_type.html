@@ -1,23 +1,103 @@
 {% extends 'settings/settings_sidebar.html' %}
 
 {% block settings_content %}
-    <div class="settings-content">
-        <h1>{% if request_type %}Редактировать{% else %}Создать{% endif %} тип заявки</h1>
+<div class="settings-content">
+    <h1 class="mb-4">{{ request_type|default:"Создать новый" }} тип заявки</h1>
 
-        {% if messages %}
-            <ul class="messages">
-                {% for message in messages %}
-                    <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
+    {% if messages %}
+        <div class="alert alert-info" role="alert">
+            {% for message in messages %}
+                <p class="{{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
 
-        <form method="post" class="request-type-form">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">{% if request_type %}Сохранить изменения{% else %}Создать тип{% endif %}</button>
-        </form>
+    <form method="post" class="request-type-form">
+        {% csrf_token %}
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                {{ form.name.label_tag }}
+                {{ form.name }}
+                {{ form.name.errors }}
+            </div>
+            <div class="form-group col-md-6">
+                {{ form.description.label_tag }}
+                {{ form.description }}
+                {{ form.description.errors }}
+            </div>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary mt-3">{{ request_type|default:"Создать" }}</button>
+            <a href="{% url 'types_list' %}" class="btn btn-secondary mt-3">Вернуться к списку типов заявок</a>
+        </div>
+    </form>
+</div>
 
-        <a href="{% url 'types_list' %}" class="btn btn-secondary">Вернуться к списку типов заявок</a>
-    </div>
+<style>
+    .settings-content {
+        padding: 2rem;
+        background-color: #fff;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+        margin-right: 250px; /* Отступ слева, чтобы убрать наложение с боковой панелью */
+
+    }
+
+    /* Стили для элементов формы */
+    .settings-content .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .settings-content .form-group label {
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+
+    .settings-content .form-control {
+        width: 50%;
+        padding: 0.375rem 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+    }
+
+    .settings-content .form-control:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .settings-content .btn-primary {
+        color: #fff;
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .settings-content .btn-secondary {
+        color: #fff;
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+
+    .settings-content .alert-danger {
+        color: #721c24;
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+    }
+
+    .settings-content .alert-info {
+        color: #0c5460;
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+    }
+
+    /* Адаптация формы под мобильные устройства */
+    @media (max-width: 576px) {
+        .settings-content .form-row {
+            flex-direction: column;
+        }
+
+        .settings-content .form-group {
+            width: 50%;
+        }
+    }
+</style>
 {% endblock %}
