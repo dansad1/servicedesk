@@ -2,6 +2,7 @@ from pytz import all_timezones
 
 from service.models import CustomUser, Company, Department
 from django import forms
+from django.forms.widgets import CheckboxSelectMultiple
 
 class CompanyForm(forms.ModelForm):
     class Meta:
@@ -29,7 +30,30 @@ class CompanyForm(forms.ModelForm):
 
         self.fields['timezone'].widget = forms.Select(choices=[(tz, tz) for tz in all_timezones],
                                                       attrs={'class': 'form-control'})
+
+
 class DepartmentForm(forms.ModelForm):
+    users = forms.ModelMultipleChoiceField(
+        queryset=CustomUser.objects.none(),  # Начальный пустой queryset, который будет задан динамически
+        widget=CheckboxSelectMultiple,
+        required=False  # Сделать выбор пользователей необязательным
+    )
+
     class Meta:
         model = Department
-        fields = ['name']
+        fields = ['name', 'parent', 'company', 'users']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'parent': forms.Select(attrs={'class': 'form-control'}),
+            'company': forms.HiddenInput(),
+            # 'users': уже определено выше
+        }
+
+    def __init__(self, *args, **kwargs):
+        company_id = kwargs.pop('company_id', None)
+        super().__init__(*args, **kwargs)
+        self.fields['parent'].queryset = Department.objects.none()
+
+        if company_id:
+            self.fields['parent'].queryset = Department.objects.filter(company_id=company_id)
+            self.fields['users'].queryset = CustomUser.objects.filter(company_id=company_id)  # Фильтрация пользователей по компании
