@@ -44,15 +44,6 @@ class Company(models.Model):
 
     def __str__(self):
         return self.name
-class Department(models.Model):
-    name = models.CharField(max_length=200)
-    company = models.ForeignKey(Company, related_name='departments', on_delete=models.CASCADE)
-    parent_department = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='subdepartments')
-
-
-    def __str__(self):
-        return self.name
-
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, email, password=None, **extra_fields):
         if not email:
@@ -95,6 +86,18 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
+class Department(models.Model):
+    name = models.CharField(max_length=200, verbose_name="Название")
+    parent = models.ForeignKey('self', related_name='subdepartments', on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Родительское подразделение")
+    company = models.ForeignKey('Company', related_name='departments', on_delete=models.CASCADE, verbose_name="Компания")
+    users = models.ManyToManyField(CustomUser, related_name='departments', blank=True, verbose_name="Сотрудники")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Подразделение"
+        verbose_name_plural = "Подразделения"
 class CustomPermission(models.Model):
     code_name = models.CharField(max_length=100, unique=True)
     name = models.CharField(max_length=255)

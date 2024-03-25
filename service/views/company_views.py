@@ -24,12 +24,13 @@ def company_create(request):
     return render(request, 'company/company_create.html', {'form': form})
 
 
-@login_required
 def company_edit(request, pk):
     company = get_object_or_404(Company, pk=pk)
-    form = CompanyForm(instance=company, company_id=company.pk)  # Добавлено company_id
+    form = CompanyForm(instance=company, company_id=company.pk)
     employees = company.customuser_set.all()
     company_requests = Request.objects.filter(requester__in=employees).select_related('requester', 'assignee', 'status', 'priority', 'request_type')
+    departments = company.departments.all()
+    subdepartments = Department.objects.filter(parent__company=company).select_related('parent')
 
     if request.method == 'POST':
         form = CompanyForm(request.POST, instance=company, company_id=company.pk)
@@ -43,43 +44,80 @@ def company_edit(request, pk):
         'company': company,
         'employees': employees,
         'requests': company_requests,
+        'departments': departments,
+        'subdepartments': subdepartments,
     }
     return render(request, 'company/company_edit.html', context)
 @login_required
 def company_list(request):
     companies = Company.objects.all()
     return render(request, 'company/company_list.html', {'companies': companies})
-
-@login_required
-def create_department(request, company_pk):
-    company = get_object_or_404(Company, pk=company_pk)
-    if request.method == 'POST':
-        department_form = DepartmentForm(request.POST)
-        if department_form.is_valid():
-            new_department = department_form.save(commit=False)
-            new_department.company = company
-            new_department.save()
-            messages.success(request, 'Отдел успешно создан.')
-            return redirect('company_detail', pk=company.pk)
-        else:
-            # Если форма не валидна, добавляем сообщение об ошибке
-            messages.error(request, 'Ошибка при создании отдела. Пожалуйста, проверьте введенные данные.')
-    return redirect('company_detail', pk=company.pk)
-@login_required
-def create_subdepartment(request, department_id):
-    parent_department = get_object_or_404(Department, pk=department_id)
-    if request.method == 'POST':
-        subdepartment_form = DepartmentForm(request.POST)
-        if subdepartment_form.is_valid():
-            new_subdepartment = subdepartment_form.save(commit=False)
-            new_subdepartment.parent_department = parent_department
-            new_subdepartment.company = parent_department.company
-            new_subdepartment.save()
-            return redirect('company_detail', pk=parent_department.company.pk)
-    return redirect('company_detail', pk=parent_department.company.pk)
 @require_http_methods(["POST"])
 def company_delete(request, pk):
     company = get_object_or_404(Company, pk=pk)
     company.delete()
     messages.success(request, "Компания успешно удалена.")
     return redirect('company_list')
+
+@login_required
+def department_create(request, company_pk):
+    company = get_object_or_404(Company, pk=company_pk)
+    if request.method == 'POST':
+        form = DepartmentForm(request.POST, company_id=company.id)
+        if form.is_valid():
+            department = form.save(commit=False)
+            department.company = company
+            department.save()
+            form.save_m2m()
+            messages.success(request, 'Отдел успешно создан.')
+            return redirect('company_edit', pk=company.pk)
+    else:
+        form = DepartmentForm(initial={'company': company}, company_id=company.id)
+    return render(request, 'company/department_create.html', {'form': form})
+
+
+@login_required
+def department_edit(request, pk):
+    department = get_object_or_404(Department, pk=pk)
+    form = DepartmentForm(request.POST or None, instance=department)
+
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, "Отдел обновлён.")
+        return redirect('company_edit', pk=department.company.pk)
+
+    context = {
+        'form': form,
+        'department': department,
+        'company': department.company  # Убедитесь, что компания действительно существует
+    }
+    return render(request, 'company/department_edit.html', context)
+
+
+@login_required
+@require_http_methods(["POST"])
+def department_delete(request, pk):
+    department = get_object_or_404(Department, pk=pk)
+    company_pk = department.company.pk
+    department.delete()
+    messages.success(request, "Отдел удалён.")
+    # Redirect to the company edit page
+    return redirect('company_edit', pk=company_pk)
+
+
+@login_required
+def subdepartment_create(request, department_id):
+    parent_department = get_object_or_404(Department, pk=department_id)
+    if request.method == 'POST':
+        form = DepartmentForm(request.POST)
+        if form.is_valid():
+            subdepartment = form.save(commit=False)
+            subdepartment.parent_department = parent_department
+            subdepartment.company = parent_department.company
+            subdepartment.save()
+            messages.success(request, 'Подотдел успешно создан.')
+            return redirect('department_edit', pk=parent_department.pk)
+    else:
+        form = DepartmentForm()
+
+    return render(request, 'company/subdepartment_create.html', {'form': form, 'parent_department': parent_department})

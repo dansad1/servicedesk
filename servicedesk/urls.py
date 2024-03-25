@@ -9,7 +9,7 @@ from service.views.asset_type_views import *
 from service.views.asset_views import create_asset, edit_asset, delete_asset, asset_list
 from service.views.attribute_views import attribute_create, attribute_delete, attribute_edit
 from service.views.request_views import request_list, request_create, add_comment,update_request,export_requests_pdf,select_request_type,delete_request
-from service.views.company_views import company_create,company_edit ,company_list,create_department,create_subdepartment,company_delete
+from service.views.company_views import company_create,company_edit,company_list,company_delete,department_create,department_delete,department_edit,subdepartment_create
 from service.views.profile_views import register, home, edit_profile, profile
 from service.views.user_views import user_list,create_user_view,user_delete
 from service.views.settings_views import types_list,create_or_edit_request_type,create_or_edit_priority,settings_sidebar,delete_status
@@ -41,8 +41,6 @@ urlpatterns = [
     path('company/', company_list, name='company_list'),
     path('company/<int:pk>/delete/', company_delete, name='company_delete'),
     path('create_user/', create_user_view, name='create_user'),
-    path('company/<int:department_id>/create_subdepartment/', service.views.company_views.create_subdepartment, name='create_subdepartment'),
-    path('company/<int:company_pk>/create_department/', service.views.company_views.create_department,name='create_department'),
     path('request_type/create/', create_or_edit_request_type, name='create_request_type'),
     path('request_type/edit/<int:pk>/', create_or_edit_request_type, name='edit_request_type'),
     path('types_list/', types_list, name='types_list'),
@@ -87,6 +85,12 @@ urlpatterns = [
     path('attributes/create/', attribute_create, name='attribute_create'),
     path('attributes/edit/<int:pk>/', attribute_edit, name='attribute_edit'),
     path('attributes/delete/<int:pk>/', attribute_delete, name='attribute_delete'),
+
+# URL-паттерны для отделов
+    path('department/<int:company_pk>/create_department/', department_create, name='department_create'),
+    path('department/<int:department_id>/subdepartment_create/', subdepartment_create, name='_subdepartment_create'),
+    path('department/<int:pk>/edit/', department_edit, name='department_edit'),
+    path('department/<int:pk>/delete/', department_delete, name='department_delete'),
 ]
 
 

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Редактирование отдела "{{ department.name }}"</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+        <a href="{% url 'company_edit' department.company.id %}" class="btn btn-secondary">Назад к компании</a>
+    </form>
+</div>
+{% endblock %}
