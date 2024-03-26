@@ -25,7 +25,7 @@ class GroupForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         group = kwargs.get('instance')
         super(GroupForm, self).__init__(*args, **kwargs)
-
+        print(group)
         # Инициализация начальных значений для разрешений действий
         if group:
             self.initial['action_permissions'] = group.grouppermission_set.filter(
@@ -35,7 +35,8 @@ class GroupForm(forms.ModelForm):
             self.initial['section_permissions'] = group.grouppermission_set.filter(
                 custompermission__code_name__startswith='section_'
             ).values_list('custompermission__id', flat=True)
-
+        print(self.initial)
+        
         # Добавляем динамические поля для уровней доступа
         for permission in CustomPermission.objects.filter(code_name__startswith='action_'):
             field_name = f'access_level_{permission.id}'

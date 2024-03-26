@@ -1,67 +1,67 @@
-{% extends 'settings/settings_sidebar.html' %}
-{% block settings_content %}
+{% extends 'settings/settings_sidebar.html' %} {% block settings_content %}
 <main>
     <h1>Настройки электронной почты</h1>
     <form method="post" id="emailSettingsForm">
-        {% csrf_token %}
-        {{ form.as_p }}
+        {% csrf_token %} {{ form.as_p }}
         <button type="submit" class="btn btn-primary">Сохранить настройки</button>
     </form>
 
     <!-- Дополнительная кнопка для отправки тестового письма -->
-    <button type="button" class="btn btn-secondary" id="sendTestEmailButton">Отправить тестовое письмо</button>
+    <button type="button" class="btn btn-secondary" id="sendTestEmailButton">
+        Отправить тестовое письмо
+    </button>
 </main>
 
 <script>
-document.getElementById('sendTestEmailButton').addEventListener('click', sendTestEmail);
+    document.getElementById('sendTestEmailButton').addEventListener('click', sendTestEmail);
 
-function sendTestEmail() {
-    var testEmail = document.querySelector('[name="test_email_to"]').value;
-    if (!testEmail) {
-        alert('Пожалуйста, введите адрес электронной почты для теста.');
-        return;
+    function sendTestEmail() {
+        var testEmail = document.querySelector('[name="test_email_to"]').value;
+        if (!testEmail) {
+            alert('Пожалуйста, введите адрес электронной почты для теста.');
+            return;
+        }
+
+        var data = new FormData(document.getElementById('emailSettingsForm'));
+        fetch('{% url 'send_test_email' %}', {
+            method: 'POST',
+            body: data,
+            credentials: 'same-origin',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Сетевая ошибка при попытке отправить запрос');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert('Тестовое письмо успешно отправлено.');
+                } else {
+                    alert('Ошибка при отправке письма: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Произошла ошибка: ' + error.message);
+            });
     }
 
-    var data = new FormData(document.getElementById('emailSettingsForm'));
-    fetch('{% url 'send_test_email' %}', {
-        method: 'POST',
-        body: data,
-        credentials: 'same-origin',
-        headers: {
-            'X-CS
-RFToken': getCookie('csrftoken')
-}
-})
-.then(response => {
-if (!response.ok) {
-throw new Error('Сетевая ошибка при попытке отправить запрос');
-}
-return response.json();
-})
-.then(data => {
-if (data.success) {
-alert('Тестовое письмо успешно отправлено.');
-} else {
-alert('Ошибка при отправке письма: ' + data.error);
-}
-})
-.catch(error => {
-alert('Произошла ошибка: ' + error.message);
-});
-}
-
-function getCookie(name) {
-let cookieValue = null;
-if (document.cookie && document.cookie !== '') {
-const cookies = document.cookie.split(';');
-for (let i = 0; i < cookies.length; i++) {
-const cookie = cookies[i].trim();
-if (cookie.startsWith(name + '=')) {
-cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-break;
-}   }
-}
-return cookieValue;
-}
-    </script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
 {% endblock %}

@@ -4,7 +4,7 @@ from django.urls import reverse
 from service.forms.Asset_Forms import AssetForm
 from service.models import AssetAttribute, Attribute, Asset
 
-
+# Создание актива
 def create_asset(request):
     if request.method == 'POST':
         form = AssetForm(request.POST)
@@ -20,6 +20,9 @@ def create_asset(request):
     else:
         form = AssetForm()
     return render(request, 'assets/create_asset.html', {'form': form})
+
+
+# Редактирование актива
 def edit_asset(request, pk):
     asset = Asset.objects.get(pk=pk)
     if request.method == 'POST':
@@ -37,12 +40,18 @@ def edit_asset(request, pk):
     else:
         form = AssetForm(instance=asset)
     return render(request, 'assets/edit_asset.html', {'form': form, 'asset': asset})
+
+
+# Удаление актива
 def delete_asset(request, pk):
     asset = Asset.objects.get(pk=pk)
     if request.method == 'POST':
         asset.delete()
         return HttpResponseRedirect(reverse('assets'))  # Перенаправление на список активов
     return render(request, 'assets/delete_asset.html', {'asset': asset})
+
+
+# Вывод списка активов
 def asset_list(request):
     assets = Asset.objects.prefetch_related('components', 'asset_attributes').all()
     return render(request, 'assets/asset_list.html', {'assets': assets})

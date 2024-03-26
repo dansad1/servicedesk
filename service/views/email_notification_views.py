@@ -10,12 +10,14 @@ from servicedesk import settings
 from service.forms.Emai_forms import *
 from ..models import EmailSettings
 
+# Вывод настроек для почты
 def email_settings_view(request):
     if request.method == 'POST':
         form = EmailSettingsForm(request.POST)
+        print(form.data)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Настройки электронной почты успешно сохранены.')
+            messages.success(request, f'Настройки электронной почты успешно сохранены.')
             return redirect('email_settings')
         else:
             # В случае ошибок, форма будет отображена снова с сохраненными данными
@@ -26,10 +28,12 @@ def email_settings_view(request):
 
     return render(request, 'settings/email_settings.html', {'form': form})
 
+# Отправка тестового письма
 @require_POST
 def send_test_email(request):
     try:
-        email_settings = EmailSettings.objects.first()
+        email_settings = EmailSettings.objects.last()
+        print(email_settings)
         if not email_settings:
             return JsonResponse({'success': False, 'error': 'Настройки электронной почты не настроены'})
 
@@ -38,6 +42,7 @@ def send_test_email(request):
             return JsonResponse({'success': False, 'error': 'Не указан адрес электронной почты для теста'})
 
         # Создание настраиваемого подключения на основе сохраненных настроек
+
         connection = get_connection(
             host=email_settings.server,
             port=email_settings.port,
@@ -57,6 +62,7 @@ def send_test_email(request):
             connection=connection
         )
         email.send()
+        
         return JsonResponse({'success': True})
     except Exception as e:  # Это поймает любые исключения, включая BadHeaderError
-        return JsonResponse({'success': False, 'error': f'Ошибка отправки письма: {e}'})
+        return JsonResponse({'success': False, 'error': f'Ошибка отправки письма: {e}, {email_settings.email_from, email_settings.login, email_settings.password}'})
