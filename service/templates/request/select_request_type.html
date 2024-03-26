@@ -1,4 +1,4 @@
-{{% extends 'base.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
     <div class="container">
@@ -14,7 +14,9 @@
 
     <script>
         function selectType(typeId) {
-            window.location.href = `{% url 'request_create' 0 %}`.replace('/0/', `/${typeId}/`);
+            var urlTemplate = "{{ url('request_create', '0') }}";
+            var url = urlTemplate.replace('0', typeId);
+            window.location.href = url;
         }
     </script>
 {% endblock %}

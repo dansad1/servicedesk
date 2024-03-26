@@ -147,7 +147,7 @@ def add_comment(request, pk):
     }
     return render(request, 'request/request_create.html', context)
 @login_required
-def update_request(request, pk):
+def request_edit(request, pk):
     request_instance = get_object_or_404(Request, pk=pk)
     is_editable = request.user.has_perm('service.action_edit_request', request_instance)
 
@@ -159,7 +159,7 @@ def update_request(request, pk):
     else:
         form = RequestForm(instance=request_instance)
 
-    return render(request, 'request/request_update.html', {
+    return render(request, 'request/request_edit.html', {
         'form': form,
         'is_editable': is_editable,
         'request_instance': request_instance,
@@ -190,7 +190,7 @@ def request_list(request):
         'requests_with_action': requests_with_action,
         'filter_form': filter_form
     })
-def delete_request(request, pk):
+def request_delete(request, pk):
     request_instance = get_object_or_404(Request, pk=pk)
 
     if request.method == 'POST':
