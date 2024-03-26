@@ -1,12 +1,18 @@
-from django.core.checks import messages
+from django.contrib import messages
 from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth.models import Group, Permission
 from ..models import GroupPermission, CustomPermission
 from service.forms.Role_forms import *
+
+
+
+# Создание роли 
 def role_create(request):
     if request.method == 'POST':
         form = GroupForm(request.POST)
+        print(form.is_valid())
         if form.is_valid():
+            print(form.data)
             new_group = form.save()
             # Сохранение уровней доступа для каждого разрешения действий
             for permission in form.cleaned_data['action_permissions']:
@@ -24,11 +30,24 @@ def role_create(request):
                 )
             return redirect('role_list')
     else:
-        form = GroupForm()
+        existing_group_id = request.GET.get('group_id')  # Assuming you pass the group_id in the request
+        existing_group = get_object_or_404(Group, id=existing_group_id) if existing_group_id else None
+        print(existing_group_id)
+        # Pass the existing Group instance to the form
+        form = GroupForm(instance=existing_group)
+    print(request.method)
+    print(form.data)
+    print(request.user.get_user_permissions())
+    print("__________________________")
+    print(request.user.get_group_permissions())
     return render(request, 'role/role_create_edit.html', {'form': form})
 
+
+
+# Редактирование роли
 def role_edit(request, group_id):
     group = get_object_or_404(Group, id=group_id)
+    print(group)
     if request.method == 'POST':
         form = GroupForm(request.POST, instance=group)
         if form.is_valid():
@@ -54,9 +73,16 @@ def role_edit(request, group_id):
         form = GroupForm(instance=group)
     return render(request, 'role/role_create_edit.html', {'form': form, 'group': group})
 
+
+
+# Вывод списка ролей
 def role_list(request):
     groups = Group.objects.all()
     return render(request, 'role/role_list.html', {'groups': groups})
+
+
+
+# Удаление ролей
 def role_delete(request, group_id):
     group = get_object_or_404(Group, id=group_id)
     group.delete()

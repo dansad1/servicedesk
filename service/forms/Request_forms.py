@@ -5,6 +5,8 @@ from django.forms import SelectMultiple, DateInput
 from service.models import StatusTransition, Status, Comment, Request, Company, Priority, RequestType, SavedFilter
 
 User = get_user_model()
+
+
 class RequestForm(forms.ModelForm):
     description = forms.CharField(widget=CKEditorWidget())
     duration_in_hours = forms.IntegerField(required=False, widget=forms.HiddenInput())
@@ -17,7 +19,7 @@ class RequestForm(forms.ModelForm):
     class Meta:
         model = Request
         # Исключаем 'request_type' из списка отображаемых полей
-        fields = ['title', 'description', 'assignee', 'status', 'due_date', 'priority','request_type']
+        fields = ['title', 'description', 'assignee', 'status', 'due_date', 'priority']
 
     def __init__(self, *args, **kwargs):
         current_status = kwargs.pop('current_status', None)

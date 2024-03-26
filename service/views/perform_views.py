@@ -2,6 +2,9 @@ from service.forms.Performer_forms import *
 from service.models import PerformerGroup, Company, CustomUser
 from django.shortcuts import render, redirect, get_object_or_404
 
+# TODO разобраться что это и расписать комментарии
+
+
 def performer_group_list(request):
     # Используйте prefetch_related для оптимизации запросов к отношениям многие-ко-многим
     groups = PerformerGroup.objects.prefetch_related('companies').all()

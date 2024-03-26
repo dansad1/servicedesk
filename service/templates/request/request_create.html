@@ -20,18 +20,23 @@
     {% endif %}
   {% endfor %}
 
+  {% if comment_form %}
+  <h3>Добавить комментарий к заявке</h3>
+  {{ comment_form.as_p}}
+  {% endif %}
+
   <button type="submit" name="action" value="save" class="btn btn-primary">Сохранить</button>
   <button type="submit" name="action" value="save_and_close" class="btn btn-secondary">Сохранить и закрыть</button>
 </form>
 
-{% if comment_form %}
+<!-- {% if comment_form %}
 <h3>Добавить комментарий к заявке</h3>
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ comment_form.as_p }}
-    <button type="submit" class="btn btn-success">Добавить комментарий</button>
+    <button type="submit" name="action" value="add_comment" class="btn btn-success">Добавить комментарий</button>
 </form>
-{% endif %}
+{% endif %} -->
 
 <a href="{% url 'request_list' %}" class="btn btn-secondary">Вернуться к списку заявок</a>
 {% endblock %}
