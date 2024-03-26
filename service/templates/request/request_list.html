@@ -57,7 +57,7 @@
       <tbody>
     {% for item in requests_with_action %}
         <tr>
-            <td><a href="{% url 'update_request' item.request.pk %}">{{ item.request.title }}</a></td>
+            <td><a href="{% url 'request_edit' item.request.pk %}">{{ item.request.title }}</a></td>
             <td>{{ item.request.request_type }}</td>
             <td>{{ item.request.priority }}</td>
             <td>{{ item.request.assignee }}</td>
@@ -67,7 +67,7 @@
             <td>{% if item.request.updated_at %}{{ item.request.updated_at|date:"d.m.Y H:i" }}{% else %}Не указано{% endif %}</td>
             <!-- Кнопка удаления теперь в своей ячейке -->
             <td>
-                <form action="{% url 'delete_request' item.request.pk %}" method="post">
+                <form action="{% url 'request_delete' item.request.pk %}" method="post">
                     {% csrf_token %}
                     <button type="submit" class="delete-btn">Удалить</button>
                 </form>

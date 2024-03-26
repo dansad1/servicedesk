@@ -9,8 +9,11 @@ class RequestForm(forms.ModelForm):
     description = forms.CharField(widget=CKEditorWidget())
     duration_in_hours = forms.IntegerField(required=False, widget=forms.HiddenInput())
     attachment = forms.FileField(required=False)
-    request_type = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly': 'readonly'}))
-
+    request_type = forms.ModelChoiceField(
+        queryset=RequestType.objects.all(),
+        widget=forms.HiddenInput(),
+        required=False
+    )
     class Meta:
         model = Request
         # Исключаем 'request_type' из списка отображаемых полей
@@ -31,7 +34,7 @@ class RequestForm(forms.ModelForm):
 
         # Adjust status field based on current status
         self.adjust_status_field(current_status)
-
+        self.fields['request_type'].widget = forms.HiddenInput()
     def adjust_status_field(self, current_status):
         if current_status:
             # Limit status choices to valid next statuses

@@ -8,7 +8,7 @@ import service.models
 from service.views.asset_type_views import *
 from service.views.asset_views import create_asset, edit_asset, delete_asset, asset_list
 from service.views.attribute_views import attribute_create, attribute_delete, attribute_edit
-from service.views.request_views import request_list, request_create, add_comment,update_request,export_requests_pdf,select_request_type,delete_request
+from service.views.request_views import request_list, request_create, add_comment,request_edit,export_requests_pdf,select_request_type,request_delete
 from service.views.company_views import company_create,company_edit,company_list,company_delete,department_create,department_delete,department_edit,subdepartment_create
 from service.views.profile_views import register, home, edit_profile, profile
 from service.views.user_views import user_list,create_user_view,user_delete
@@ -30,8 +30,8 @@ urlpatterns = [
     path('select_request_type/', select_request_type, name='select_request_type'),
     path('select_request_type/', select_request_type, name='select_request_type'),
     path('request/create/<int:type_id>/', request_create, name='request_create'),
-    path('request/update/<int:pk>/', update_request, name='update_request'),
-    path('requests/<int:pk>/delete/', delete_request, name='delete_request'),
+    path('request/update/<int:pk>/', request_edit, name='request_edit'),
+    path('requests/<int:pk>/delete/', request_delete, name='request_delete'),
     path('request/<int:pk>/comment/', add_comment, name='add_comment'),
     path('profile/', profile, name='profile'),
     path('company/create/', company_create, name='create_company'),

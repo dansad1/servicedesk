@@ -10,6 +10,7 @@
     <h1 class="mb-4">Обновление заявки</h1>
 
     <form method="post" {% if not is_editable %}class="read-only"{% endif %}>
+    <form method="post" {% if not is_editable %}class="read-only"{% endif %}>
         {% csrf_token %}
 
         {% for field in form %}
