@@ -196,7 +196,7 @@
             <tbody>
                 {% for request in requests %}
                 <tr>
-    <td><a href="{% url 'update_request' request.pk %}">{{ request.title }}</a></td>
+    <td><a href="{% url 'request_edit' request.pk %}">{{ request.title }}</a></td>
                     <td>{{ request.request_type.name|default:"Тип не указан" }}</td>
                     <td>{{ request.priority.name|default:"Приоритет не указан" }}</td>
                     <td>{{ request.assignee.get_full_name|default:"Исполнитель не назначен" }}</td>

@@ -73,7 +73,10 @@ def department_create(request, company_pk):
             return redirect('company_edit', pk=company.pk)
     else:
         form = DepartmentForm(initial={'company': company}, company_id=company.id)
-    return render(request, 'company/department_create.html', {'form': form})
+
+    # В контекст добавляем переменную company
+    context = {'form': form, 'company': company}
+    return render(request, 'company/department_create.html', context)
 
 
 @login_required
