@@ -1,22 +1,24 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <div class="container">
-        <h2>Выберите тип заявки</h2>
-        <div class="list-group">
-            {% for type in types %}
-            <button class="list-group-item list-group-item-action" onclick="selectType({{ type.id }})">
-                {{ type.name }}
-            </button>
-            {% endfor %}
-        </div>
+<div class="container">
+    <h2>Выберите тип заявки</h2>
+    <div class="list-group">
+        {% for type in types %}
+        <button class="list-group-item list-group-item-action" onclick="selectType({{ type.id }})">
+            {{ type.name }}
+        </button>
+        {% endfor %}
     </div>
+</div>
 
-    <script>
-        function selectType(typeId) {
-            var urlTemplate = "{{ url('request_create', '0') }}";
-            var url = urlTemplate.replace('0', typeId);
-            window.location.href = url;
-        }
-    </script>
+<script>
+    function selectType(typeId) {
+        // Синтаксис Django для вставки URL-адреса
+        var urlTemplate = "{% url 'request_create' 0 %}";
+        // JavaScript заменяет 0 на реальный typeId
+        var url = urlTemplate.replace('0', typeId);
+        window.location.href = url;
+    }
+</script>
 {% endblock %}
