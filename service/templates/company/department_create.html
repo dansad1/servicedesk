@@ -5,7 +5,39 @@
     <h2>Создание нового отдела</h2>
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
+        <p>
+            <label for="{{ form.name.id_for_label }}">Название:</label><br>
+            {{ form.name }}
+        </p>
+        <p>
+            <label for="{{ form.parent.id_for_label }}">Родительский отдел:</label><br>
+            {{ form.parent }}
+        </p>
+        {{ form.company }}
+        <div>
+            <label>Сотрудники:</label>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Выбрать</th>
+                        <th>Имя</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for user in form.users.field.queryset %}
+    <tr>
+        <td>
+            <input type="checkbox" name="users" value="{{ user.id }}" id="user_{{ user.id }}"
+            {% if user.id in form.users.value %} checked {% endif %}>
+        </td>
+        <td>
+            <label for="user_{{ user.id }}">{{ user.first_name }} {{ user.last_name }}</label>
+        </td>
+    </tr>
+{% endfor %}
+                </tbody>
+            </table>
+        </div>
         <button type="submit" class="btn btn-primary">Создать</button>
         <a href="{% url 'company_edit' company.id %}" class="btn btn-secondary">Назад к компании</a>
     </form>

@@ -5,9 +5,66 @@
     <h2>Редактирование отдела "{{ department.name }}"</h2>
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
+        <div class="mb-3">
+            <label for="{{ form.name.id_for_label }}" class="form-label">Название:</label>
+            {{ form.name }}
+        </div>
+        <div class="mb-3">
+            <label for="{{ form.parent.id_for_label }}" class="form-label">Родительский отдел:</label>
+            {{ form.parent }}
+        </div>
+        {{ form.company }}
+        <div class="mb-3">
+            <label class="form-label">Сотрудники:</label>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Выбрать</th>
+                        <th>Имя</th>
+                    </tr>
+                </thead>
+                <tbody>
+                  {% for user in form.users.field.queryset %}
+    <tr>
+        <td>
+            <input type="checkbox" name="users" value="{{ user.id }}" id="user_{{ user.id }}"
+            {% if user.id in form.users.value %} checked {% endif %}>
+        </td>
+        <td>
+            <label for="user_{{ user.id }}">{{ user.first_name }} {{ user.last_name }}</label>
+        </td>
+    </tr>
+{% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+
         <button type="submit" class="btn btn-primary">Сохранить изменения</button>
         <a href="{% url 'company_edit' department.company.id %}" class="btn btn-secondary">Назад к компании</a>
     </form>
+
+    <!-- Таблица заявок -->
+    <h3 class="mt-4">Заявки от сотрудников отдела:</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID заявки</th>
+                <th>Название</th>
+                <th>Дата создания</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in department_requests %}
+            <tr>
+                <td>{{ request.id }}</td>
+                <td>{{ request.title }}</td>
+                <td>{{ request.created_at|date:"Y-m-d H:i" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3">Нет заявок от сотрудников этого отдела.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}

@@ -16,13 +16,12 @@ def register(request):
         if form.is_valid():
             user = form.save()
             login(request, user)  # Автоматически входить после регистрации
-            return redirect('home')  # Замените 'home' на URL вашей домашней страницы
+            return redirect('profile')  # Переадресация на страницу профиля пользователя
     else:
         form = CustomUserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
 
-def home(request):
-    return render(request, 'pages/home.html')
+
 
 
 @login_required

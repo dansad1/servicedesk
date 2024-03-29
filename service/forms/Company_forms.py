@@ -34,9 +34,9 @@ class CompanyForm(forms.ModelForm):
 
 class DepartmentForm(forms.ModelForm):
     users = forms.ModelMultipleChoiceField(
-        queryset=CustomUser.objects.none(),  # Начальный пустой queryset, который будет задан динамически
-        widget=CheckboxSelectMultiple,
-        required=False  # Сделать выбор пользователей необязательным
+        queryset=CustomUser.objects.none(),  # Изменится далее
+        widget=forms.CheckboxSelectMultiple,
+        required=False
     )
 
     class Meta:
@@ -45,15 +45,13 @@ class DepartmentForm(forms.ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'parent': forms.Select(attrs={'class': 'form-control'}),
-            'company': forms.HiddenInput(),
-            # 'users': уже определено выше
+            'company': forms.HiddenInput(),  # Компания устанавливается скрытым полем
         }
 
     def __init__(self, *args, **kwargs):
         company_id = kwargs.pop('company_id', None)
-        super().__init__(*args, **kwargs)
-        self.fields['parent'].queryset = Department.objects.none()
-
+        super(DepartmentForm, self).__init__(*args, **kwargs)
         if company_id:
             self.fields['parent'].queryset = Department.objects.filter(company_id=company_id)
-            self.fields['users'].queryset = CustomUser.objects.filter(company_id=company_id)  # Фильтрация пользователей по компании
+            # Это место нужно исправить для правильной фильтрации пользователей
+            self.fields['users'].queryset = CustomUser.objects.filter(company_id=company_id)
