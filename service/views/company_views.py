@@ -72,27 +72,35 @@ def department_create(request, company_pk):
             messages.success(request, 'Отдел успешно создан.')
             return redirect('company_edit', pk=company.pk)
     else:
-        form = DepartmentForm(initial={'company': company}, company_id=company.id)
+        form = DepartmentForm(initial={'company': company.id}, company_id=company.id)
+        # Проверьте, что это место кода выполняется и queryset устанавливается правильно
+        form.fields['users'].queryset = CustomUser.objects.filter(company=company)
 
-    # В контекст добавляем переменную company
     context = {'form': form, 'company': company}
     return render(request, 'company/department_create.html', context)
-
 
 @login_required
 def department_edit(request, pk):
     department = get_object_or_404(Department, pk=pk)
-    form = DepartmentForm(request.POST or None, instance=department)
+    department_requests = Request.objects.filter(requester__department=department)
 
-    if request.method == 'POST' and form.is_valid():
-        form.save()
-        messages.success(request, "Отдел обновлён.")
-        return redirect('company_edit', pk=department.company.pk)
+    if request.method == 'POST':
+        form = DepartmentForm(request.POST, instance=department, company_id=department.company_id)
+        if form.is_valid():
+            form.save()
+            form.save_m2m()  # Сохранение связей многие-ко-многим
+            messages.success(request, "Отдел обновлён.")
+            return redirect('company_edit', pk=department.company.pk)
+    else:
+        form = DepartmentForm(instance=department, company_id=department.company_id)
+        # Правильно устанавливаем queryset для пользователей в представлении
+        form.fields['users'].queryset = CustomUser.objects.filter(department_id=pk)
 
     context = {
         'form': form,
         'department': department,
-        'company': department.company  # Убедитесь, что компания действительно существует
+        'company': department.company,
+        'department_requests': department_requests
     }
     return render(request, 'company/department_edit.html', context)
 

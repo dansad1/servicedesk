@@ -10,7 +10,7 @@ from service.views.asset_views import create_asset, edit_asset, delete_asset, as
 from service.views.attribute_views import attribute_create, attribute_delete, attribute_edit
 from service.views.request_views import *
 from service.views.company_views import company_create,company_edit,company_list,company_delete,department_create,department_delete,department_edit,subdepartment_create
-from service.views.profile_views import register, home, edit_profile, profile
+from service.views.profile_views import register,  edit_profile, profile
 from service.views.user_views import user_list,create_user_view,user_delete
 from service.views.settings_views import types_list,create_or_edit_request_type,create_or_edit_priority,settings_sidebar,delete_status
 from service.views.settings_views import *
@@ -18,11 +18,11 @@ from service.views.role_views import role_delete,role_edit,role_create,role_list
 from service.views.email_notification_views import email_settings_view
 from service.views.perform_views import *
 urlpatterns = [
+
     path('admin/', admin.site.urls),
-    path('login/', auth_views.LoginView.as_view(), name='login'),
+    path('', auth_views.LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('register/', register, name='register'),
-    path('', home, name='home'),
     path('profile/edit/', edit_profile, name='edit_own_profile'),
     re_path(r'^profile/edit/(?P<pk>\d+)?/$', edit_profile, name='edit_profile'),
     path('users/<int:pk>/delete/', user_delete, name='user_delete'),

@@ -129,8 +129,8 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'service.CustomUser'
-LOGOUT_REDIRECT_URL = 'templates/pages/home.html'  # Замените 'home' на URL вашей домашней страницы
-LOGIN_REDIRECT_URL = '/profile/'  # Путь к вашей странице профиля
+LOGOUT_REDIRECT_URL = 'register'  # Имя, используемое в 'name' в urls.py
+LOGIN_REDIRECT_URL = 'profile'  # Предполагая, что у вас есть такое имя URL-адреса в urls.py
 
 STATIC_URL = '/static/'
 
