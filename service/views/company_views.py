@@ -87,22 +87,20 @@ def department_edit(request, pk):
     if request.method == 'POST':
         form = DepartmentForm(request.POST, instance=department, company_id=department.company_id)
         if form.is_valid():
-            form.save()
-            form.save_m2m()  # Сохранение связей многие-ко-многим
+            department = form.save()  # Сохраняем объект модели и связанные данные многие-ко-многим
             messages.success(request, "Отдел обновлён.")
             return redirect('company_edit', pk=department.company.pk)
     else:
         form = DepartmentForm(instance=department, company_id=department.company_id)
-        # Правильно устанавливаем queryset для пользователей в представлении
-        form.fields['users'].queryset = CustomUser.objects.filter(department_id=pk)
 
     context = {
         'form': form,
         'department': department,
         'company': department.company,
-        'department_requests': department_requests
+        'department_requests': department_requests,
     }
     return render(request, 'company/department_edit.html', context)
+
 
 
 @login_required
