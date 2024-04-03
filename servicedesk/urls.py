@@ -88,7 +88,7 @@ urlpatterns = [
 
 # URL-паттерны для отделов
     path('department/<int:company_pk>/create_department/', department_create, name='department_create'),
-    path('department/<int:department_id>/subdepartment_create/', subdepartment_create, name='_subdepartment_create'),
+    path('department/<int:department_id>/subdepartment_create/', subdepartment_create, name='subdepartment_create'),
     path('department/<int:pk>/edit/', department_edit, name='department_edit'),
     path('department/<int:pk>/delete/', department_delete, name='department_delete'),
 ]
