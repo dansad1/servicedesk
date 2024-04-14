@@ -82,9 +82,9 @@ urlpatterns = [
     path('asset_types/', asset_type_list, name='asset_type_list'),
 
     # Маршруты для атрибутов
-    path('attributes/create/', attribute_create, name='attribute_create'),
     path('attributes/edit/<int:pk>/', attribute_edit, name='attribute_edit'),
     path('attributes/delete/<int:pk>/', attribute_delete, name='attribute_delete'),
+    path('asset_types/<int:asset_type_id>/attributes/create/', attribute_create, name='attribute_create'),
 
 # URL-паттерны для отделов
     path('department/<int:company_pk>/create_department/', department_create, name='department_create'),
