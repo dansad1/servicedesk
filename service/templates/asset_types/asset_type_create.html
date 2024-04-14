@@ -1,43 +1,15 @@
+<!-- asset_type_create.html -->
 {% extends "base.html" %}
 
 {% block content %}
-  <h2>Создание нового типа актива</h2>
-  <form method="post" enctype="multipart/form-data">
+<h2>Создать новый тип актива</h2>
+<form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-
-    <hr>
-
-    <h3>Добавить атрибуты</h3>
-    <div id="attributes">
-      <!-- JavaScript will clone this div for new attributes -->
-      <div class="attribute">
-        <div class="form-group">
-          <label for="attributeName">Название атрибута:</label>
-          <input type="text" class="form-control" name="attributeName[]" required>
-        </div>
-        <div class="form-group">
-          <label for="attributeType">Тип атрибута:</label>
-          <select class="form-control" name="attributeType[]" required>
-            <option value="text">Текст</option>
-            <option value="number">Число</option>
-            <!-- Дополнительные типы атрибутов -->
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <button type="button" class="btn btn-secondary" onclick="addAttribute()">Добавить ещё один атрибут</button>
-    <hr>
     <button type="submit" class="btn btn-primary">Создать</button>
-  </form>
+</form>
 
-  <script>
-    function addAttribute() {
-      // Clone the attribute form fields
-      var original = document.querySelector('.attribute');
-      var clone = original.cloneNode(true);
-      document.getElementById('attributes').appendChild(clone);
-    }
-  </script>
+<!-- Кнопка для создания нового атрибута -->
+<a href="{% url 'attribute_create' asset_type_id=asset_type.id %}" class="btn btn-secondary">Создать атрибут</a>
+
 {% endblock %}

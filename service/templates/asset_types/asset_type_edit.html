@@ -1,11 +1,16 @@
+<!-- asset_type_edit.html -->
 {% extends "base.html" %}
 
 {% block content %}
-  <h2>Редактирование типа актива</h2>
-  <form method="post" enctype="multipart/form-data">
+<h2>Редактировать тип актива "{{ asset_type.name }}"</h2>
+<form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit" class="btn btn-primary">Сохранить изменения</button>
-    <a href="{% url 'asset_type_list' %}" class="btn btn-secondary">Отмена</a>
-  </form>
+</form>
+
+{% if asset_type.pk %}
+    <a href="{% url 'attribute_create' asset_type_id=asset_type.pk %}" class="btn btn-secondary">Создать атрибут</a>
+{% endif %}
+
 {% endblock %}

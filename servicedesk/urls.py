@@ -76,8 +76,8 @@ urlpatterns = [
     path('assets/', asset_list, name='asset_list'),
 
     # Маршруты для типов активов
-    path('asset_types/create/', create_asset_type, name='asset_type_create'),
-    path('asset_types/edit/<int:pk>/', edit_asset_type, name='asset_type_edit'),
+    path('asset_types/create/', asset_type_create, name='asset_type_create'),
+    path('asset_types/edit/<int:pk>/', asset_type_edit, name='asset_type_edit'),
     path('asset_types/delete/<int:pk>/', asset_type_delete, name='asset_type_delete'),
     path('asset_types/', asset_type_list, name='asset_type_list'),
 
