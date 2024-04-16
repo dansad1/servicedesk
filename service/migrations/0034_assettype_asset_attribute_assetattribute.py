@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
                 ('asset', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='attributes', to='service.asset')),
                 ('value_asset_reference', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='service.asset')),
                 ('value_attribute_reference', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='service.assetattribute')),
-                ('attribute', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='service.attribute')),
+                ('attributes', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='service.attributes')),
             ],
         ),
     ]

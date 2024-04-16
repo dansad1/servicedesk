@@ -1,3 +1,4 @@
+from django.core.checks import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render, get_object_or_404
 from service.forms.Asset_Forms import AttributeForm
@@ -12,10 +13,11 @@ def attribute_create(request, asset_type_id):
             attribute = form.save(commit=False)
             attribute.save()
             asset_type.attributes.add(attribute)
-            return redirect('asset_type_attributes', asset_type_id=asset_type.pk)
+            return redirect('asset_type_edit', pk=asset_type.pk)  # Используйте 'asset_type_edit' как имя паттерна
     else:
         form = AttributeForm()
-    return render(request, 'attributes/attribute_create.html', {'form': form, 'asset_types': asset_type})
+    return render(request, 'attributes/attribute_create.html', {'form': form, 'asset_type': asset_type})
+
 
 # Редактирование атрибута
 def attribute_edit(request, pk):
@@ -32,12 +34,19 @@ def attribute_edit(request, pk):
     return render(request, 'attributes/attribute_edit.html', {'form': form})
 
 # Удаление атрибута
+# views.py
 def attribute_delete(request, pk):
     attribute = get_object_or_404(Attribute, pk=pk)
+    asset_type_id = attribute.asset_types.first().id if attribute.asset_types.exists() else None
     if request.method == 'POST':
         attribute.delete()
-        # Аналогично, предполагаем перенаправление на список типов активов
-        # или другую страницу в зависимости от логики приложения
-        return redirect('asset_type_list')
-    return render(request, 'attributes/attribute_delete.html', {'object': attribute})
-
+        if asset_type_id:
+            return redirect('asset_type_edit', pk=asset_type_id)
+        else:
+            return redirect('asset_type_list')
+    # Если это GET-запрос, то предоставляем страницу с подтверждением удаления
+    context = {
+        'attribute': attribute,
+        'asset_type_id': asset_type_id,
+    }
+    return render(request, 'attributes/attribute_delete.html', context)
