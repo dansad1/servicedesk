@@ -89,7 +89,11 @@ def request_create(request, type_id):
     comment_form = CommentForm(request.POST or None, request.FILES or None)
 
     if request.method == 'POST':
-        if form.is_valid():
+        comment_data = {"attachment": request.POST['attachment'], "text": request.POST['text']}
+        print(comment_data)
+        comment_form = CommentForm(comment_data, request.FILES or None)
+        print(comment_form.is_valid())
+        if form.is_valid() and comment_form.is_valid():
             new_request = form.save(commit=False)
             new_request.requester = request.user
             new_request.request_type = request_type
@@ -102,20 +106,19 @@ def request_create(request, type_id):
             new_request.save()
             form.save_m2m()
 
-            if comment_form.is_valid():
-                new_comment = comment_form.save(commit=False)
-                new_comment.request = new_request
-                new_comment.author = request.user
-                new_comment.save()
+            new_comment = comment_form.save(commit=False)
+            new_comment.request = new_request
+            new_comment.author = request.user
+            new_comment.save()
 
-            # Определяем, какая кнопка была нажата
-            if 'save_and_close' in request.POST:
+            if 'save_and_close' in request.POST.get('action', ''):
                 messages.success(request, "Заявка успешно создана.")
                 return redirect('request_list')
             else:
                 messages.success(request, "Заявка создана. Вы можете продолжить редактирование.")
-                return redirect('request_edit', pk=new_request.pk)
+                return redirect('edit_request', pk=new_request.pk)
 
+    # Этот контекст должен быть доступен вне условных блоков, чтобы всегда возвращать страницу, даже если POST не произошел.
     context = {
         'form': form,
         'comment_form': comment_form,
@@ -127,6 +130,8 @@ def add_comment(request, pk):
     request_instance = get_object_or_404(Request, pk=pk)
     if request.method == 'POST':
         comment_form = CommentForm(request.POST, request.FILES)
+        print(comment_form.data)
+        print(comment_form.is_valid)
         if comment_form.is_valid():
             new_comment = comment_form.save(commit=False)
             new_comment.request = request_instance
@@ -149,6 +154,7 @@ def add_comment(request, pk):
 @login_required
 def request_edit(request, pk):
     request_instance = get_object_or_404(Request, pk=pk)
+    comment_instances = Comment.objects.filter(request_id=pk)
     is_editable = request.user.has_perm('service.action_edit_request', request_instance)
 
     if request.method == 'POST' and 'submit_update' in request.POST and is_editable:
@@ -156,15 +162,31 @@ def request_edit(request, pk):
         if form.is_valid():
             form.save()
             return redirect('request_list')  # или другой URL, куда вы хотите перенаправить пользователя
+    elif request.method == "POST" and "add_comment" in request.POST:
+        comment_form = CommentForm(request.POST, request.FILES)
+        if comment_form.is_valid():
+            new_comment = comment_form.save(commit=False)
+            new_comment.request = request_instance
+            new_comment.author = request.user
+            new_comment.save()
+        comment_instances = Comment.objects.filter(request_id=pk)
+        form = RequestForm(instance=request_instance)
+
     else:
         form = RequestForm(instance=request_instance)
+        comment_form = CommentForm(instance=request_instance)
+        print(request.POST)
 
     return render(request, 'request/request_edit.html', {
         'form': form,
         'is_editable': is_editable,
+        'comments': comment_instances,
+        "comment_form": comment_form,
         'request_instance': request_instance,
         'due_date': request_instance.due_date
     })
+
+
 @login_required
 def request_list(request):
     filter_form = RequestFilterForm(request.GET)
