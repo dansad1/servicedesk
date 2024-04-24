@@ -13,13 +13,13 @@
       </tr>
     </thead>
     <tbody>
-      {% for attribute in asset_type.attributes.all %}
+      {% for asset_type_attr in asset_type.type_attributes.all %}
         <tr>
-          <td>{{ attribute.name }}</td>
-          <td>{{ attribute.get_attribute_type_display }}</td>
+          <td>{{ asset_type_attr.attribute.name }}</td>
+          <td>{{ asset_type_attr.attribute.get_attribute_type_display }}</td>
           <td>
-            <a href="{% url 'attribute_edit' attribute.id %}">Редактировать</a>
-            <a href="{% url 'attribute_delete' attribute.id %}" onclick="return confirm('Вы уверены, что хотите удалить этот атрибут?');">Удалить</a>
+            <a href="{% url 'attribute_edit' asset_type_attr.attribute.id %}">Редактировать</a>
+            <a href="{% url 'attribute_delete' asset_type_attr.attribute.id %}" onclick="return confirm('Вы уверены, что хотите удалить этот атрибут?');">Удалить</a>
           </td>
         </tr>
       {% empty %}
@@ -33,7 +33,6 @@
   <!-- Кнопка для добавления нового атрибута -->
   <a href="{% url 'attribute_create' asset_type_id=asset_type.id %}" class="btn btn-primary">Добавить новый атрибут</a>
 
-  <!-- Форма для редактирования или другие детали типа актива, если это страница редактирования -->
   {% if editable %}
     <h3>Редактирование типа актива</h3>
     <form method="post">
