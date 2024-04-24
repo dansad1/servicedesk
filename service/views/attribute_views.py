@@ -2,7 +2,8 @@ from django.core.checks import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render, get_object_or_404
 from service.forms.Asset_Forms import AttributeForm
-from service.models import Attribute, AssetType
+from service.models import Attribute, AssetType, AssetAttribute, AssetTypeAttribute
+
 
 # Создание атрибута
 def attribute_create(request, asset_type_id):
@@ -10,10 +11,10 @@ def attribute_create(request, asset_type_id):
     if request.method == 'POST':
         form = AttributeForm(request.POST)
         if form.is_valid():
-            attribute = form.save(commit=False)
-            attribute.save()
-            asset_type.attributes.add(attribute)
-            return redirect('asset_type_edit', pk=asset_type.pk)  # Используйте 'asset_type_edit' как имя паттерна
+            attribute = form.save()
+            # Создание связи через промежуточную модель
+            AssetTypeAttribute.objects.create(asset_type=asset_type, attribute=attribute)
+            return redirect('asset_type_edit', pk=asset_type.pk)
     else:
         form = AttributeForm()
     return render(request, 'attributes/attribute_create.html', {'form': form, 'asset_type': asset_type})
