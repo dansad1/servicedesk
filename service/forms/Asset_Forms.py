@@ -28,49 +28,53 @@ class AttributeForm(forms.ModelForm):
         super(AttributeForm, self).__init__(*args, **kwargs)
         # Здесь можно добавить любую специфическую логику, например, настройку начальных значений или условную логику отображения полей
 
+
 class AssetForm(forms.ModelForm):
     class Meta:
         model = Asset
         fields = ['name', 'asset_type', 'parent_asset']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'asset_type': forms.Select(attrs={'class': 'form-control'}),
+            'parent_asset': forms.Select(attrs={'class': 'form-control'}),
+        }
 
     def __init__(self, *args, **kwargs):
         super(AssetForm, self).__init__(*args, **kwargs)
-        if self.instance.pk:  # Only if the asset instance has been saved (editing)
+
+        # Check if we are editing an existing asset (it has a primary key)
+        if self.instance.pk:
+            # Iterate over all attributes linked to this asset
             for asset_attribute in self.instance.asset_attributes.all():
                 field_name = f'attribute_{asset_attribute.attribute.pk}'
                 field_label = asset_attribute.attribute.name
                 field_value = asset_attribute.get_value()
 
-                # Dynamically add fields based on attribute type
-                if asset_attribute.attribute.attribute_type == Attribute.TEXT:
-                    self.fields[field_name] = forms.CharField(
-                        initial=field_value, label=field_label, widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
-                elif asset_attribute.attribute.attribute_type == Attribute.NUMBER:
-                    self.fields[field_name] = forms.FloatField(
-                        initial=field_value, label=field_label, widget=forms.NumberInput(attrs={'class': 'form-control'}), required=False)
-                elif asset_attribute.attribute.attribute_type == Attribute.DATE:
-                    self.fields[field_name] = forms.DateField(
-                        initial=field_value, label=field_label, widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}), required=False)
-                elif asset_attribute.attribute.attribute_type == Attribute.BOOLEAN:
-                    self.fields[field_name] = forms.BooleanField(
-                        initial=bool(field_value), label=field_label, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}), required=False)
-                elif asset_attribute.attribute.attribute_type == Attribute.EMAIL:
-                    self.fields[field_name] = forms.EmailField(
-                        initial=field_value, label=field_label, widget=forms.EmailInput(attrs={'class': 'form-control'}), required=False)
-                elif asset_attribute.attribute.attribute_type == Attribute.URL:
-                    self.fields[field_name] = forms.URLField(
-                        initial=field_value, label=field_label, widget=forms.URLInput(attrs={'class': 'form-control'}), required=False)
-                elif asset_attribute.attribute.attribute_type == Attribute.JSON:
-                    self.fields[field_name] = forms.JSONField(
-                        initial=field_value, label=field_label, widget=forms.Textarea(attrs={'class': 'form-control'}), required=False)
-                elif asset_attribute.attribute.attribute_type == Attribute.ASSET_REFERENCE:
-                    self.fields[field_name] = forms.ModelChoiceField(
-                        queryset=Asset.objects.all(), initial=asset_attribute.value_asset_reference, label=field_label,
-                        widget=forms.Select(attrs={'class': 'form-control'}), required=False)
-                elif asset_attribute.attribute.attribute_type == Attribute.ATTRIBUTE_REFERENCE:
-                    self.fields[field_name] = forms.ModelChoiceField(
-                        queryset=AssetAttribute.objects.filter(asset=self.instance),
-                        initial=asset_attribute.value_attribute_reference, label=field_label,
-                        widget=forms.Select(attrs={'class': 'form-control'}), required=False)
+                # Determine the field type based on the attribute's specified type
+                field_class, widget_class = self.determine_field_class(asset_attribute.attribute.attribute_type)
+
+                # Create and add the field to the form
+                self.fields[field_name] = field_class(
+                    initial=field_value, label=field_label,
+                    widget=widget_class(attrs={'class': 'form-control'}),
+                    required=False
+                )
+
+    def determine_field_class(self, attribute_type):
+        """ Map attribute types to form fields and widgets. """
+        type_map = {
+            Attribute.TEXT: (forms.CharField, forms.TextInput),
+            Attribute.NUMBER: (forms.FloatField, forms.NumberInput),
+            Attribute.DATE: (forms.DateField, forms.DateInput),
+            Attribute.BOOLEAN: (forms.BooleanField, forms.CheckboxInput),
+            Attribute.EMAIL: (forms.EmailField, forms.EmailInput),
+            Attribute.URL: (forms.URLField, forms.URLInput),
+            Attribute.JSON: (forms.JSONField, forms.Textarea),
+            Attribute.ASSET_REFERENCE: (forms.ModelChoiceField, forms.Select),
+            Attribute.ATTRIBUTE_REFERENCE: (forms.ModelChoiceField, forms.Select),
+        }
+        field_class, widget_class = type_map[attribute_type]
+        return field_class, widget_class
+
 
 

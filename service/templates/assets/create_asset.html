@@ -1,1 +1,16 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Создание нового актива</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            <strong>Ошибка!</strong> Пожалуйста, исправьте ошибки ниже.
+        </div>
+    {% endif %}
+    <button type="submit" class="btn btn-primary">Создать актив</button>
+</form>
+<a href="{% url 'assets_list' %}" class="btn btn-secondary">Вернуться к списку активов</a>
+{% endblock %}

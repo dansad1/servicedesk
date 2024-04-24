@@ -100,7 +100,7 @@ urlpatterns = [
     path('assets/create/', create_asset, name='create_asset'),
     path('assets/edit/<int:pk>/', edit_asset, name='edit_asset'),
     path('assets/delete/<int:pk>/', delete_asset, name='delete_asset'),
-    path('assets/', asset_list, name='asset_list'),
+    path('assets/', asset_list, name='assets_list'),
 
     # Маршруты для типов активов
     path('asset_types/create/', asset_type_create, name='asset_type_create'),
