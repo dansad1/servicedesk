@@ -2,9 +2,10 @@
 
 {% block content %}
 <h2>Создание нового актива</h2>
-<form method="post" enctype="multipart/form-data">
+<form method="post" enctype="multipart/form-data" id="assetForm">
     {% csrf_token %}
     {{ form.as_p }}
+    <div id="dynamicAttributesContainer"></div> <!-- Контейнер для динамических полей -->
     {% if form.errors %}
         <div class="alert alert-danger">
             <strong>Ошибка!</strong> Пожалуйста, исправьте ошибки ниже.
@@ -13,4 +14,31 @@
     <button type="submit" class="btn btn-primary">Создать актив</button>
 </form>
 <a href="{% url 'assets_list' %}" class="btn btn-secondary">Вернуться к списку активов</a>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#id_asset_type').change(function() {
+            var assetTypeId = $(this).val(); // Получаем ID выбранного типа актива
+            if (assetTypeId) {
+                $.ajax({
+                    url: `{% url 'get_attributes_by_asset_type' 0 %}`.replace('0', assetTypeId),
+                    success: function(data) {
+                        $('#dynamicAttributesContainer').empty(); // Очищаем контейнер
+                        data.forEach(function(attr) {
+                            var fieldHtml = '<div><label>' + attr.attribute__name + ':</label>';
+                            // Подбор поля в зависимости от типа атрибута
+                            fieldHtml += '<input type="text" name="attribute_' + attr.id + '_value" class="form-control"';
+                            fieldHtml += ' value="' + (attr.value || '') + '"/>'; // Установить значение, если оно есть
+                            fieldHtml += '</div>';
+                            $('#dynamicAttributesContainer').append(fieldHtml);
+                        });
+                    }
+                });
+            } else {
+                $('#dynamicAttributesContainer').empty();
+            }
+        });
+    });
+</script>
 {% endblock %}

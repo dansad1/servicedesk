@@ -15,7 +15,9 @@
     {% for asset in assets %}
     <tr>
       <td>{{ asset.name }}</td>
-      <td>{{ asset.asset_type.name }}</td>
+      <td>
+        <a href="{% url 'asset_type_edit' asset.asset_type.id %}">{{ asset.asset_type.name }}</a>
+      </td>
       <td>{{ asset.parent_asset.name|default:"N/A" }}</td>
       <td>
         <a href="{% url 'edit_asset' asset.id %}">Редактировать</a>
@@ -30,4 +32,5 @@
   </tbody>
 </table>
 <a href="{% url 'create_asset' %}" class="btn btn-primary">Добавить новый актив</a>
+<a href="{% url 'asset_type_list' %}" class="btn btn-secondary">Посмотреть типы активов</a>
 {% endblock %}

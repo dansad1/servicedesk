@@ -6,7 +6,7 @@ from django.conf.urls.static import static  # Import static for serving media fi
 
 import service.models
 from service.views.asset_type_views import *
-from service.views.asset_views import create_asset, edit_asset, delete_asset, asset_list
+from service.views.asset_views import create_asset, edit_asset, delete_asset, asset_list, get_attributes_by_asset_type
 from service.views.attribute_views import attribute_create, attribute_delete, attribute_edit
 from service.views.file_views import file_view
 from service.views.request_views import *
@@ -101,6 +101,7 @@ urlpatterns = [
     path('assets/edit/<int:pk>/', edit_asset, name='edit_asset'),
     path('assets/delete/<int:pk>/', delete_asset, name='delete_asset'),
     path('assets/', asset_list, name='assets_list'),
+    path('asset-types/<int:asset_type_id>/attributes/', get_attributes_by_asset_type,name='get_attributes_by_asset_type'),
 
     # Маршруты для типов активов
     path('asset_types/create/', asset_type_create, name='asset_type_create'),
@@ -112,6 +113,7 @@ urlpatterns = [
     path('attributes/edit/<int:pk>/', attribute_edit, name='attribute_edit'),
     path('attributes/delete/<int:pk>/', attribute_delete, name='attribute_delete'),
     path('asset_types/<int:asset_type_id>/attributes/create/', service.views.attribute_views.attribute_create, name='attribute_create'),
+path('asset-types/<int:asset_type_id>/attributes/', get_attributes_by_asset_type, name='get_attributes_by_asset_type'),
 
 # URL-паттерны для отделов
     path('department/<int:company_pk>/create_department/', department_create, name='department_create'),
