@@ -1,10 +1,10 @@
 from django.urls import path, re_path, include
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
-from django.conf import settings  # Import the settings module
 from django.conf.urls.static import static  # Import static for serving media files
 
 import service.models
+from service.views.chat_views import chat_view
 from service.views.asset_type_views import *
 from service.views.asset_views import create_asset, edit_asset, delete_asset, asset_list, get_attributes_by_asset_type
 from service.views.attribute_views import attribute_create, attribute_delete, attribute_edit
@@ -13,11 +13,12 @@ from service.views.request_views import *
 from service.views.company_views import company_create,company_edit,company_list,company_delete,department_create,department_delete,department_edit,subdepartment_create
 from service.views.profile_views import register,  edit_profile, profile
 from service.views.user_views import user_list,create_user_view,user_delete
-from service.views.settings_views import types_list,create_or_edit_request_type,create_or_edit_priority,settings_sidebar,delete_status
+from service.views.settings_views import types_list
 from service.views.settings_views import *
-from service.views.role_views import role_delete,role_edit,role_create,role_list
+from service.views.role_views import role_delete
 from service.views.email_notification_views import email_settings_view
 from service.views.perform_views import *
+from service.views.chat_views import *
 urlpatterns = [
 # URL-паттерны для регистрации
     path('admin/', admin.site.urls),
@@ -123,9 +124,11 @@ path('asset-types/<int:asset_type_id>/attributes/', get_attributes_by_asset_type
 
 # URL-паттерны для вложений
     path('file/<path:file_path>/', file_view, name='file_view'),
-    path('file/', file_view, name='file_view')
-]
+    path('file/', file_view, name='file_view'),
 
+#чат
+    path('chat/', chat_view, name='chat_view'),
+]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
