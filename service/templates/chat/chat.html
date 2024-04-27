@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Interface</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #FAFAFA;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .chat-container {
+            background: white;
+            max-width: 600px;
+            margin: 20px auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .chat-messages {
+            height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .chat-message {
+            margin: 5px 0;
+            padding: 8px;
+            background: #f1f1f1;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .chat-input {
+            display: flex;
+        }
+
+        .chat-input input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 0;
+            margin: 0;
+        }
+
+        .chat-input button {
+            padding: 10px 20px;
+            background-color: #5C67F2;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 0;
+        }
+
+        .chat-input button:hover {
+            background-color: #4a54e1;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-messages">
+            {% for message in messages %}
+            <div class="chat-message {% if message.user == request.user %}sent{% else %}received{% endif %}">
+                {{ message.user.username }}: {{ message.message }}
+            </div>
+            {% endfor %}
+        </div>
+        <form method="post" action="{% url 'chat_view' %}" class="chat-input">
+            {% csrf_token %}
+            <input type="text" name="message" placeholder="Type your message here..." required>
+            <button type="submit">Send</button>
+    </div>
+</body>
+</html>

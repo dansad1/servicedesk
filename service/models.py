@@ -330,3 +330,16 @@ def get_value(self):
             Attribute.ATTRIBUTE_REFERENCE: self.value_attribute_reference.get_value() if self.value_attribute_reference else None,
         }
         return type_map.get(self.attribute.attribute_type)
+class ChatMessage(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.message[:50]  # Вывод первых 50 символов сообщения
+class Doc(models.Model):
+    title = models.CharField(max_length=255)
+    doc_file = models.FileField(upload_to='documents/%Y/%m/%d/')
+
+    def __str__(self):
+        return self.title
