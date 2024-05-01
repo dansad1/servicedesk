@@ -1,5 +1,6 @@
 from absl.flags import ValidationError
 from django.contrib import messages
+from django.contrib.auth.models import Group
 from django.core.mail import send_mail, BadHeaderError, get_connection, EmailMessage
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
@@ -7,10 +8,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_http_methods
 
 from servicedesk import settings
-from service.forms.Emai_forms import *
-from ..models import EmailSettings
+from service.forms.Email_forms import *
+from ..models import EmailSettings, Event, NotificationSetting
 
-# Вывод настроек для почты
+
 def email_settings_view(request):
     if request.method == 'POST':
         form = EmailSettingsForm(request.POST)
@@ -27,6 +28,7 @@ def email_settings_view(request):
         form = EmailSettingsForm()  # Пустая форма для GET запроса
 
     return render(request, 'settings/email_settings.html', {'form': form})
+
 
 # Отправка тестового письма
 @require_POST
@@ -62,7 +64,24 @@ def send_test_email(request):
             connection=connection
         )
         email.send()
-        
+
         return JsonResponse({'success': True})
     except Exception as e:  # Это поймает любые исключения, включая BadHeaderError
-        return JsonResponse({'success': False, 'error': f'Ошибка отправки письма: {e}, {email_settings.email_from, email_settings.login, email_settings.password}'})
+        return JsonResponse({'success': False,
+                             'error': f'Ошибка отправки письма: {e}, {email_settings.email_from, email_settings.login, email_settings.password}'})
+
+
+def notification_overview(request):
+    groups = Group.objects.all().order_by('id')
+    events = Event.objects.all().order_by('id')
+    settings_list = []
+
+    for group in groups:
+        group_settings = ['Да' if NotificationSetting.objects.filter(group=group, event=event).exists() else 'Нет' for event in events]
+        settings_list.append((group, group_settings))
+
+    return render(request, 'notifications/overview.html', {
+        'groups': groups,
+        'events': events,
+        'settings_list': settings_list
+    })

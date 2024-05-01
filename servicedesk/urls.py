@@ -12,12 +12,12 @@ from service.views.doc_views import upload_document, document_list, analyze_docu
 from service.views.file_views import file_view
 from service.views.request_views import *
 from service.views.company_views import company_create,company_edit,company_list,company_delete,department_create,department_delete,department_edit,subdepartment_create
-from service.views.profile_views import register,  edit_profile, profile
+from service.views.profile_views import *
 from service.views.user_views import user_list,create_user_view,user_delete
 from service.views.settings_views import types_list
 from service.views.settings_views import *
 from service.views.role_views import role_delete
-from service.views.email_notification_views import email_settings_view
+from service.views.email_notification_views import email_settings_view, notification_overview
 from service.views.perform_views import *
 from service.views.chat_views import *
 urlpatterns = [
@@ -131,9 +131,20 @@ path('asset-types/<int:asset_type_id>/attributes/', get_attributes_by_asset_type
     path('chat/', chat_view, name='chat_view'),
     path('documents/upload/', upload_document, name='upload_document'),
     path('documents/', document_list, name='document_list'),
-    path('documents/analyze/<int:doc_id>/', analyze_document, name='analyze_document'),  #
+    path('documents/analyze/<int:doc_id>/', analyze_document, name='analyze_document'),
 
+
+
+    path('password_reset/', service.views.profile_views.CustomPasswordResetView.as_view(), name='password_reset'),
+    path('password_reset/done/', service.views.profile_views.CustomPasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', service.views.profile_views.CustomPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('reset/done/', service.views.profile_views.CustomPasswordResetCompleteView.as_view(), name='password_reset_complete'),
+
+#уведомления
+    path('notifications/', notification_overview, name='notification_overview'),
 ]
+
+
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
