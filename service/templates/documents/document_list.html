@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>List of Uploaded Documents</h1>
+<a href="{% url 'upload_document' %}">Загрузить новый документ</a>
+<table>
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Document</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for document in documents %}
+    <tr>
+        <td>{{ document.title }}</td>
+        <td><a href="{{ document.doc_file.url }}">Download</a></td>
+        <td>
+            {% if document.analyzed %}
+                <a href="{% url 'analyze_document' document.id %}">View Analysis</a>  <!-- Updated link to view analysis -->
+            {% else %}
+                <button onclick="location.href='{% url 'analyze_document' document.id %}'">Analyze</button>
+            {% endif %}
+        </td>
+    </tr>
+{% endfor %}
+    </tbody>
+</table>
+{% endblock %}

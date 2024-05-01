@@ -340,6 +340,10 @@ class ChatMessage(models.Model):
 class Doc(models.Model):
     title = models.CharField(max_length=255)
     doc_file = models.FileField(upload_to='documents/%Y/%m/%d/')
+    analyzed = models.BooleanField(default=False)
+    text_content = models.TextField(blank=True, null=True)
+    image_urls = models.TextField(blank=True, null=True)
+    tables = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.title
