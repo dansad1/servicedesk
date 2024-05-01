@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Document Analysis{% endblock %}
+
+{% block content %}
+<h1>Analysis of the Document</h1>
+
+<h2>Text Content</h2>
+{% if text_content %}
+<div>
+    {% for paragraph in text_content %}
+    <p>{{ paragraph }}</p>
+    {% endfor %}
+</div>
+{% else %}
+<p>No text content available.</p>
+{% endif %}
+
+<h2>Tables</h2>
+{% if tables %}
+<div>
+    {% for table in tables %}
+    <table border="1">
+        {% for row in table %}
+        <tr>
+            {% for cell in row %}
+            <td>{{ cell }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+    {% endfor %}
+</div>
+{% else %}
+<p>No tables found in the document.</p>
+{% endif %}
+
+<h2>Images</h2>
+{% if images %}
+<div>
+    {% for image in images %}
+    <img src="{{ image }}" alt="Document Image">
+    {% endfor %}
+</div>
+{% else %}
+<p>No images found in the document.</p>
+{% endif %}
+
+{% endblock %}

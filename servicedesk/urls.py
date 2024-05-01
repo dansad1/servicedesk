@@ -8,6 +8,7 @@ from service.views.chat_views import chat_view
 from service.views.asset_type_views import *
 from service.views.asset_views import create_asset, edit_asset, delete_asset, asset_list, get_attributes_by_asset_type
 from service.views.attribute_views import attribute_create, attribute_delete, attribute_edit
+from service.views.doc_views import upload_document, document_list, analyze_document
 from service.views.file_views import file_view
 from service.views.request_views import *
 from service.views.company_views import company_create,company_edit,company_list,company_delete,department_create,department_delete,department_edit,subdepartment_create
@@ -128,6 +129,10 @@ path('asset-types/<int:asset_type_id>/attributes/', get_attributes_by_asset_type
 
 #чат
     path('chat/', chat_view, name='chat_view'),
+    path('documents/upload/', upload_document, name='upload_document'),
+    path('documents/', document_list, name='document_list'),
+    path('documents/analyze/<int:doc_id>/', analyze_document, name='analyze_document'),  #
+
 ]
 
 if settings.DEBUG:

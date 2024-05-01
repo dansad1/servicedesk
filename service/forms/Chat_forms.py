@@ -1,5 +1,6 @@
 from django import forms
-from service.models  import ChatMessage
+from service.models import ChatMessage, Doc
+
 
 class MessageForm(forms.ModelForm):
     class Meta:
@@ -8,3 +9,9 @@ class MessageForm(forms.ModelForm):
         widgets = {
             'message': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Type your message here...'})
         }
+
+
+class DocumentUploadForm(forms.ModelForm):
+    class Meta:
+        model = Doc
+        fields = ('title', 'doc_file',)
