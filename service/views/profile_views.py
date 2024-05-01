@@ -10,6 +10,8 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from service.views import profile_views
 from django.contrib.auth.models import Group
+from django.contrib.auth import views as auth_views
+
 def register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
@@ -20,8 +22,21 @@ def register(request):
     else:
         form = CustomUserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
+class CustomPasswordResetView(auth_views.PasswordResetView):
+    template_name = 'registration/password_reset_form.html'
+    email_template_name = 'registration/password_reset_email.html'
+    subject_template_name = 'registration/password_reset_subject.txt'
+    success_url = reverse_lazy('registration/password_reset_done')
 
+class CustomPasswordResetDoneView(auth_views.PasswordResetDoneView):
+    template_name = 'registration/password_reset_done.html'
 
+class CustomPasswordResetConfirmView(auth_views.PasswordResetConfirmView):
+    template_name = 'registration/password_reset_confirm.html'
+    success_url = reverse_lazy('registration/password_reset_complete')
+
+class CustomPasswordResetCompleteView(auth_views.PasswordResetCompleteView):
+    template_name = 'registration/password_reset_complete.html'
 
 
 @login_required

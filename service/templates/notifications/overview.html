@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Обзор уведомлений</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Роль</th>
+            {% for event in events %}
+            <th>{{ event.name }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for group, group_settings in settings_list %}
+        <tr>
+            <td>{{ group.name }}</td>
+            {% for status in group_settings %}
+            <td>{{ status }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

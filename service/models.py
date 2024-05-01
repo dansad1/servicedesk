@@ -235,13 +235,29 @@ class EmailSettings(models.Model):
     @property
     def use_ssl(self):
         return self.connection_type == 'ssl'
-class GroupEventNotification(models.Model):
-    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='event_notifications')
-    event = models.CharField(max_length=255)
-    email_template = models.TextField()
+from django.db import models
+
+class Event(models.Model):
+    EVENT_CHOICES = [
+        ('create_request', 'Создание заявки'),
+        ('update_request', 'Изменение полей заявки'),
+        ('add_comment', 'Добавление комментария'),
+        ('deadline_expiration', 'Истечение срока заявки'),
+        ('status_change', 'Смена статуса заявки'),
+    ]
+    name = models.CharField(max_length=255, choices=EVENT_CHOICES, unique=True)
+    description = models.TextField()
 
     def __str__(self):
-        return f"Уведомление для группы '{self.group.name}' на событие '{self.event}'"
+        return self.get_name_display()
+
+class NotificationSetting(models.Model):
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='notification_settings')
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    email_template = models.TextField(blank=True, null=True)  # Пустой шаблон означает неактивное уведомление
+
+    def __str__(self):
+        return f"{self.group.name} - {self.event.name}"
 class PerformerGroup(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
