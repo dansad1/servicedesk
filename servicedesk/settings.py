@@ -77,14 +77,19 @@ WSGI_APPLICATION = 'servicedesk.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+from dotenv import load_dotenv
+
+dotenv_path = ".env"
+load_dotenv(dotenv_path)
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'service',
-        'USER': 'root',
-        'PASSWORD': '12345',
-        'HOST': 'localhost',  # Или IP-адрес вашего сервера MySQL
-        'PORT': '3306',       # Порт по умолчанию для MySQL
+        'NAME': os.getenv("MYSQL_DATABASE"),
+        'USER': os.getenv("MYSQL_USER"),
+        'PASSWORD': os.getenv("MYSQL_PASSWORD"),
+        'HOST': os.getenv("MYSQL_HOST"),  # Или IP-адрес вашего сервера MySQL
+        'PORT': os.getenv("MYSQL_PORT"),       # Порт по умолчанию для MySQL
         'OPTIONS': {
             'charset': 'utf8mb4',
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
