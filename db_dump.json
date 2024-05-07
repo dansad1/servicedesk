@@ -1,1 +1,2684 @@
-[{"model": "admin.logentry", "pk": 1, "fields": {"action_time": "2023-10-29T15:42:58.328Z", "user": 1, "content_type": 7, "object_id": "1", "object_repr": "1", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 2, "fields": {"action_time": "2023-10-29T15:43:07.354Z", "user": 1, "content_type": 7, "object_id": "2", "object_repr": "2", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 3, "fields": {"action_time": "2023-10-29T15:44:43.424Z", "user": 1, "content_type": 12, "object_id": "1", "object_repr": "Открыта", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 4, "fields": {"action_time": "2023-10-29T15:45:01.949Z", "user": 1, "content_type": 12, "object_id": "2", "object_repr": "В работе", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 5, "fields": {"action_time": "2023-10-29T15:45:53.210Z", "user": 1, "content_type": 12, "object_id": "3", "object_repr": "Требует уточнения", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 6, "fields": {"action_time": "2023-10-29T15:46:07.588Z", "user": 1, "content_type": 12, "object_id": "4", "object_repr": "Закрыта", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 7, "fields": {"action_time": "2023-10-29T15:46:20.994Z", "user": 1, "content_type": 12, "object_id": "5", "object_repr": "Выполнена", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 8, "fields": {"action_time": "2023-10-29T15:46:48.786Z", "user": 1, "content_type": 12, "object_id": "6", "object_repr": "Отмененена", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 9, "fields": {"action_time": "2023-10-29T15:49:01.039Z", "user": 1, "content_type": 3, "object_id": "1", "object_repr": "Администратор", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 10, "fields": {"action_time": "2023-10-29T15:50:10.455Z", "user": 1, "content_type": 3, "object_id": "1", "object_repr": "Исполнитель", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"Name\", \"Permissions\"]}}]"}}, {"model": "admin.logentry", "pk": 11, "fields": {"action_time": "2023-10-29T15:50:26.636Z", "user": 1, "content_type": 3, "object_id": "2", "object_repr": "Администратор", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 12, "fields": {"action_time": "2023-10-29T15:50:56.157Z", "user": 1, "content_type": 11, "object_id": "1", "object_repr": "Инцидент", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 13, "fields": {"action_time": "2023-10-29T15:51:04.947Z", "user": 1, "content_type": 11, "object_id": "2", "object_repr": "Проблема", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 14, "fields": {"action_time": "2023-10-29T15:51:17.056Z", "user": 1, "content_type": 11, "object_id": "3", "object_repr": "Запрос  на обслуживание", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 15, "fields": {"action_time": "2023-10-29T15:51:43.575Z", "user": 1, "content_type": 11, "object_id": "4", "object_repr": "Запрос  на изменение", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 16, "fields": {"action_time": "2023-10-29T15:53:38.104Z", "user": 1, "content_type": 6, "object_id": "1", "object_repr": "admin", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"Groups\", \"\\u041a\\u043e\\u043c\\u043f\\u0430\\u043d\\u0438\\u044f\", \"\\u0420\\u043e\\u043b\\u044c\"]}}]"}}, {"model": "admin.logentry", "pk": 17, "fields": {"action_time": "2023-10-29T15:53:44.699Z", "user": 1, "content_type": 6, "object_id": "1", "object_repr": "admin", "action_flag": 2, "change_message": "[]"}}, {"model": "admin.logentry", "pk": 18, "fields": {"action_time": "2023-10-29T15:54:48.327Z", "user": 1, "content_type": 6, "object_id": "2", "object_repr": "test_user", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 19, "fields": {"action_time": "2023-10-29T15:56:11.316Z", "user": 1, "content_type": 6, "object_id": "3", "object_repr": "test_user2", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 20, "fields": {"action_time": "2023-10-29T16:08:17.510Z", "user": 1, "content_type": 10, "object_id": "1", "object_repr": "низкая", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 21, "fields": {"action_time": "2023-10-29T16:08:29.489Z", "user": 1, "content_type": 10, "object_id": "2", "object_repr": "средний", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 22, "fields": {"action_time": "2023-10-29T16:09:07.522Z", "user": 1, "content_type": 10, "object_id": "3", "object_repr": "Высокий", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 23, "fields": {"action_time": "2023-10-29T16:09:57.632Z", "user": 1, "content_type": 10, "object_id": "4", "object_repr": "Экстремальный", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 24, "fields": {"action_time": "2023-10-29T16:10:18.533Z", "user": 1, "content_type": 10, "object_id": "1", "object_repr": "Низкий", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"Name\"]}}]"}}, {"model": "admin.logentry", "pk": 25, "fields": {"action_time": "2023-10-29T16:10:29.635Z", "user": 1, "content_type": 10, "object_id": "2", "object_repr": "Средний", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"Name\"]}}]"}}, {"model": "admin.logentry", "pk": 26, "fields": {"action_time": "2023-10-29T16:11:08.224Z", "user": 1, "content_type": 14, "object_id": "1", "object_repr": "Низкий for Инцидент : 48 hours", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 27, "fields": {"action_time": "2023-10-29T16:11:31.798Z", "user": 1, "content_type": 14, "object_id": "2", "object_repr": "Средний for Инцидент : 36 hours", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 28, "fields": {"action_time": "2023-10-29T16:11:59.196Z", "user": 1, "content_type": 14, "object_id": "3", "object_repr": "Высокий for Инцидент : 24 hours", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 29, "fields": {"action_time": "2023-10-29T16:12:17.259Z", "user": 1, "content_type": 14, "object_id": "4", "object_repr": "Экстремальный for Инцидент : 12 hours", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 30, "fields": {"action_time": "2023-10-29T16:12:58.418Z", "user": 1, "content_type": 14, "object_id": "5", "object_repr": "Низкий for Проблема : 48 hours", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 31, "fields": {"action_time": "2023-10-29T16:16:27.897Z", "user": 1, "content_type": 14, "object_id": "6", "object_repr": "Средний for Проблема : 40 hours", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 32, "fields": {"action_time": "2023-10-29T16:16:55.701Z", "user": 1, "content_type": 14, "object_id": "7", "object_repr": "Высокий for Проблема : 24 hours", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 33, "fields": {"action_time": "2023-10-29T16:17:31.749Z", "user": 1, "content_type": 14, "object_id": "8", "object_repr": "Экстремальный for Проблема : 8 hours", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 34, "fields": {"action_time": "2023-11-06T20:30:03.167Z", "user": 1, "content_type": 6, "object_id": "1", "object_repr": "admin", "action_flag": 2, "change_message": "[]"}}, {"model": "admin.logentry", "pk": 35, "fields": {"action_time": "2023-11-11T12:26:34.553Z", "user": 1, "content_type": 6, "object_id": "1", "object_repr": "admin", "action_flag": 2, "change_message": "[]"}}, {"model": "admin.logentry", "pk": 36, "fields": {"action_time": "2023-11-25T15:14:01.036Z", "user": 1, "content_type": 19, "object_id": "2", "object_repr": "View user profile at own level", "action_flag": 3, "change_message": ""}}, {"model": "admin.logentry", "pk": 37, "fields": {"action_time": "2023-11-25T15:14:01.050Z", "user": 1, "content_type": 19, "object_id": "1", "object_repr": "Edit user profile at own level", "action_flag": 3, "change_message": ""}}, {"model": "admin.logentry", "pk": 38, "fields": {"action_time": "2023-11-25T15:24:25.838Z", "user": 1, "content_type": 19, "object_id": "3", "object_repr": "Просмотр заявок", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 39, "fields": {"action_time": "2023-11-25T15:25:54.228Z", "user": 1, "content_type": 19, "object_id": "4", "object_repr": "редактирование заявок", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 40, "fields": {"action_time": "2023-11-25T15:41:36.723Z", "user": 1, "content_type": 19, "object_id": "4", "object_repr": "Редактирование заявок", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"Name\"]}}]"}}, {"model": "admin.logentry", "pk": 41, "fields": {"action_time": "2023-11-25T19:37:05.143Z", "user": 1, "content_type": 6, "object_id": "1", "object_repr": "admin", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"Group\"]}}]"}}, {"model": "admin.logentry", "pk": 42, "fields": {"action_time": "2023-11-26T12:04:47.168Z", "user": 1, "content_type": 19, "object_id": "5", "object_repr": "Просмотр ролей", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 43, "fields": {"action_time": "2023-11-26T12:05:48.042Z", "user": 1, "content_type": 19, "object_id": "6", "object_repr": "Редактирование Ролей", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 44, "fields": {"action_time": "2023-11-26T14:06:34.651Z", "user": 1, "content_type": 19, "object_id": "5", "object_repr": "Просмотр ролей", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"Code name\"]}}]"}}, {"model": "admin.logentry", "pk": 45, "fields": {"action_time": "2023-11-26T14:06:55.363Z", "user": 1, "content_type": 19, "object_id": "6", "object_repr": "Редактирование Ролей", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"Code name\"]}}]"}}, {"model": "admin.logentry", "pk": 46, "fields": {"action_time": "2023-11-26T14:07:21.001Z", "user": 1, "content_type": 19, "object_id": "4", "object_repr": "Редактирование заявок", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"Code name\"]}}]"}}, {"model": "admin.logentry", "pk": 47, "fields": {"action_time": "2023-11-26T14:07:48.430Z", "user": 1, "content_type": 19, "object_id": "3", "object_repr": "Просмотр заявок", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"Code name\"]}}]"}}, {"model": "admin.logentry", "pk": 48, "fields": {"action_time": "2023-11-26T15:53:31.455Z", "user": 1, "content_type": 19, "object_id": "5", "object_repr": "Просмотр ролей", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"Requires access level\"]}}]"}}, {"model": "admin.logentry", "pk": 49, "fields": {"action_time": "2023-11-26T15:53:36.250Z", "user": 1, "content_type": 19, "object_id": "6", "object_repr": "Редактирование Ролей", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"Requires access level\"]}}]"}}, {"model": "admin.logentry", "pk": 50, "fields": {"action_time": "2023-11-26T16:01:55.038Z", "user": 1, "content_type": 19, "object_id": "3", "object_repr": "Просмотр заявок", "action_flag": 2, "change_message": "[]"}}, {"model": "admin.logentry", "pk": 51, "fields": {"action_time": "2023-11-26T16:02:04.184Z", "user": 1, "content_type": 19, "object_id": "5", "object_repr": "Просмотр ролей", "action_flag": 2, "change_message": "[]"}}, {"model": "admin.logentry", "pk": 52, "fields": {"action_time": "2023-11-26T16:02:08.171Z", "user": 1, "content_type": 19, "object_id": "6", "object_repr": "Редактирование Ролей", "action_flag": 2, "change_message": "[]"}}, {"model": "admin.logentry", "pk": 53, "fields": {"action_time": "2023-11-28T17:14:44.182Z", "user": 1, "content_type": 19, "object_id": "6", "object_repr": "Редактирование Ролей", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"Code name\"]}}]"}}, {"model": "admin.logentry", "pk": 54, "fields": {"action_time": "2023-11-28T17:23:29.918Z", "user": 1, "content_type": 19, "object_id": "7", "object_repr": "показывать компании", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 55, "fields": {"action_time": "2023-11-28T17:28:44.904Z", "user": 1, "content_type": 19, "object_id": "7", "object_repr": "Показывать компании", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"Name\"]}}]"}}, {"model": "admin.logentry", "pk": 56, "fields": {"action_time": "2023-11-28T17:32:44.784Z", "user": 1, "content_type": 19, "object_id": "8", "object_repr": "Редактировать компании", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 57, "fields": {"action_time": "2023-11-28T17:42:34.308Z", "user": 1, "content_type": 19, "object_id": "9", "object_repr": "Показывать пользователей", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 58, "fields": {"action_time": "2023-11-28T17:43:16.509Z", "user": 1, "content_type": 19, "object_id": "8", "object_repr": "Редактировать компании", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"Code name\"]}}]"}}, {"model": "admin.logentry", "pk": 59, "fields": {"action_time": "2023-11-28T17:43:34.922Z", "user": 1, "content_type": 19, "object_id": "9", "object_repr": "Показывать пользователей", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"Code name\"]}}]"}}, {"model": "admin.logentry", "pk": 60, "fields": {"action_time": "2023-11-28T17:48:24.938Z", "user": 1, "content_type": 19, "object_id": "10", "object_repr": "Редактирование профилей", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 61, "fields": {"action_time": "2023-11-28T17:50:06.279Z", "user": 1, "content_type": 19, "object_id": "11", "object_repr": "Редактировать свой профиль", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 62, "fields": {"action_time": "2023-11-28T17:54:11.377Z", "user": 1, "content_type": 19, "object_id": "12", "object_repr": "редактировать настройки", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "auth.permission", "pk": 1, "fields": {"name": "Can add log entry", "content_type": 1, "codename": "add_logentry"}}, {"model": "auth.permission", "pk": 2, "fields": {"name": "Can change log entry", "content_type": 1, "codename": "change_logentry"}}, {"model": "auth.permission", "pk": 3, "fields": {"name": "Can delete log entry", "content_type": 1, "codename": "delete_logentry"}}, {"model": "auth.permission", "pk": 4, "fields": {"name": "Can view log entry", "content_type": 1, "codename": "view_logentry"}}, {"model": "auth.permission", "pk": 5, "fields": {"name": "Can add permission", "content_type": 2, "codename": "add_permission"}}, {"model": "auth.permission", "pk": 6, "fields": {"name": "Can change permission", "content_type": 2, "codename": "change_permission"}}, {"model": "auth.permission", "pk": 7, "fields": {"name": "Can delete permission", "content_type": 2, "codename": "delete_permission"}}, {"model": "auth.permission", "pk": 8, "fields": {"name": "Can view permission", "content_type": 2, "codename": "view_permission"}}, {"model": "auth.permission", "pk": 9, "fields": {"name": "Can add group", "content_type": 3, "codename": "add_group"}}, {"model": "auth.permission", "pk": 10, "fields": {"name": "Can change group", "content_type": 3, "codename": "change_group"}}, {"model": "auth.permission", "pk": 11, "fields": {"name": "Can delete group", "content_type": 3, "codename": "delete_group"}}, {"model": "auth.permission", "pk": 12, "fields": {"name": "Can view group", "content_type": 3, "codename": "view_group"}}, {"model": "auth.permission", "pk": 13, "fields": {"name": "Can add content type", "content_type": 4, "codename": "add_contenttype"}}, {"model": "auth.permission", "pk": 14, "fields": {"name": "Can change content type", "content_type": 4, "codename": "change_contenttype"}}, {"model": "auth.permission", "pk": 15, "fields": {"name": "Can delete content type", "content_type": 4, "codename": "delete_contenttype"}}, {"model": "auth.permission", "pk": 16, "fields": {"name": "Can view content type", "content_type": 4, "codename": "view_contenttype"}}, {"model": "auth.permission", "pk": 17, "fields": {"name": "Can add session", "content_type": 5, "codename": "add_session"}}, {"model": "auth.permission", "pk": 18, "fields": {"name": "Can change session", "content_type": 5, "codename": "change_session"}}, {"model": "auth.permission", "pk": 19, "fields": {"name": "Can delete session", "content_type": 5, "codename": "delete_session"}}, {"model": "auth.permission", "pk": 20, "fields": {"name": "Can view session", "content_type": 5, "codename": "view_session"}}, {"model": "auth.permission", "pk": 21, "fields": {"name": "Can add custom user", "content_type": 6, "codename": "add_customuser"}}, {"model": "auth.permission", "pk": 22, "fields": {"name": "Can change custom user", "content_type": 6, "codename": "change_customuser"}}, {"model": "auth.permission", "pk": 23, "fields": {"name": "Can delete custom user", "content_type": 6, "codename": "delete_customuser"}}, {"model": "auth.permission", "pk": 24, "fields": {"name": "Can view custom user", "content_type": 6, "codename": "view_customuser"}}, {"model": "auth.permission", "pk": 25, "fields": {"name": "Can add company", "content_type": 7, "codename": "add_company"}}, {"model": "auth.permission", "pk": 26, "fields": {"name": "Can change company", "content_type": 7, "codename": "change_company"}}, {"model": "auth.permission", "pk": 27, "fields": {"name": "Can delete company", "content_type": 7, "codename": "delete_company"}}, {"model": "auth.permission", "pk": 28, "fields": {"name": "Can view company", "content_type": 7, "codename": "view_company"}}, {"model": "auth.permission", "pk": 29, "fields": {"name": "Can add user role", "content_type": 8, "codename": "add_userrole"}}, {"model": "auth.permission", "pk": 30, "fields": {"name": "Can change user role", "content_type": 8, "codename": "change_userrole"}}, {"model": "auth.permission", "pk": 31, "fields": {"name": "Can delete user role", "content_type": 8, "codename": "delete_userrole"}}, {"model": "auth.permission", "pk": 32, "fields": {"name": "Can view user role", "content_type": 8, "codename": "view_userrole"}}, {"model": "auth.permission", "pk": 33, "fields": {"name": "Can add request", "content_type": 9, "codename": "add_request"}}, {"model": "auth.permission", "pk": 34, "fields": {"name": "Can change request", "content_type": 9, "codename": "change_request"}}, {"model": "auth.permission", "pk": 35, "fields": {"name": "Can delete request", "content_type": 9, "codename": "delete_request"}}, {"model": "auth.permission", "pk": 36, "fields": {"name": "Can view request", "content_type": 9, "codename": "view_request"}}, {"model": "auth.permission", "pk": 37, "fields": {"name": "Can add priority", "content_type": 10, "codename": "add_priority"}}, {"model": "auth.permission", "pk": 38, "fields": {"name": "Can change priority", "content_type": 10, "codename": "change_priority"}}, {"model": "auth.permission", "pk": 39, "fields": {"name": "Can delete priority", "content_type": 10, "codename": "delete_priority"}}, {"model": "auth.permission", "pk": 40, "fields": {"name": "Can view priority", "content_type": 10, "codename": "view_priority"}}, {"model": "auth.permission", "pk": 41, "fields": {"name": "Can add request type", "content_type": 11, "codename": "add_requesttype"}}, {"model": "auth.permission", "pk": 42, "fields": {"name": "Can change request type", "content_type": 11, "codename": "change_requesttype"}}, {"model": "auth.permission", "pk": 43, "fields": {"name": "Can delete request type", "content_type": 11, "codename": "delete_requesttype"}}, {"model": "auth.permission", "pk": 44, "fields": {"name": "Can view request type", "content_type": 11, "codename": "view_requesttype"}}, {"model": "auth.permission", "pk": 45, "fields": {"name": "Can add status", "content_type": 12, "codename": "add_status"}}, {"model": "auth.permission", "pk": 46, "fields": {"name": "Can change status", "content_type": 12, "codename": "change_status"}}, {"model": "auth.permission", "pk": 47, "fields": {"name": "Can delete status", "content_type": 12, "codename": "delete_status"}}, {"model": "auth.permission", "pk": 48, "fields": {"name": "Can view status", "content_type": 12, "codename": "view_status"}}, {"model": "auth.permission", "pk": 49, "fields": {"name": "Can add comment", "content_type": 13, "codename": "add_comment"}}, {"model": "auth.permission", "pk": 50, "fields": {"name": "Can change comment", "content_type": 13, "codename": "change_comment"}}, {"model": "auth.permission", "pk": 51, "fields": {"name": "Can delete comment", "content_type": 13, "codename": "delete_comment"}}, {"model": "auth.permission", "pk": 52, "fields": {"name": "Can view comment", "content_type": 13, "codename": "view_comment"}}, {"model": "auth.permission", "pk": 53, "fields": {"name": "Can add priority duration", "content_type": 14, "codename": "add_priorityduration"}}, {"model": "auth.permission", "pk": 54, "fields": {"name": "Can change priority duration", "content_type": 14, "codename": "change_priorityduration"}}, {"model": "auth.permission", "pk": 55, "fields": {"name": "Can delete priority duration", "content_type": 14, "codename": "delete_priorityduration"}}, {"model": "auth.permission", "pk": 56, "fields": {"name": "Can view priority duration", "content_type": 14, "codename": "view_priorityduration"}}, {"model": "auth.permission", "pk": 57, "fields": {"name": "Can add status transition", "content_type": 15, "codename": "add_statustransition"}}, {"model": "auth.permission", "pk": 58, "fields": {"name": "Can change status transition", "content_type": 15, "codename": "change_statustransition"}}, {"model": "auth.permission", "pk": 59, "fields": {"name": "Can delete status transition", "content_type": 15, "codename": "delete_statustransition"}}, {"model": "auth.permission", "pk": 60, "fields": {"name": "Can view status transition", "content_type": 15, "codename": "view_statustransition"}}, {"model": "auth.permission", "pk": 61, "fields": {"name": "Can add saved filter", "content_type": 16, "codename": "add_savedfilter"}}, {"model": "auth.permission", "pk": 62, "fields": {"name": "Can change saved filter", "content_type": 16, "codename": "change_savedfilter"}}, {"model": "auth.permission", "pk": 63, "fields": {"name": "Can delete saved filter", "content_type": 16, "codename": "delete_savedfilter"}}, {"model": "auth.permission", "pk": 64, "fields": {"name": "Can view saved filter", "content_type": 16, "codename": "view_savedfilter"}}, {"model": "auth.permission", "pk": 65, "fields": {"name": "Can add department", "content_type": 17, "codename": "add_department"}}, {"model": "auth.permission", "pk": 66, "fields": {"name": "Can change department", "content_type": 17, "codename": "change_department"}}, {"model": "auth.permission", "pk": 67, "fields": {"name": "Can delete department", "content_type": 17, "codename": "delete_department"}}, {"model": "auth.permission", "pk": 68, "fields": {"name": "Can view department", "content_type": 17, "codename": "view_department"}}, {"model": "auth.permission", "pk": 69, "fields": {"name": "Can add attachment", "content_type": 18, "codename": "add_attachment"}}, {"model": "auth.permission", "pk": 70, "fields": {"name": "Can change attachment", "content_type": 18, "codename": "change_attachment"}}, {"model": "auth.permission", "pk": 71, "fields": {"name": "Can delete attachment", "content_type": 18, "codename": "delete_attachment"}}, {"model": "auth.permission", "pk": 72, "fields": {"name": "Can view attachment", "content_type": 18, "codename": "view_attachment"}}, {"model": "auth.permission", "pk": 73, "fields": {"name": "Can add permission", "content_type": 19, "codename": "add_permission"}}, {"model": "auth.permission", "pk": 74, "fields": {"name": "Can change permission", "content_type": 19, "codename": "change_permission"}}, {"model": "auth.permission", "pk": 75, "fields": {"name": "Can delete permission", "content_type": 19, "codename": "delete_permission"}}, {"model": "auth.permission", "pk": 76, "fields": {"name": "Can view permission", "content_type": 19, "codename": "view_permission"}}, {"model": "auth.permission", "pk": 77, "fields": {"name": "Can add role", "content_type": 20, "codename": "add_role"}}, {"model": "auth.permission", "pk": 78, "fields": {"name": "Can change role", "content_type": 20, "codename": "change_role"}}, {"model": "auth.permission", "pk": 79, "fields": {"name": "Can delete role", "content_type": 20, "codename": "delete_role"}}, {"model": "auth.permission", "pk": 80, "fields": {"name": "Can view role", "content_type": 20, "codename": "view_role"}}, {"model": "auth.permission", "pk": 81, "fields": {"name": "Can add role permission", "content_type": 21, "codename": "add_rolepermission"}}, {"model": "auth.permission", "pk": 82, "fields": {"name": "Can change role permission", "content_type": 21, "codename": "change_rolepermission"}}, {"model": "auth.permission", "pk": 83, "fields": {"name": "Can delete role permission", "content_type": 21, "codename": "delete_rolepermission"}}, {"model": "auth.permission", "pk": 84, "fields": {"name": "Can view role permission", "content_type": 21, "codename": "view_rolepermission"}}, {"model": "auth.permission", "pk": 85, "fields": {"name": "Can add group permission", "content_type": 22, "codename": "add_grouppermission"}}, {"model": "auth.permission", "pk": 86, "fields": {"name": "Can change group permission", "content_type": 22, "codename": "change_grouppermission"}}, {"model": "auth.permission", "pk": 87, "fields": {"name": "Can delete group permission", "content_type": 22, "codename": "delete_grouppermission"}}, {"model": "auth.permission", "pk": 88, "fields": {"name": "Can view group permission", "content_type": 22, "codename": "view_grouppermission"}}, {"model": "auth.permission", "pk": 89, "fields": {"name": "Can add custom permission", "content_type": 19, "codename": "add_custompermission"}}, {"model": "auth.permission", "pk": 90, "fields": {"name": "Can change custom permission", "content_type": 19, "codename": "change_custompermission"}}, {"model": "auth.permission", "pk": 91, "fields": {"name": "Can delete custom permission", "content_type": 19, "codename": "delete_custompermission"}}, {"model": "auth.permission", "pk": 92, "fields": {"name": "Can view custom permission", "content_type": 19, "codename": "view_custompermission"}}, {"model": "auth.permission", "pk": 93, "fields": {"name": "Can add dynamic field", "content_type": 23, "codename": "add_dynamicfield"}}, {"model": "auth.permission", "pk": 94, "fields": {"name": "Can change dynamic field", "content_type": 23, "codename": "change_dynamicfield"}}, {"model": "auth.permission", "pk": 95, "fields": {"name": "Can delete dynamic field", "content_type": 23, "codename": "delete_dynamicfield"}}, {"model": "auth.permission", "pk": 96, "fields": {"name": "Can view dynamic field", "content_type": 23, "codename": "view_dynamicfield"}}, {"model": "auth.permission", "pk": 97, "fields": {"name": "Can add dynamic field value", "content_type": 24, "codename": "add_dynamicfieldvalue"}}, {"model": "auth.permission", "pk": 98, "fields": {"name": "Can change dynamic field value", "content_type": 24, "codename": "change_dynamicfieldvalue"}}, {"model": "auth.permission", "pk": 99, "fields": {"name": "Can delete dynamic field value", "content_type": 24, "codename": "delete_dynamicfieldvalue"}}, {"model": "auth.permission", "pk": 100, "fields": {"name": "Can view dynamic field value", "content_type": 24, "codename": "view_dynamicfieldvalue"}}, {"model": "auth.permission", "pk": 101, "fields": {"name": "Can add email settings", "content_type": 25, "codename": "add_emailsettings"}}, {"model": "auth.permission", "pk": 102, "fields": {"name": "Can change email settings", "content_type": 25, "codename": "change_emailsettings"}}, {"model": "auth.permission", "pk": 103, "fields": {"name": "Can delete email settings", "content_type": 25, "codename": "delete_emailsettings"}}, {"model": "auth.permission", "pk": 104, "fields": {"name": "Can view email settings", "content_type": 25, "codename": "view_emailsettings"}}, {"model": "auth.permission", "pk": 105, "fields": {"name": "Can add group event notification", "content_type": 26, "codename": "add_groupeventnotification"}}, {"model": "auth.permission", "pk": 106, "fields": {"name": "Can change group event notification", "content_type": 26, "codename": "change_groupeventnotification"}}, {"model": "auth.permission", "pk": 107, "fields": {"name": "Can delete group event notification", "content_type": 26, "codename": "delete_groupeventnotification"}}, {"model": "auth.permission", "pk": 108, "fields": {"name": "Can view group event notification", "content_type": 26, "codename": "view_groupeventnotification"}}, {"model": "auth.permission", "pk": 109, "fields": {"name": "Can add performer group", "content_type": 27, "codename": "add_performergroup"}}, {"model": "auth.permission", "pk": 110, "fields": {"name": "Can change performer group", "content_type": 27, "codename": "change_performergroup"}}, {"model": "auth.permission", "pk": 111, "fields": {"name": "Can delete performer group", "content_type": 27, "codename": "delete_performergroup"}}, {"model": "auth.permission", "pk": 112, "fields": {"name": "Can view performer group", "content_type": 27, "codename": "view_performergroup"}}, {"model": "auth.permission", "pk": 113, "fields": {"name": "Can add asset type", "content_type": 28, "codename": "add_assettype"}}, {"model": "auth.permission", "pk": 114, "fields": {"name": "Can change asset type", "content_type": 28, "codename": "change_assettype"}}, {"model": "auth.permission", "pk": 115, "fields": {"name": "Can delete asset type", "content_type": 28, "codename": "delete_assettype"}}, {"model": "auth.permission", "pk": 116, "fields": {"name": "Can view asset type", "content_type": 28, "codename": "view_assettype"}}, {"model": "auth.permission", "pk": 117, "fields": {"name": "Can add asset", "content_type": 29, "codename": "add_asset"}}, {"model": "auth.permission", "pk": 118, "fields": {"name": "Can change asset", "content_type": 29, "codename": "change_asset"}}, {"model": "auth.permission", "pk": 119, "fields": {"name": "Can delete asset", "content_type": 29, "codename": "delete_asset"}}, {"model": "auth.permission", "pk": 120, "fields": {"name": "Can view asset", "content_type": 29, "codename": "view_asset"}}, {"model": "auth.permission", "pk": 121, "fields": {"name": "Can add attribute", "content_type": 30, "codename": "add_attribute"}}, {"model": "auth.permission", "pk": 122, "fields": {"name": "Can change attribute", "content_type": 30, "codename": "change_attribute"}}, {"model": "auth.permission", "pk": 123, "fields": {"name": "Can delete attribute", "content_type": 30, "codename": "delete_attribute"}}, {"model": "auth.permission", "pk": 124, "fields": {"name": "Can view attribute", "content_type": 30, "codename": "view_attribute"}}, {"model": "auth.permission", "pk": 125, "fields": {"name": "Can add asset attribute", "content_type": 31, "codename": "add_assetattribute"}}, {"model": "auth.permission", "pk": 126, "fields": {"name": "Can change asset attribute", "content_type": 31, "codename": "change_assetattribute"}}, {"model": "auth.permission", "pk": 127, "fields": {"name": "Can delete asset attribute", "content_type": 31, "codename": "delete_assetattribute"}}, {"model": "auth.permission", "pk": 128, "fields": {"name": "Can view asset attribute", "content_type": 31, "codename": "view_assetattribute"}}, {"model": "auth.group", "pk": 1, "fields": {"name": "Исполнитель", "permissions": [33, 34, 35, 36, 41, 42, 43, 44]}}, {"model": "auth.group", "pk": 2, "fields": {"name": "Администратор", "permissions": [1, 2, 3, 4, 9, 10, 11, 12, 5, 6, 7, 8, 13, 14, 15, 16, 49, 50, 51, 52, 25, 26, 27, 28, 21, 22, 23, 24, 37, 38, 39, 40, 53, 54, 55, 56, 33, 34, 35, 36, 41, 42, 43, 44, 61, 62, 63, 64, 45, 46, 47, 48, 57, 58, 59, 60, 29, 30, 31, 32, 17, 18, 19, 20]}}, {"model": "contenttypes.contenttype", "pk": 1, "fields": {"app_label": "admin", "model": "logentry"}}, {"model": "contenttypes.contenttype", "pk": 2, "fields": {"app_label": "auth", "model": "permission"}}, {"model": "contenttypes.contenttype", "pk": 3, "fields": {"app_label": "auth", "model": "group"}}, {"model": "contenttypes.contenttype", "pk": 4, "fields": {"app_label": "contenttypes", "model": "contenttype"}}, {"model": "contenttypes.contenttype", "pk": 5, "fields": {"app_label": "sessions", "model": "session"}}, {"model": "contenttypes.contenttype", "pk": 6, "fields": {"app_label": "service", "model": "customuser"}}, {"model": "contenttypes.contenttype", "pk": 7, "fields": {"app_label": "service", "model": "company"}}, {"model": "contenttypes.contenttype", "pk": 8, "fields": {"app_label": "service", "model": "userrole"}}, {"model": "contenttypes.contenttype", "pk": 9, "fields": {"app_label": "service", "model": "request"}}, {"model": "contenttypes.contenttype", "pk": 10, "fields": {"app_label": "service", "model": "priority"}}, {"model": "contenttypes.contenttype", "pk": 11, "fields": {"app_label": "service", "model": "requesttype"}}, {"model": "contenttypes.contenttype", "pk": 12, "fields": {"app_label": "service", "model": "status"}}, {"model": "contenttypes.contenttype", "pk": 13, "fields": {"app_label": "service", "model": "comment"}}, {"model": "contenttypes.contenttype", "pk": 14, "fields": {"app_label": "service", "model": "priorityduration"}}, {"model": "contenttypes.contenttype", "pk": 15, "fields": {"app_label": "service", "model": "statustransition"}}, {"model": "contenttypes.contenttype", "pk": 16, "fields": {"app_label": "service", "model": "savedfilter"}}, {"model": "contenttypes.contenttype", "pk": 17, "fields": {"app_label": "service", "model": "department"}}, {"model": "contenttypes.contenttype", "pk": 18, "fields": {"app_label": "service", "model": "attachment"}}, {"model": "contenttypes.contenttype", "pk": 19, "fields": {"app_label": "service", "model": "custompermission"}}, {"model": "contenttypes.contenttype", "pk": 20, "fields": {"app_label": "service", "model": "role"}}, {"model": "contenttypes.contenttype", "pk": 21, "fields": {"app_label": "service", "model": "rolepermission"}}, {"model": "contenttypes.contenttype", "pk": 22, "fields": {"app_label": "service", "model": "grouppermission"}}, {"model": "contenttypes.contenttype", "pk": 23, "fields": {"app_label": "service", "model": "dynamicfield"}}, {"model": "contenttypes.contenttype", "pk": 24, "fields": {"app_label": "service", "model": "dynamicfieldvalue"}}, {"model": "contenttypes.contenttype", "pk": 25, "fields": {"app_label": "service", "model": "emailsettings"}}, {"model": "contenttypes.contenttype", "pk": 26, "fields": {"app_label": "service", "model": "groupeventnotification"}}, {"model": "contenttypes.contenttype", "pk": 27, "fields": {"app_label": "service", "model": "performergroup"}}, {"model": "contenttypes.contenttype", "pk": 28, "fields": {"app_label": "service", "model": "assettype"}}, {"model": "contenttypes.contenttype", "pk": 29, "fields": {"app_label": "service", "model": "asset"}}, {"model": "contenttypes.contenttype", "pk": 30, "fields": {"app_label": "service", "model": "attribute"}}, {"model": "contenttypes.contenttype", "pk": 31, "fields": {"app_label": "service", "model": "assetattribute"}}, {"model": "sessions.session", "pk": "67xqt0i8u1e4k8dxajlum54qqqhloxbi", "fields": {"session_data": ".eJxVjDsOwyAQBe9CHSGw-aZM7zOgZVmCkwgkY1dR7h5bcpG0b2bemwXY1hK2TkuYE7syyS6_WwR8Uj1AekC9N46trssc-aHwk3Y-tUSv2-n-HRToZa9pzCNmdEM0EQV4Le3ohfLKktaDUOh9Vk6ABGucimgyKRIAuxG1z4l9vt-HN-A:1rX1Fs:wWmKy3AyGeavnGjwJjOx44YzaQvWeZl-uYWR9YkVUCc", "expire_date": "2024-02-19T15:51:32.396Z"}}, {"model": "sessions.session", "pk": "i9muyym2usawzghghumxrpp5x1ye8p6b", "fields": {"session_data": ".eJxVjDsOwyAQBe9CHSGw-aZM7zOgZVmCkwgkY1dR7h5bcpG0b2bemwXY1hK2TkuYE7syyS6_WwR8Uj1AekC9N46trssc-aHwk3Y-tUSv2-n-HRToZa9pzCNmdEM0EQV4Le3ohfLKktaDUOh9Vk6ABGucimgyKRIAuxG1z4l9vt-HN-A:1rrwNH:7HwLgEO3OqTtcIcW7JrmzVQhcH_WwFMA5JlwWKTIVpo", "expire_date": "2024-04-17T08:53:39.655Z"}}, {"model": "sessions.session", "pk": "pl5e0knxmhluldg7z1tnyg9h1d17s9fr", "fields": {"session_data": ".eJxVjMEOwiAQRP-FsyHAghSP3v0GsnR3bdXQpLQn47_bJj3obTLvzbxVxnUZ8tp4ziOpi7Lq9NsV7J9cd0APrPdJ91Nd5rHoXdEHbfo2Eb-uh_t3MGAbtrU7-86LpALBBQhA0QTsY2JvKJJI2UJhA5IcIbHY6AAIjRFbOs-gPl_fZTgq:1rAW6Z:p6eTmYH7NLs2ckay91CZ-uyAKB3DsdhnDodvjKqWG0M", "expire_date": "2023-12-19T14:08:55.338Z"}}, {"model": "service.company", "pk": 1, "fields": {"name": "1", "region": "spb", "address": "1", "phone": "", "email": "", "website": "", "description": "1", "ceo": 1, "deputy": 1, "contact_person": 1, "timezone": "UTC"}}, {"model": "service.customuser", "pk": 1, "fields": {"password": "pbkdf2_sha256$720000$ZnxaRH6vquvQyr3qBLAsrt$6dVS+xjBSy69YeDj/oNe941a/IMDLWpevge604QkYzc=", "last_login": "2024-04-03T08:53:39.649Z", "is_superuser": true, "username": "admin", "email": "dansadkov@yandex.ru", "first_name": "dan", "last_name": "sad", "phone_number": "+79213252090", "address": "САНКТ-ПЕТЕРБУРГ, ДЖОНА РИДА УЛ., дом № 4, корпус 2, кв. 13", "is_active": true, "is_staff": true, "group": 2, "company": 1, "department": null, "groups": [2], "user_permissions": []}}, {"model": "service.department", "pk": 1, "fields": {"name": "тест отдел", "parent": null, "company": 1, "users": [1]}}, {"model": "service.department", "pk": 2, "fields": {"name": "123", "parent": null, "company": 1, "users": []}}, {"model": "service.custompermission", "pk": 3, "fields": {"code_name": "action_view_request", "name": "Просмотр заявок"}}, {"model": "service.custompermission", "pk": 4, "fields": {"code_name": "action_edit_request", "name": "Редактирование заявок"}}, {"model": "service.custompermission", "pk": 5, "fields": {"code_name": "section_roles", "name": "Просмотр ролей"}}, {"model": "service.custompermission", "pk": 6, "fields": {"code_name": "section_edit roles", "name": "Редактирование Ролей"}}, {"model": "service.custompermission", "pk": 7, "fields": {"code_name": "section_view_companies", "name": "Показывать компании"}}, {"model": "service.custompermission", "pk": 8, "fields": {"code_name": "section_edit_companies", "name": "Редактировать компании"}}, {"model": "service.custompermission", "pk": 9, "fields": {"code_name": "section_view_users", "name": "Показывать пользователей"}}, {"model": "service.custompermission", "pk": 10, "fields": {"code_name": "section_edit_users", "name": "Редактирование профилей"}}, {"model": "service.custompermission", "pk": 11, "fields": {"code_name": "section_edit_myself", "name": "Редактировать свой профиль"}}, {"model": "service.custompermission", "pk": 12, "fields": {"code_name": "section_edit_settings", "name": "редактировать настройки"}}, {"model": "service.grouppermission", "pk": 71, "fields": {"group": 2, "custompermission": 3, "access_level": "global"}}, {"model": "service.grouppermission", "pk": 72, "fields": {"group": 2, "custompermission": 4, "access_level": "company"}}, {"model": "service.grouppermission", "pk": 73, "fields": {"group": 2, "custompermission": 7, "access_level": null}}, {"model": "service.grouppermission", "pk": 74, "fields": {"group": 2, "custompermission": 11, "access_level": null}}, {"model": "service.grouppermission", "pk": 75, "fields": {"group": 1, "custompermission": 3, "access_level": "company"}}, {"model": "service.grouppermission", "pk": 76, "fields": {"group": 1, "custompermission": 4, "access_level": "personal"}}, {"model": "service.grouppermission", "pk": 77, "fields": {"group": 1, "custompermission": 5, "access_level": null}}, {"model": "service.grouppermission", "pk": 78, "fields": {"group": 1, "custompermission": 6, "access_level": null}}, {"model": "service.grouppermission", "pk": 79, "fields": {"group": 1, "custompermission": 7, "access_level": null}}, {"model": "service.grouppermission", "pk": 80, "fields": {"group": 1, "custompermission": 9, "access_level": null}}, {"model": "service.status", "pk": 1, "fields": {"name": "Открыта", "color": null, "description": ""}}, {"model": "service.status", "pk": 2, "fields": {"name": "В работе", "color": null, "description": ""}}, {"model": "service.status", "pk": 3, "fields": {"name": "Требует уточнения", "color": null, "description": ""}}, {"model": "service.status", "pk": 4, "fields": {"name": "Закрыта", "color": null, "description": ""}}, {"model": "service.status", "pk": 5, "fields": {"name": "Выполнена", "color": null, "description": ""}}, {"model": "service.priority", "pk": 1, "fields": {"name": "Низкий"}}, {"model": "service.priority", "pk": 2, "fields": {"name": "Средний"}}, {"model": "service.priority", "pk": 3, "fields": {"name": "Высокий"}}, {"model": "service.priority", "pk": 4, "fields": {"name": "Экстремальный"}}, {"model": "service.requesttype", "pk": 1, "fields": {"name": "Инцидент", "description": ""}}, {"model": "service.requesttype", "pk": 2, "fields": {"name": "Проблема", "description": ""}}, {"model": "service.requesttype", "pk": 3, "fields": {"name": "Запрос  на обслуживание", "description": ""}}, {"model": "service.requesttype", "pk": 4, "fields": {"name": "Запрос  на изменение", "description": ""}}, {"model": "service.priorityduration", "pk": 1, "fields": {"request_type": 1, "priority": 1, "duration_in_hours": 48}}, {"model": "service.priorityduration", "pk": 2, "fields": {"request_type": 1, "priority": 2, "duration_in_hours": 36}}, {"model": "service.priorityduration", "pk": 3, "fields": {"request_type": 1, "priority": 3, "duration_in_hours": 24}}, {"model": "service.priorityduration", "pk": 4, "fields": {"request_type": 1, "priority": 4, "duration_in_hours": 12}}, {"model": "service.priorityduration", "pk": 5, "fields": {"request_type": 2, "priority": 1, "duration_in_hours": 48}}, {"model": "service.priorityduration", "pk": 6, "fields": {"request_type": 2, "priority": 2, "duration_in_hours": 40}}, {"model": "service.priorityduration", "pk": 7, "fields": {"request_type": 2, "priority": 3, "duration_in_hours": 24}}, {"model": "service.priorityduration", "pk": 8, "fields": {"request_type": 2, "priority": 4, "duration_in_hours": 8}}, {"model": "service.priorityduration", "pk": 9, "fields": {"request_type": 3, "priority": 1, "duration_in_hours": 2}}, {"model": "service.request", "pk": 1, "fields": {"title": "1", "description": "<p>12</p>", "requester": 1, "assignee": 1, "company": null, "status": 1, "created_at": "2023-10-29T16:20:31.726Z", "updated_at": "2023-11-09T20:30:19.257Z", "priority": 2, "request_type": 1, "due_date": "2023-10-31T04:20:31Z", "attachment": ""}}, {"model": "service.request", "pk": 2, "fields": {"title": "test типа", "description": "<p>тест типа</p>", "requester": 1, "assignee": 1, "company": null, "status": 1, "created_at": "2024-03-26T09:14:10.731Z", "updated_at": "2024-03-26T12:04:18.796Z", "priority": 3, "request_type": 1, "due_date": null, "attachment": ""}}, {"model": "service.comment", "pk": 4, "fields": {"request": 1, "author": 1, "text": "f", "attachment": "comments/L_CZ3B9IPlE.jpg", "created_at": "2023-11-06T17:28:39.325Z", "content": ""}}, {"model": "service.comment", "pk": 5, "fields": {"request": 1, "author": 1, "text": "f", "attachment": "comments/L_CZ3B9IPlE_6DTVZPj.jpg", "created_at": "2023-11-06T17:29:51.138Z", "content": ""}}, {"model": "service.comment", "pk": 9, "fields": {"request": 1, "author": 1, "text": "<p>тест ком</p>", "attachment": "", "created_at": "2023-11-10T08:11:41.335Z", "content": ""}}, {"model": "service.comment", "pk": 10, "fields": {"request": 1, "author": 1, "text": "<p>тест с вложениями</p>", "attachment": "comments/METODIChESKOEPOSOBIELR1_9L0oWRt.pdf", "created_at": "2023-11-10T08:13:36.047Z", "content": ""}}, {"model": "service.statustransition", "pk": 8, "fields": {"from_status": 1, "to_status": 2, "allowed_groups": [2]}}, {"model": "service.statustransition", "pk": 9, "fields": {"from_status": 2, "to_status": 4, "allowed_groups": [2]}}, {"model": "service.statustransition", "pk": 10, "fields": {"from_status": 2, "to_status": 5, "allowed_groups": [2]}}, {"model": "service.statustransition", "pk": 11, "fields": {"from_status": 4, "to_status": 5, "allowed_groups": [2]}}, {"model": "service.emailsettings", "pk": 1, "fields": {"server": "smtp.yandex.ru", "port": 567, "login": "dansadkov@yandex.ru", "password": "3252090A", "email_from": "dansadkov@yandex.ru", "connection_type": "tls"}}, {"model": "service.emailsettings", "pk": 2, "fields": {"server": "smtp.yandex.ru", "port": 567, "login": "dansadkov@yandex.ru", "password": "3252090A", "email_from": "dansadkov@yandex.ru", "connection_type": "tls"}}, {"model": "service.emailsettings", "pk": 3, "fields": {"server": "smtp.yandex.ru", "port": 587, "login": "dansadkov@yandex.ru", "password": "12345", "email_from": "dansadkov@yandex.ru", "connection_type": "tls"}}, {"model": "service.emailsettings", "pk": 4, "fields": {"server": "smtp.yandex.ru", "port": 587, "login": "dansadkov@yandex.ru", "password": "3252090a", "email_from": "dansadkov@yandex.ru", "connection_type": "tls"}}, {"model": "service.emailsettings", "pk": 5, "fields": {"server": "smtp.yandex.ru", "port": 587, "login": "dansadkov@yandex.ru", "password": "3252090a", "email_from": "dansadkov@yandex.ru", "connection_type": "tls"}}, {"model": "service.emailsettings", "pk": 6, "fields": {"server": "smtp.yandex.ru", "port": 587, "login": "dansadkov@yandex.ru", "password": "3252090a", "email_from": "dansadkov@yandex.ru", "connection_type": "tls"}}, {"model": "service.emailsettings", "pk": 7, "fields": {"server": "smtp.example.com", "port": 567, "login": "dansadkov@yandex.ru", "password": "3252090a", "email_from": "dansadkov@yandex.ru", "connection_type": "tls"}}, {"model": "service.emailsettings", "pk": 8, "fields": {"server": "smtp.yandex.ru", "port": 567, "login": "dansadkov@yandex.ru", "password": "3252090a", "email_from": "dansadkov@yandex.ru", "connection_type": "tls"}}, {"model": "service.emailsettings", "pk": 9, "fields": {"server": "smtp.yandex.ru", "port": 567, "login": "dansadkov@yandex.ru", "password": "12345", "email_from": "dansadkov@yandex.ru", "connection_type": "tls"}}, {"model": "service.emailsettings", "pk": 10, "fields": {"server": "smtp.yandex.ru", "port": 587, "login": "dansadkov@yandex.ru", "password": "3252090a", "email_from": "dansadkov@yandex.ru", "connection_type": "tls"}}, {"model": "service.emailsettings", "pk": 11, "fields": {"server": "smtp.yandex.ru", "port": 587, "login": "dansadkov@yandex.ru", "password": "12345", "email_from": "dansadkov@yandex.ru", "connection_type": "tls"}}, {"model": "service.emailsettings", "pk": 12, "fields": {"server": "smtp.yandex.ru", "port": 587, "login": "dansadkov@yandex.ru", "password": "3252090a", "email_from": "dansadkov@yandex.ru", "connection_type": "tls"}}]
+[
+  {
+    "model": "admin.logentry",
+    "pk": 1,
+    "fields": {
+      "action_time": "2023-10-29T15:42:58.328Z",
+      "user": 1,
+      "content_type": 7,
+      "object_id": "1",
+      "object_repr": "1",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 2,
+    "fields": {
+      "action_time": "2023-10-29T15:43:07.354Z",
+      "user": 1,
+      "content_type": 7,
+      "object_id": "2",
+      "object_repr": "2",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 3,
+    "fields": {
+      "action_time": "2023-10-29T15:44:43.424Z",
+      "user": 1,
+      "content_type": 12,
+      "object_id": "1",
+      "object_repr": "Открыта",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 4,
+    "fields": {
+      "action_time": "2023-10-29T15:45:01.949Z",
+      "user": 1,
+      "content_type": 12,
+      "object_id": "2",
+      "object_repr": "В работе",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 5,
+    "fields": {
+      "action_time": "2023-10-29T15:45:53.210Z",
+      "user": 1,
+      "content_type": 12,
+      "object_id": "3",
+      "object_repr": "Требует уточнения",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 6,
+    "fields": {
+      "action_time": "2023-10-29T15:46:07.588Z",
+      "user": 1,
+      "content_type": 12,
+      "object_id": "4",
+      "object_repr": "Закрыта",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 7,
+    "fields": {
+      "action_time": "2023-10-29T15:46:20.994Z",
+      "user": 1,
+      "content_type": 12,
+      "object_id": "5",
+      "object_repr": "Выполнена",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 8,
+    "fields": {
+      "action_time": "2023-10-29T15:46:48.786Z",
+      "user": 1,
+      "content_type": 12,
+      "object_id": "6",
+      "object_repr": "Отмененена",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 9,
+    "fields": {
+      "action_time": "2023-10-29T15:49:01.039Z",
+      "user": 1,
+      "content_type": 3,
+      "object_id": "1",
+      "object_repr": "Администратор",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 10,
+    "fields": {
+      "action_time": "2023-10-29T15:50:10.455Z",
+      "user": 1,
+      "content_type": 3,
+      "object_id": "1",
+      "object_repr": "Исполнитель",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Name\", \"Permissions\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 11,
+    "fields": {
+      "action_time": "2023-10-29T15:50:26.636Z",
+      "user": 1,
+      "content_type": 3,
+      "object_id": "2",
+      "object_repr": "Администратор",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 12,
+    "fields": {
+      "action_time": "2023-10-29T15:50:56.157Z",
+      "user": 1,
+      "content_type": 11,
+      "object_id": "1",
+      "object_repr": "Инцидент",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 13,
+    "fields": {
+      "action_time": "2023-10-29T15:51:04.947Z",
+      "user": 1,
+      "content_type": 11,
+      "object_id": "2",
+      "object_repr": "Проблема",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 14,
+    "fields": {
+      "action_time": "2023-10-29T15:51:17.056Z",
+      "user": 1,
+      "content_type": 11,
+      "object_id": "3",
+      "object_repr": "Запрос  на обслуживание",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 15,
+    "fields": {
+      "action_time": "2023-10-29T15:51:43.575Z",
+      "user": 1,
+      "content_type": 11,
+      "object_id": "4",
+      "object_repr": "Запрос  на изменение",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 16,
+    "fields": {
+      "action_time": "2023-10-29T15:53:38.104Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "1",
+      "object_repr": "admin",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Groups\", \"\\u041a\\u043e\\u043c\\u043f\\u0430\\u043d\\u0438\\u044f\", \"\\u0420\\u043e\\u043b\\u044c\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 17,
+    "fields": {
+      "action_time": "2023-10-29T15:53:44.699Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "1",
+      "object_repr": "admin",
+      "action_flag": 2,
+      "change_message": "[]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 18,
+    "fields": {
+      "action_time": "2023-10-29T15:54:48.327Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "2",
+      "object_repr": "test_user",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 19,
+    "fields": {
+      "action_time": "2023-10-29T15:56:11.316Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "3",
+      "object_repr": "test_user2",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 20,
+    "fields": {
+      "action_time": "2023-10-29T16:08:17.510Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "1",
+      "object_repr": "низкая",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 21,
+    "fields": {
+      "action_time": "2023-10-29T16:08:29.489Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "2",
+      "object_repr": "средний",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 22,
+    "fields": {
+      "action_time": "2023-10-29T16:09:07.522Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "3",
+      "object_repr": "Высокий",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 23,
+    "fields": {
+      "action_time": "2023-10-29T16:09:57.632Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "4",
+      "object_repr": "Экстремальный",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 24,
+    "fields": {
+      "action_time": "2023-10-29T16:10:18.533Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "1",
+      "object_repr": "Низкий",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Name\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 25,
+    "fields": {
+      "action_time": "2023-10-29T16:10:29.635Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "2",
+      "object_repr": "Средний",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Name\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 26,
+    "fields": {
+      "action_time": "2023-10-29T16:11:08.224Z",
+      "user": 1,
+      "content_type": 14,
+      "object_id": "1",
+      "object_repr": "Низкий for Инцидент : 48 hours",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 27,
+    "fields": {
+      "action_time": "2023-10-29T16:11:31.798Z",
+      "user": 1,
+      "content_type": 14,
+      "object_id": "2",
+      "object_repr": "Средний for Инцидент : 36 hours",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 28,
+    "fields": {
+      "action_time": "2023-10-29T16:11:59.196Z",
+      "user": 1,
+      "content_type": 14,
+      "object_id": "3",
+      "object_repr": "Высокий for Инцидент : 24 hours",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 29,
+    "fields": {
+      "action_time": "2023-10-29T16:12:17.259Z",
+      "user": 1,
+      "content_type": 14,
+      "object_id": "4",
+      "object_repr": "Экстремальный for Инцидент : 12 hours",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 30,
+    "fields": {
+      "action_time": "2023-10-29T16:12:58.418Z",
+      "user": 1,
+      "content_type": 14,
+      "object_id": "5",
+      "object_repr": "Низкий for Проблема : 48 hours",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 31,
+    "fields": {
+      "action_time": "2023-10-29T16:16:27.897Z",
+      "user": 1,
+      "content_type": 14,
+      "object_id": "6",
+      "object_repr": "Средний for Проблема : 40 hours",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 32,
+    "fields": {
+      "action_time": "2023-10-29T16:16:55.701Z",
+      "user": 1,
+      "content_type": 14,
+      "object_id": "7",
+      "object_repr": "Высокий for Проблема : 24 hours",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 33,
+    "fields": {
+      "action_time": "2023-10-29T16:17:31.749Z",
+      "user": 1,
+      "content_type": 14,
+      "object_id": "8",
+      "object_repr": "Экстремальный for Проблема : 8 hours",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 34,
+    "fields": {
+      "action_time": "2023-11-06T20:30:03.167Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "1",
+      "object_repr": "admin",
+      "action_flag": 2,
+      "change_message": "[]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 35,
+    "fields": {
+      "action_time": "2023-11-11T12:26:34.553Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "1",
+      "object_repr": "admin",
+      "action_flag": 2,
+      "change_message": "[]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 36,
+    "fields": {
+      "action_time": "2023-11-25T15:14:01.036Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "2",
+      "object_repr": "View user profile at own level",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 37,
+    "fields": {
+      "action_time": "2023-11-25T15:14:01.050Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "1",
+      "object_repr": "Edit user profile at own level",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 38,
+    "fields": {
+      "action_time": "2023-11-25T15:24:25.838Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "3",
+      "object_repr": "Просмотр заявок",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 39,
+    "fields": {
+      "action_time": "2023-11-25T15:25:54.228Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "4",
+      "object_repr": "редактирование заявок",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 40,
+    "fields": {
+      "action_time": "2023-11-25T15:41:36.723Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "4",
+      "object_repr": "Редактирование заявок",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Name\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 41,
+    "fields": {
+      "action_time": "2023-11-25T19:37:05.143Z",
+      "user": 1,
+      "content_type": 6,
+      "object_id": "1",
+      "object_repr": "admin",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Group\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 42,
+    "fields": {
+      "action_time": "2023-11-26T12:04:47.168Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "5",
+      "object_repr": "Просмотр ролей",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 43,
+    "fields": {
+      "action_time": "2023-11-26T12:05:48.042Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "6",
+      "object_repr": "Редактирование Ролей",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 44,
+    "fields": {
+      "action_time": "2023-11-26T14:06:34.651Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "5",
+      "object_repr": "Просмотр ролей",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Code name\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 45,
+    "fields": {
+      "action_time": "2023-11-26T14:06:55.363Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "6",
+      "object_repr": "Редактирование Ролей",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Code name\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 46,
+    "fields": {
+      "action_time": "2023-11-26T14:07:21.001Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "4",
+      "object_repr": "Редактирование заявок",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Code name\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 47,
+    "fields": {
+      "action_time": "2023-11-26T14:07:48.430Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "3",
+      "object_repr": "Просмотр заявок",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Code name\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 48,
+    "fields": {
+      "action_time": "2023-11-26T15:53:31.455Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "5",
+      "object_repr": "Просмотр ролей",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Requires access level\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 49,
+    "fields": {
+      "action_time": "2023-11-26T15:53:36.250Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "6",
+      "object_repr": "Редактирование Ролей",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Requires access level\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 50,
+    "fields": {
+      "action_time": "2023-11-26T16:01:55.038Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "3",
+      "object_repr": "Просмотр заявок",
+      "action_flag": 2,
+      "change_message": "[]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 51,
+    "fields": {
+      "action_time": "2023-11-26T16:02:04.184Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "5",
+      "object_repr": "Просмотр ролей",
+      "action_flag": 2,
+      "change_message": "[]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 52,
+    "fields": {
+      "action_time": "2023-11-26T16:02:08.171Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "6",
+      "object_repr": "Редактирование Ролей",
+      "action_flag": 2,
+      "change_message": "[]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 53,
+    "fields": {
+      "action_time": "2023-11-28T17:14:44.182Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "6",
+      "object_repr": "Редактирование Ролей",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Code name\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 54,
+    "fields": {
+      "action_time": "2023-11-28T17:23:29.918Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "7",
+      "object_repr": "показывать компании",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 55,
+    "fields": {
+      "action_time": "2023-11-28T17:28:44.904Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "7",
+      "object_repr": "Показывать компании",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Name\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 56,
+    "fields": {
+      "action_time": "2023-11-28T17:32:44.784Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "8",
+      "object_repr": "Редактировать компании",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 57,
+    "fields": {
+      "action_time": "2023-11-28T17:42:34.308Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "9",
+      "object_repr": "Показывать пользователей",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 58,
+    "fields": {
+      "action_time": "2023-11-28T17:43:16.509Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "8",
+      "object_repr": "Редактировать компании",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Code name\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 59,
+    "fields": {
+      "action_time": "2023-11-28T17:43:34.922Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "9",
+      "object_repr": "Показывать пользователей",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Code name\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 60,
+    "fields": {
+      "action_time": "2023-11-28T17:48:24.938Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "10",
+      "object_repr": "Редактирование профилей",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 61,
+    "fields": {
+      "action_time": "2023-11-28T17:50:06.279Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "11",
+      "object_repr": "Редактировать свой профиль",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 62,
+    "fields": {
+      "action_time": "2023-11-28T17:54:11.377Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "12",
+      "object_repr": "редактировать настройки",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 1,
+    "fields": {
+      "name": "Can add log entry",
+      "content_type": 1,
+      "codename": "add_logentry"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 2,
+    "fields": {
+      "name": "Can change log entry",
+      "content_type": 1,
+      "codename": "change_logentry"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 3,
+    "fields": {
+      "name": "Can delete log entry",
+      "content_type": 1,
+      "codename": "delete_logentry"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 4,
+    "fields": {
+      "name": "Can view log entry",
+      "content_type": 1,
+      "codename": "view_logentry"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 5,
+    "fields": {
+      "name": "Can add permission",
+      "content_type": 2,
+      "codename": "add_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 6,
+    "fields": {
+      "name": "Can change permission",
+      "content_type": 2,
+      "codename": "change_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 7,
+    "fields": {
+      "name": "Can delete permission",
+      "content_type": 2,
+      "codename": "delete_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 8,
+    "fields": {
+      "name": "Can view permission",
+      "content_type": 2,
+      "codename": "view_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 9,
+    "fields": {
+      "name": "Can add group",
+      "content_type": 3,
+      "codename": "add_group"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 10,
+    "fields": {
+      "name": "Can change group",
+      "content_type": 3,
+      "codename": "change_group"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 11,
+    "fields": {
+      "name": "Can delete group",
+      "content_type": 3,
+      "codename": "delete_group"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 12,
+    "fields": {
+      "name": "Can view group",
+      "content_type": 3,
+      "codename": "view_group"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 13,
+    "fields": {
+      "name": "Can add content type",
+      "content_type": 4,
+      "codename": "add_contenttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 14,
+    "fields": {
+      "name": "Can change content type",
+      "content_type": 4,
+      "codename": "change_contenttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 15,
+    "fields": {
+      "name": "Can delete content type",
+      "content_type": 4,
+      "codename": "delete_contenttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 16,
+    "fields": {
+      "name": "Can view content type",
+      "content_type": 4,
+      "codename": "view_contenttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 17,
+    "fields": {
+      "name": "Can add session",
+      "content_type": 5,
+      "codename": "add_session"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 18,
+    "fields": {
+      "name": "Can change session",
+      "content_type": 5,
+      "codename": "change_session"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 19,
+    "fields": {
+      "name": "Can delete session",
+      "content_type": 5,
+      "codename": "delete_session"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 20,
+    "fields": {
+      "name": "Can view session",
+      "content_type": 5,
+      "codename": "view_session"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 21,
+    "fields": {
+      "name": "Can add custom user",
+      "content_type": 6,
+      "codename": "add_customuser"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 22,
+    "fields": {
+      "name": "Can change custom user",
+      "content_type": 6,
+      "codename": "change_customuser"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 23,
+    "fields": {
+      "name": "Can delete custom user",
+      "content_type": 6,
+      "codename": "delete_customuser"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 24,
+    "fields": {
+      "name": "Can view custom user",
+      "content_type": 6,
+      "codename": "view_customuser"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 25,
+    "fields": {
+      "name": "Can add company",
+      "content_type": 7,
+      "codename": "add_company"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 26,
+    "fields": {
+      "name": "Can change company",
+      "content_type": 7,
+      "codename": "change_company"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 27,
+    "fields": {
+      "name": "Can delete company",
+      "content_type": 7,
+      "codename": "delete_company"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 28,
+    "fields": {
+      "name": "Can view company",
+      "content_type": 7,
+      "codename": "view_company"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 29,
+    "fields": {
+      "name": "Can add user role",
+      "content_type": 8,
+      "codename": "add_userrole"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 30,
+    "fields": {
+      "name": "Can change user role",
+      "content_type": 8,
+      "codename": "change_userrole"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 31,
+    "fields": {
+      "name": "Can delete user role",
+      "content_type": 8,
+      "codename": "delete_userrole"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 32,
+    "fields": {
+      "name": "Can view user role",
+      "content_type": 8,
+      "codename": "view_userrole"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 33,
+    "fields": {
+      "name": "Can add request",
+      "content_type": 9,
+      "codename": "add_request"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 34,
+    "fields": {
+      "name": "Can change request",
+      "content_type": 9,
+      "codename": "change_request"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 35,
+    "fields": {
+      "name": "Can delete request",
+      "content_type": 9,
+      "codename": "delete_request"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 36,
+    "fields": {
+      "name": "Can view request",
+      "content_type": 9,
+      "codename": "view_request"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 37,
+    "fields": {
+      "name": "Can add priority",
+      "content_type": 10,
+      "codename": "add_priority"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 38,
+    "fields": {
+      "name": "Can change priority",
+      "content_type": 10,
+      "codename": "change_priority"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 39,
+    "fields": {
+      "name": "Can delete priority",
+      "content_type": 10,
+      "codename": "delete_priority"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 40,
+    "fields": {
+      "name": "Can view priority",
+      "content_type": 10,
+      "codename": "view_priority"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 41,
+    "fields": {
+      "name": "Can add request type",
+      "content_type": 11,
+      "codename": "add_requesttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 42,
+    "fields": {
+      "name": "Can change request type",
+      "content_type": 11,
+      "codename": "change_requesttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 43,
+    "fields": {
+      "name": "Can delete request type",
+      "content_type": 11,
+      "codename": "delete_requesttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 44,
+    "fields": {
+      "name": "Can view request type",
+      "content_type": 11,
+      "codename": "view_requesttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 45,
+    "fields": {
+      "name": "Can add status",
+      "content_type": 12,
+      "codename": "add_status"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 46,
+    "fields": {
+      "name": "Can change status",
+      "content_type": 12,
+      "codename": "change_status"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 47,
+    "fields": {
+      "name": "Can delete status",
+      "content_type": 12,
+      "codename": "delete_status"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 48,
+    "fields": {
+      "name": "Can view status",
+      "content_type": 12,
+      "codename": "view_status"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 49,
+    "fields": {
+      "name": "Can add comment",
+      "content_type": 13,
+      "codename": "add_comment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 50,
+    "fields": {
+      "name": "Can change comment",
+      "content_type": 13,
+      "codename": "change_comment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 51,
+    "fields": {
+      "name": "Can delete comment",
+      "content_type": 13,
+      "codename": "delete_comment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 52,
+    "fields": {
+      "name": "Can view comment",
+      "content_type": 13,
+      "codename": "view_comment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 53,
+    "fields": {
+      "name": "Can add priority duration",
+      "content_type": 14,
+      "codename": "add_priorityduration"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 54,
+    "fields": {
+      "name": "Can change priority duration",
+      "content_type": 14,
+      "codename": "change_priorityduration"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 55,
+    "fields": {
+      "name": "Can delete priority duration",
+      "content_type": 14,
+      "codename": "delete_priorityduration"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 56,
+    "fields": {
+      "name": "Can view priority duration",
+      "content_type": 14,
+      "codename": "view_priorityduration"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 57,
+    "fields": {
+      "name": "Can add status transition",
+      "content_type": 15,
+      "codename": "add_statustransition"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 58,
+    "fields": {
+      "name": "Can change status transition",
+      "content_type": 15,
+      "codename": "change_statustransition"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 59,
+    "fields": {
+      "name": "Can delete status transition",
+      "content_type": 15,
+      "codename": "delete_statustransition"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 60,
+    "fields": {
+      "name": "Can view status transition",
+      "content_type": 15,
+      "codename": "view_statustransition"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 61,
+    "fields": {
+      "name": "Can add saved filter",
+      "content_type": 16,
+      "codename": "add_savedfilter"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 62,
+    "fields": {
+      "name": "Can change saved filter",
+      "content_type": 16,
+      "codename": "change_savedfilter"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 63,
+    "fields": {
+      "name": "Can delete saved filter",
+      "content_type": 16,
+      "codename": "delete_savedfilter"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 64,
+    "fields": {
+      "name": "Can view saved filter",
+      "content_type": 16,
+      "codename": "view_savedfilter"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 65,
+    "fields": {
+      "name": "Can add department",
+      "content_type": 17,
+      "codename": "add_department"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 66,
+    "fields": {
+      "name": "Can change department",
+      "content_type": 17,
+      "codename": "change_department"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 67,
+    "fields": {
+      "name": "Can delete department",
+      "content_type": 17,
+      "codename": "delete_department"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 68,
+    "fields": {
+      "name": "Can view department",
+      "content_type": 17,
+      "codename": "view_department"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 69,
+    "fields": {
+      "name": "Can add attachment",
+      "content_type": 18,
+      "codename": "add_attachment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 70,
+    "fields": {
+      "name": "Can change attachment",
+      "content_type": 18,
+      "codename": "change_attachment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 71,
+    "fields": {
+      "name": "Can delete attachment",
+      "content_type": 18,
+      "codename": "delete_attachment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 72,
+    "fields": {
+      "name": "Can view attachment",
+      "content_type": 18,
+      "codename": "view_attachment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 73,
+    "fields": {
+      "name": "Can add permission",
+      "content_type": 19,
+      "codename": "add_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 74,
+    "fields": {
+      "name": "Can change permission",
+      "content_type": 19,
+      "codename": "change_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 75,
+    "fields": {
+      "name": "Can delete permission",
+      "content_type": 19,
+      "codename": "delete_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 76,
+    "fields": {
+      "name": "Can view permission",
+      "content_type": 19,
+      "codename": "view_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 77,
+    "fields": {
+      "name": "Can add role",
+      "content_type": 20,
+      "codename": "add_role"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 78,
+    "fields": {
+      "name": "Can change role",
+      "content_type": 20,
+      "codename": "change_role"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 79,
+    "fields": {
+      "name": "Can delete role",
+      "content_type": 20,
+      "codename": "delete_role"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 80,
+    "fields": {
+      "name": "Can view role",
+      "content_type": 20,
+      "codename": "view_role"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 81,
+    "fields": {
+      "name": "Can add role permission",
+      "content_type": 21,
+      "codename": "add_rolepermission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 82,
+    "fields": {
+      "name": "Can change role permission",
+      "content_type": 21,
+      "codename": "change_rolepermission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 83,
+    "fields": {
+      "name": "Can delete role permission",
+      "content_type": 21,
+      "codename": "delete_rolepermission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 84,
+    "fields": {
+      "name": "Can view role permission",
+      "content_type": 21,
+      "codename": "view_rolepermission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 85,
+    "fields": {
+      "name": "Can add group permission",
+      "content_type": 22,
+      "codename": "add_grouppermission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 86,
+    "fields": {
+      "name": "Can change group permission",
+      "content_type": 22,
+      "codename": "change_grouppermission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 87,
+    "fields": {
+      "name": "Can delete group permission",
+      "content_type": 22,
+      "codename": "delete_grouppermission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 88,
+    "fields": {
+      "name": "Can view group permission",
+      "content_type": 22,
+      "codename": "view_grouppermission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 89,
+    "fields": {
+      "name": "Can add custom permission",
+      "content_type": 19,
+      "codename": "add_custompermission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 90,
+    "fields": {
+      "name": "Can change custom permission",
+      "content_type": 19,
+      "codename": "change_custompermission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 91,
+    "fields": {
+      "name": "Can delete custom permission",
+      "content_type": 19,
+      "codename": "delete_custompermission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 92,
+    "fields": {
+      "name": "Can view custom permission",
+      "content_type": 19,
+      "codename": "view_custompermission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 93,
+    "fields": {
+      "name": "Can add dynamic field",
+      "content_type": 23,
+      "codename": "add_dynamicfield"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 94,
+    "fields": {
+      "name": "Can change dynamic field",
+      "content_type": 23,
+      "codename": "change_dynamicfield"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 95,
+    "fields": {
+      "name": "Can delete dynamic field",
+      "content_type": 23,
+      "codename": "delete_dynamicfield"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 96,
+    "fields": {
+      "name": "Can view dynamic field",
+      "content_type": 23,
+      "codename": "view_dynamicfield"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 97,
+    "fields": {
+      "name": "Can add dynamic field value",
+      "content_type": 24,
+      "codename": "add_dynamicfieldvalue"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 98,
+    "fields": {
+      "name": "Can change dynamic field value",
+      "content_type": 24,
+      "codename": "change_dynamicfieldvalue"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 99,
+    "fields": {
+      "name": "Can delete dynamic field value",
+      "content_type": 24,
+      "codename": "delete_dynamicfieldvalue"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 100,
+    "fields": {
+      "name": "Can view dynamic field value",
+      "content_type": 24,
+      "codename": "view_dynamicfieldvalue"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 101,
+    "fields": {
+      "name": "Can add email settings",
+      "content_type": 25,
+      "codename": "add_emailsettings"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 102,
+    "fields": {
+      "name": "Can change email settings",
+      "content_type": 25,
+      "codename": "change_emailsettings"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 103,
+    "fields": {
+      "name": "Can delete email settings",
+      "content_type": 25,
+      "codename": "delete_emailsettings"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 104,
+    "fields": {
+      "name": "Can view email settings",
+      "content_type": 25,
+      "codename": "view_emailsettings"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 105,
+    "fields": {
+      "name": "Can add group event notification",
+      "content_type": 26,
+      "codename": "add_groupeventnotification"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 106,
+    "fields": {
+      "name": "Can change group event notification",
+      "content_type": 26,
+      "codename": "change_groupeventnotification"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 107,
+    "fields": {
+      "name": "Can delete group event notification",
+      "content_type": 26,
+      "codename": "delete_groupeventnotification"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 108,
+    "fields": {
+      "name": "Can view group event notification",
+      "content_type": 26,
+      "codename": "view_groupeventnotification"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 109,
+    "fields": {
+      "name": "Can add performer group",
+      "content_type": 27,
+      "codename": "add_performergroup"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 110,
+    "fields": {
+      "name": "Can change performer group",
+      "content_type": 27,
+      "codename": "change_performergroup"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 111,
+    "fields": {
+      "name": "Can delete performer group",
+      "content_type": 27,
+      "codename": "delete_performergroup"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 112,
+    "fields": {
+      "name": "Can view performer group",
+      "content_type": 27,
+      "codename": "view_performergroup"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 113,
+    "fields": {
+      "name": "Can add asset type",
+      "content_type": 28,
+      "codename": "add_assettype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 114,
+    "fields": {
+      "name": "Can change asset type",
+      "content_type": 28,
+      "codename": "change_assettype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 115,
+    "fields": {
+      "name": "Can delete asset type",
+      "content_type": 28,
+      "codename": "delete_assettype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 116,
+    "fields": {
+      "name": "Can view asset type",
+      "content_type": 28,
+      "codename": "view_assettype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 117,
+    "fields": {
+      "name": "Can add asset",
+      "content_type": 29,
+      "codename": "add_asset"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 118,
+    "fields": {
+      "name": "Can change asset",
+      "content_type": 29,
+      "codename": "change_asset"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 119,
+    "fields": {
+      "name": "Can delete asset",
+      "content_type": 29,
+      "codename": "delete_asset"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 120,
+    "fields": {
+      "name": "Can view asset",
+      "content_type": 29,
+      "codename": "view_asset"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 121,
+    "fields": {
+      "name": "Can add attribute",
+      "content_type": 30,
+      "codename": "add_attribute"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 122,
+    "fields": {
+      "name": "Can change attribute",
+      "content_type": 30,
+      "codename": "change_attribute"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 123,
+    "fields": {
+      "name": "Can delete attribute",
+      "content_type": 30,
+      "codename": "delete_attribute"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 124,
+    "fields": {
+      "name": "Can view attribute",
+      "content_type": 30,
+      "codename": "view_attribute"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 125,
+    "fields": {
+      "name": "Can add asset attribute",
+      "content_type": 31,
+      "codename": "add_assetattribute"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 126,
+    "fields": {
+      "name": "Can change asset attribute",
+      "content_type": 31,
+      "codename": "change_assetattribute"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 127,
+    "fields": {
+      "name": "Can delete asset attribute",
+      "content_type": 31,
+      "codename": "delete_assetattribute"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 128,
+    "fields": {
+      "name": "Can view asset attribute",
+      "content_type": 31,
+      "codename": "view_assetattribute"
+    }
+  },
+  {
+    "model": "auth.group",
+    "pk": 1,
+    "fields": {
+      "name": "Исполнитель",
+      "permissions": [33, 34, 35, 36, 41, 42, 43, 44]
+    }
+  },
+  {
+    "model": "auth.group",
+    "pk": 2,
+    "fields": {
+      "name": "Администратор",
+      "permissions": [
+        1, 2, 3, 4, 9, 10, 11, 12, 5, 6, 7, 8, 13, 14, 15, 16, 49, 50, 51, 52,
+        25, 26, 27, 28, 21, 22, 23, 24, 37, 38, 39, 40, 53, 54, 55, 56, 33, 34,
+        35, 36, 41, 42, 43, 44, 61, 62, 63, 64, 45, 46, 47, 48, 57, 58, 59, 60,
+        29, 30, 31, 32, 17, 18, 19, 20
+      ]
+    }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 1,
+    "fields": { "app_label": "admin", "model": "logentry" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 2,
+    "fields": { "app_label": "auth", "model": "permission" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 3,
+    "fields": { "app_label": "auth", "model": "group" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 4,
+    "fields": { "app_label": "contenttypes", "model": "contenttype" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 5,
+    "fields": { "app_label": "sessions", "model": "session" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 6,
+    "fields": { "app_label": "service", "model": "customuser" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 7,
+    "fields": { "app_label": "service", "model": "company" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 8,
+    "fields": { "app_label": "service", "model": "userrole" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 9,
+    "fields": { "app_label": "service", "model": "request" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 10,
+    "fields": { "app_label": "service", "model": "priority" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 11,
+    "fields": { "app_label": "service", "model": "requesttype" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 12,
+    "fields": { "app_label": "service", "model": "status" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 13,
+    "fields": { "app_label": "service", "model": "comment" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 14,
+    "fields": { "app_label": "service", "model": "priorityduration" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 15,
+    "fields": { "app_label": "service", "model": "statustransition" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 16,
+    "fields": { "app_label": "service", "model": "savedfilter" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 17,
+    "fields": { "app_label": "service", "model": "department" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 18,
+    "fields": { "app_label": "service", "model": "attachment" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 19,
+    "fields": { "app_label": "service", "model": "custompermission" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 20,
+    "fields": { "app_label": "service", "model": "role" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 21,
+    "fields": { "app_label": "service", "model": "rolepermission" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 22,
+    "fields": { "app_label": "service", "model": "grouppermission" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 23,
+    "fields": { "app_label": "service", "model": "dynamicfield" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 24,
+    "fields": { "app_label": "service", "model": "dynamicfieldvalue" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 25,
+    "fields": { "app_label": "service", "model": "emailsettings" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 26,
+    "fields": { "app_label": "service", "model": "groupeventnotification" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 27,
+    "fields": { "app_label": "service", "model": "performergroup" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 28,
+    "fields": { "app_label": "service", "model": "assettype" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 29,
+    "fields": { "app_label": "service", "model": "asset" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 30,
+    "fields": { "app_label": "service", "model": "attribute" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 31,
+    "fields": { "app_label": "service", "model": "assetattribute" }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "67xqt0i8u1e4k8dxajlum54qqqhloxbi",
+    "fields": {
+      "session_data": ".eJxVjDsOwyAQBe9CHSGw-aZM7zOgZVmCkwgkY1dR7h5bcpG0b2bemwXY1hK2TkuYE7syyS6_WwR8Uj1AekC9N46trssc-aHwk3Y-tUSv2-n-HRToZa9pzCNmdEM0EQV4Le3ohfLKktaDUOh9Vk6ABGucimgyKRIAuxG1z4l9vt-HN-A:1rX1Fs:wWmKy3AyGeavnGjwJjOx44YzaQvWeZl-uYWR9YkVUCc",
+      "expire_date": "2024-02-19T15:51:32.396Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "i9muyym2usawzghghumxrpp5x1ye8p6b",
+    "fields": {
+      "session_data": ".eJxVjDsOwyAQBe9CHSGw-aZM7zOgZVmCkwgkY1dR7h5bcpG0b2bemwXY1hK2TkuYE7syyS6_WwR8Uj1AekC9N46trssc-aHwk3Y-tUSv2-n-HRToZa9pzCNmdEM0EQV4Le3ohfLKktaDUOh9Vk6ABGucimgyKRIAuxG1z4l9vt-HN-A:1rrwNH:7HwLgEO3OqTtcIcW7JrmzVQhcH_WwFMA5JlwWKTIVpo",
+      "expire_date": "2024-04-17T08:53:39.655Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "pl5e0knxmhluldg7z1tnyg9h1d17s9fr",
+    "fields": {
+      "session_data": ".eJxVjMEOwiAQRP-FsyHAghSP3v0GsnR3bdXQpLQn47_bJj3obTLvzbxVxnUZ8tp4ziOpi7Lq9NsV7J9cd0APrPdJ91Nd5rHoXdEHbfo2Eb-uh_t3MGAbtrU7-86LpALBBQhA0QTsY2JvKJJI2UJhA5IcIbHY6AAIjRFbOs-gPl_fZTgq:1rAW6Z:p6eTmYH7NLs2ckay91CZ-uyAKB3DsdhnDodvjKqWG0M",
+      "expire_date": "2023-12-19T14:08:55.338Z"
+    }
+  },
+  {
+    "model": "service.company",
+    "pk": 1,
+    "fields": {
+      "name": "1",
+      "region": "spb",
+      "address": "1",
+      "phone": "",
+      "email": "",
+      "website": "",
+      "description": "1",
+      "ceo": 1,
+      "deputy": 1,
+      "contact_person": 1,
+      "timezone": "UTC"
+    }
+  },
+  {
+    "model": "service.customuser",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$ZnxaRH6vquvQyr3qBLAsrt$6dVS+xjBSy69YeDj/oNe941a/IMDLWpevge604QkYzc=",
+      "last_login": "2024-04-03T08:53:39.649Z",
+      "is_superuser": true,
+      "username": "admin",
+      "email": "dansadkov@yandex.ru",
+      "first_name": "dan",
+      "last_name": "sad",
+      "phone_number": "+79213252090",
+      "address": "САНКТ-ПЕТЕРБУРГ, ДЖОНА РИДА УЛ., дом № 4, корпус 2, кв. 13",
+      "is_active": true,
+      "is_staff": true,
+      "group": 2,
+      "company": 1,
+      "department": null,
+      "groups": [2],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "service.department",
+    "pk": 1,
+    "fields": {
+      "name": "тест отдел",
+      "parent": null,
+      "company": 1,
+      "users": [1]
+    }
+  },
+  {
+    "model": "service.department",
+    "pk": 2,
+    "fields": { "name": "123", "parent": null, "company": 1, "users": [] }
+  },
+  {
+    "model": "service.custompermission",
+    "pk": 3,
+    "fields": { "code_name": "action_view_request", "name": "Просмотр заявок" }
+  },
+  {
+    "model": "service.custompermission",
+    "pk": 4,
+    "fields": {
+      "code_name": "action_edit_request",
+      "name": "Редактирование заявок"
+    }
+  },
+  {
+    "model": "service.custompermission",
+    "pk": 5,
+    "fields": { "code_name": "section_roles", "name": "Просмотр ролей" }
+  },
+  {
+    "model": "service.custompermission",
+    "pk": 6,
+    "fields": {
+      "code_name": "section_edit roles",
+      "name": "Редактирование Ролей"
+    }
+  },
+  {
+    "model": "service.custompermission",
+    "pk": 7,
+    "fields": {
+      "code_name": "section_view_companies",
+      "name": "Показывать компании"
+    }
+  },
+  {
+    "model": "service.custompermission",
+    "pk": 8,
+    "fields": {
+      "code_name": "section_edit_companies",
+      "name": "Редактировать компании"
+    }
+  },
+  {
+    "model": "service.custompermission",
+    "pk": 9,
+    "fields": {
+      "code_name": "section_view_users",
+      "name": "Показывать пользователей"
+    }
+  },
+  {
+    "model": "service.custompermission",
+    "pk": 10,
+    "fields": {
+      "code_name": "section_edit_users",
+      "name": "Редактирование профилей"
+    }
+  },
+  {
+    "model": "service.custompermission",
+    "pk": 11,
+    "fields": {
+      "code_name": "section_edit_myself",
+      "name": "Редактировать свой профиль"
+    }
+  },
+  {
+    "model": "service.custompermission",
+    "pk": 12,
+    "fields": {
+      "code_name": "section_edit_settings",
+      "name": "редактировать настройки"
+    }
+  },
+  {
+    "model": "service.grouppermission",
+    "pk": 71,
+    "fields": { "group": 2, "custompermission": 3, "access_level": "global" }
+  },
+  {
+    "model": "service.grouppermission",
+    "pk": 72,
+    "fields": { "group": 2, "custompermission": 4, "access_level": "company" }
+  },
+  {
+    "model": "service.grouppermission",
+    "pk": 73,
+    "fields": { "group": 2, "custompermission": 7, "access_level": null }
+  },
+  {
+    "model": "service.grouppermission",
+    "pk": 74,
+    "fields": { "group": 2, "custompermission": 11, "access_level": null }
+  },
+  {
+    "model": "service.grouppermission",
+    "pk": 75,
+    "fields": { "group": 1, "custompermission": 3, "access_level": "company" }
+  },
+  {
+    "model": "service.grouppermission",
+    "pk": 76,
+    "fields": { "group": 1, "custompermission": 4, "access_level": "personal" }
+  },
+  {
+    "model": "service.grouppermission",
+    "pk": 77,
+    "fields": { "group": 1, "custompermission": 5, "access_level": null }
+  },
+  {
+    "model": "service.grouppermission",
+    "pk": 78,
+    "fields": { "group": 1, "custompermission": 6, "access_level": null }
+  },
+  {
+    "model": "service.grouppermission",
+    "pk": 79,
+    "fields": { "group": 1, "custompermission": 7, "access_level": null }
+  },
+  {
+    "model": "service.grouppermission",
+    "pk": 80,
+    "fields": { "group": 1, "custompermission": 9, "access_level": null }
+  },
+  {
+    "model": "service.status",
+    "pk": 1,
+    "fields": { "name": "Открыта", "color": null, "description": "" }
+  },
+  {
+    "model": "service.status",
+    "pk": 2,
+    "fields": { "name": "В работе", "color": null, "description": "" }
+  },
+  {
+    "model": "service.status",
+    "pk": 3,
+    "fields": { "name": "Требует уточнения", "color": null, "description": "" }
+  },
+  {
+    "model": "service.status",
+    "pk": 4,
+    "fields": { "name": "Закрыта", "color": null, "description": "" }
+  },
+  {
+    "model": "service.status",
+    "pk": 5,
+    "fields": { "name": "Выполнена", "color": null, "description": "" }
+  },
+  { "model": "service.priority", "pk": 1, "fields": { "name": "Низкий" } },
+  { "model": "service.priority", "pk": 2, "fields": { "name": "Средний" } },
+  { "model": "service.priority", "pk": 3, "fields": { "name": "Высокий" } },
+  {
+    "model": "service.priority",
+    "pk": 4,
+    "fields": { "name": "Экстремальный" }
+  },
+  {
+    "model": "service.requesttype",
+    "pk": 1,
+    "fields": { "name": "Инцидент", "description": "" }
+  },
+  {
+    "model": "service.requesttype",
+    "pk": 2,
+    "fields": { "name": "Проблема", "description": "" }
+  },
+  {
+    "model": "service.requesttype",
+    "pk": 3,
+    "fields": { "name": "Запрос  на обслуживание", "description": "" }
+  },
+  {
+    "model": "service.requesttype",
+    "pk": 4,
+    "fields": { "name": "Запрос  на изменение", "description": "" }
+  },
+  {
+    "model": "service.priorityduration",
+    "pk": 1,
+    "fields": { "request_type": 1, "priority": 1, "duration_in_hours": 48 }
+  },
+  {
+    "model": "service.priorityduration",
+    "pk": 2,
+    "fields": { "request_type": 1, "priority": 2, "duration_in_hours": 36 }
+  },
+  {
+    "model": "service.priorityduration",
+    "pk": 3,
+    "fields": { "request_type": 1, "priority": 3, "duration_in_hours": 24 }
+  },
+  {
+    "model": "service.priorityduration",
+    "pk": 4,
+    "fields": { "request_type": 1, "priority": 4, "duration_in_hours": 12 }
+  },
+  {
+    "model": "service.priorityduration",
+    "pk": 5,
+    "fields": { "request_type": 2, "priority": 1, "duration_in_hours": 48 }
+  },
+  {
+    "model": "service.priorityduration",
+    "pk": 6,
+    "fields": { "request_type": 2, "priority": 2, "duration_in_hours": 40 }
+  },
+  {
+    "model": "service.priorityduration",
+    "pk": 7,
+    "fields": { "request_type": 2, "priority": 3, "duration_in_hours": 24 }
+  },
+  {
+    "model": "service.priorityduration",
+    "pk": 8,
+    "fields": { "request_type": 2, "priority": 4, "duration_in_hours": 8 }
+  },
+  {
+    "model": "service.priorityduration",
+    "pk": 9,
+    "fields": { "request_type": 3, "priority": 1, "duration_in_hours": 2 }
+  },
+  {
+    "model": "service.request",
+    "pk": 1,
+    "fields": {
+      "title": "1",
+      "description": "<p>12</p>",
+      "requester": 1,
+      "assignee": 1,
+      "company": null,
+      "status": 1,
+      "created_at": "2023-10-29T16:20:31.726Z",
+      "updated_at": "2023-11-09T20:30:19.257Z",
+      "priority": 2,
+      "request_type": 1,
+      "due_date": "2023-10-31T04:20:31Z",
+      "attachment": ""
+    }
+  },
+  {
+    "model": "service.request",
+    "pk": 2,
+    "fields": {
+      "title": "test типа",
+      "description": "<p>тест типа</p>",
+      "requester": 1,
+      "assignee": 1,
+      "company": null,
+      "status": 1,
+      "created_at": "2024-03-26T09:14:10.731Z",
+      "updated_at": "2024-03-26T12:04:18.796Z",
+      "priority": 3,
+      "request_type": 1,
+      "due_date": null,
+      "attachment": ""
+    }
+  },
+  {
+    "model": "service.comment",
+    "pk": 4,
+    "fields": {
+      "request": 1,
+      "author": 1,
+      "text": "f",
+      "attachment": "comments/L_CZ3B9IPlE.jpg",
+      "created_at": "2023-11-06T17:28:39.325Z",
+      "content": ""
+    }
+  },
+  {
+    "model": "service.comment",
+    "pk": 5,
+    "fields": {
+      "request": 1,
+      "author": 1,
+      "text": "f",
+      "attachment": "comments/L_CZ3B9IPlE_6DTVZPj.jpg",
+      "created_at": "2023-11-06T17:29:51.138Z",
+      "content": ""
+    }
+  },
+  {
+    "model": "service.comment",
+    "pk": 9,
+    "fields": {
+      "request": 1,
+      "author": 1,
+      "text": "<p>тест ком</p>",
+      "attachment": "",
+      "created_at": "2023-11-10T08:11:41.335Z",
+      "content": ""
+    }
+  },
+  {
+    "model": "service.comment",
+    "pk": 10,
+    "fields": {
+      "request": 1,
+      "author": 1,
+      "text": "<p>тест с вложениями</p>",
+      "attachment": "comments/METODIChESKOEPOSOBIELR1_9L0oWRt.pdf",
+      "created_at": "2023-11-10T08:13:36.047Z",
+      "content": ""
+    }
+  },
+  {
+    "model": "service.statustransition",
+    "pk": 8,
+    "fields": { "from_status": 1, "to_status": 2, "allowed_groups": [2] }
+  },
+  {
+    "model": "service.statustransition",
+    "pk": 9,
+    "fields": { "from_status": 2, "to_status": 4, "allowed_groups": [2] }
+  },
+  {
+    "model": "service.statustransition",
+    "pk": 10,
+    "fields": { "from_status": 2, "to_status": 5, "allowed_groups": [2] }
+  },
+  {
+    "model": "service.statustransition",
+    "pk": 11,
+    "fields": { "from_status": 4, "to_status": 5, "allowed_groups": [2] }
+  },
+  {
+    "model": "service.emailsettings",
+    "pk": 1,
+    "fields": {
+      "server": "smtp.yandex.ru",
+      "port": 567,
+      "login": "dansadkov@yandex.ru",
+      "password": "3252090A",
+      "email_from": "dansadkov@yandex.ru",
+      "connection_type": "tls"
+    }
+  },
+  {
+    "model": "service.emailsettings",
+    "pk": 2,
+    "fields": {
+      "server": "smtp.yandex.ru",
+      "port": 567,
+      "login": "dansadkov@yandex.ru",
+      "password": "3252090A",
+      "email_from": "dansadkov@yandex.ru",
+      "connection_type": "tls"
+    }
+  },
+  {
+    "model": "service.emailsettings",
+    "pk": 3,
+    "fields": {
+      "server": "smtp.yandex.ru",
+      "port": 587,
+      "login": "dansadkov@yandex.ru",
+      "password": "12345",
+      "email_from": "dansadkov@yandex.ru",
+      "connection_type": "tls"
+    }
+  },
+  {
+    "model": "service.emailsettings",
+    "pk": 4,
+    "fields": {
+      "server": "smtp.yandex.ru",
+      "port": 587,
+      "login": "dansadkov@yandex.ru",
+      "password": "3252090a",
+      "email_from": "dansadkov@yandex.ru",
+      "connection_type": "tls"
+    }
+  },
+  {
+    "model": "service.emailsettings",
+    "pk": 5,
+    "fields": {
+      "server": "smtp.yandex.ru",
+      "port": 587,
+      "login": "dansadkov@yandex.ru",
+      "password": "3252090a",
+      "email_from": "dansadkov@yandex.ru",
+      "connection_type": "tls"
+    }
+  },
+  {
+    "model": "service.emailsettings",
+    "pk": 6,
+    "fields": {
+      "server": "smtp.yandex.ru",
+      "port": 587,
+      "login": "dansadkov@yandex.ru",
+      "password": "3252090a",
+      "email_from": "dansadkov@yandex.ru",
+      "connection_type": "tls"
+    }
+  },
+  {
+    "model": "service.emailsettings",
+    "pk": 7,
+    "fields": {
+      "server": "smtp.example.com",
+      "port": 567,
+      "login": "dansadkov@yandex.ru",
+      "password": "3252090a",
+      "email_from": "dansadkov@yandex.ru",
+      "connection_type": "tls"
+    }
+  },
+  {
+    "model": "service.emailsettings",
+    "pk": 8,
+    "fields": {
+      "server": "smtp.yandex.ru",
+      "port": 567,
+      "login": "dansadkov@yandex.ru",
+      "password": "3252090a",
+      "email_from": "dansadkov@yandex.ru",
+      "connection_type": "tls"
+    }
+  },
+  {
+    "model": "service.emailsettings",
+    "pk": 9,
+    "fields": {
+      "server": "smtp.yandex.ru",
+      "port": 567,
+      "login": "dansadkov@yandex.ru",
+      "password": "12345",
+      "email_from": "dansadkov@yandex.ru",
+      "connection_type": "tls"
+    }
+  },
+  {
+    "model": "service.emailsettings",
+    "pk": 10,
+    "fields": {
+      "server": "smtp.yandex.ru",
+      "port": 587,
+      "login": "dansadkov@yandex.ru",
+      "password": "3252090a",
+      "email_from": "dansadkov@yandex.ru",
+      "connection_type": "tls"
+    }
+  },
+  {
+    "model": "service.emailsettings",
+    "pk": 11,
+    "fields": {
+      "server": "smtp.yandex.ru",
+      "port": 587,
+      "login": "dansadkov@yandex.ru",
+      "password": "12345",
+      "email_from": "dansadkov@yandex.ru",
+      "connection_type": "tls"
+    }
+  },
+  {
+    "model": "service.emailsettings",
+    "pk": 12,
+    "fields": {
+      "server": "smtp.yandex.ru",
+      "port": 587,
+      "login": "dansadkov@yandex.ru",
+      "password": "3252090a",
+      "email_from": "dansadkov@yandex.ru",
+      "connection_type": "tls"
+    }
+  }
+]
