@@ -3,7 +3,7 @@ version: "3.8"
 services:
   service-desk-mysql:
     image: mysql:8.4.0
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./data:/var/lib/mysql
       - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
@@ -32,7 +32,7 @@ services:
       context: .
       dockerfile: Dockerfile
     command: sh -c "python3 manage.py migrate --noinput && python3 manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:8000"
-    restart: always
+    restart: unless-stopped
     volumes:
       - .:/app
     ports:
@@ -41,8 +41,6 @@ services:
       - service-desk-mysql
     env_file:
       - .env
-    links:
-      - service-desk-mysql
 
 volumes:
   data:
