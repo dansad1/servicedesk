@@ -35,7 +35,6 @@ def email_settings_view(request):
 def send_test_email(request):
     try:
         email_settings = EmailSettings.objects.last()
-        print(email_settings)
         if not email_settings:
             return JsonResponse({'success': False, 'error': 'Настройки электронной почты не настроены'})
 
@@ -43,8 +42,8 @@ def send_test_email(request):
         if not test_email:
             return JsonResponse({'success': False, 'error': 'Не указан адрес электронной почты для теста'})
 
-        # Создание настраиваемого подключения на основе сохраненных настроек
 
+        # Создание настраиваемого подключения на основе сохраненных настроек
         connection = get_connection(
             host=email_settings.server,
             port=email_settings.port,
@@ -66,6 +65,7 @@ def send_test_email(request):
         email.send()
 
         return JsonResponse({'success': True})
+    
     except Exception as e:  # Это поймает любые исключения, включая BadHeaderError
         return JsonResponse({'success': False,
                              'error': f'Ошибка отправки письма: {e}, {email_settings.email_from, email_settings.login, email_settings.password}'})

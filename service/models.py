@@ -44,6 +44,8 @@ class Company(models.Model):
 
     def __str__(self):
         return self.name
+
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, email, password=None, **extra_fields):
         if not email:
@@ -86,6 +88,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
+
+
 class Department(models.Model):
     name = models.CharField(max_length=200, verbose_name="Название")
     parent = models.ForeignKey('self', related_name='subdepartments', on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Родительское подразделение")
@@ -98,6 +102,8 @@ class Department(models.Model):
     class Meta:
         verbose_name = "Подразделение"
         verbose_name_plural = "Подразделения"
+
+
 class CustomPermission(models.Model):
     code_name = models.CharField(max_length=100, unique=True)
     name = models.CharField(max_length=255)
@@ -117,6 +123,8 @@ class GroupPermission(models.Model):
 
     def __str__(self):
         return f"{self.group.name} - {self.custom_permission.name} - {self.access_level}"
+
+
 class Status(models.Model):
     name = models.CharField(max_length=50, unique=True)
     color = models.CharField(max_length=20, blank=True, null=True)
@@ -124,6 +132,8 @@ class Status(models.Model):
 
     def __str__(self):
         return self.name
+    
+    
 class Priority(models.Model):
     name = models.CharField(max_length=50, unique=True)
     def __str__(self):
@@ -134,6 +144,8 @@ class RequestType(models.Model):
     description = models.TextField(blank=True, null=True)
     def __str__(self):
         return self.name
+    
+    
 class PriorityDuration(models.Model):
     request_type = models.ForeignKey(RequestType, on_delete=models.CASCADE)
     priority = models.ForeignKey(Priority, on_delete=models.CASCADE)
@@ -144,6 +156,8 @@ class PriorityDuration(models.Model):
 
     def __str__(self):
         return f"{self.priority.name} for {self.request_type.name} : {self.duration_in_hours} hours"
+
+
 class Request(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
@@ -178,6 +192,8 @@ class Request(models.Model):
         super(Request, self).save(*args, **kwargs)
     def __str__(self):
         return self.title
+
+
 class Comment(models.Model):
     request = models.ForeignKey(Request, on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -188,6 +204,8 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'Comment by {self.author.username} on {self.request.title}'
+
+
 class StatusTransition(models.Model):
     from_status = models.ForeignKey(Status, related_name='from_transitions', on_delete=models.CASCADE)
     to_status = models.ForeignKey(Status, related_name='to_transitions', on_delete=models.CASCADE)
@@ -198,6 +216,8 @@ class StatusTransition(models.Model):
 
     def __str__(self):
         return f"{self.from_status.name} -> {self.to_status.name}"
+
+
 class SavedFilter(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     filter_name = models.CharField(max_length=100)
@@ -235,6 +255,8 @@ class EmailSettings(models.Model):
     @property
     def use_ssl(self):
         return self.connection_type == 'ssl'
+
+
 from django.db import models
 
 class Event(models.Model):
@@ -251,6 +273,7 @@ class Event(models.Model):
     def __str__(self):
         return self.get_name_display()
 
+
 class NotificationSetting(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='notification_settings')
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
@@ -258,6 +281,8 @@ class NotificationSetting(models.Model):
 
     def __str__(self):
         return f"{self.group.name} - {self.event.name}"
+
+
 class PerformerGroup(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
@@ -273,6 +298,7 @@ class AssetType(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class Attribute(models.Model):
     TEXT = 'text'
@@ -328,10 +354,11 @@ class AssetAttribute(models.Model):
     value_email = models.EmailField(null=True, blank=True)
     value_url = models.URLField(null=True, blank=True)
     value_json = models.JSONField(null=True, blank=True)
-def __str__(self):
-     return f"{self.attribute.name} for {self.asset.name}: {self.get_value()}"
 
-def get_value(self):
+    def __str__(self):
+        return f"{self.attribute.name} for {self.asset.name}: {self.get_value()}"
+
+    def get_value(self):
         """ Возвращает значение атрибута в зависимости от его типа. """
         type_map = {
             Attribute.TEXT: self.value_text,
@@ -346,6 +373,8 @@ def get_value(self):
             Attribute.ATTRIBUTE_REFERENCE: self.value_attribute_reference.get_value() if self.value_attribute_reference else None,
         }
         return type_map.get(self.attribute.attribute_type)
+    
+    
 class ChatMessage(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     message = models.TextField()
@@ -353,6 +382,8 @@ class ChatMessage(models.Model):
 
     def __str__(self):
         return self.message[:50]  # Вывод первых 50 символов сообщения
+
+
 class Doc(models.Model):
     title = models.CharField(max_length=255)
     doc_file = models.FileField(upload_to='documents/%Y/%m/%d/')
