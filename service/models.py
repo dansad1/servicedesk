@@ -258,6 +258,14 @@ class NotificationSetting(models.Model):
 
     def __str__(self):
         return f"{self.group.name} - {self.event.name}"
+class NotificationTemplate(models.Model):
+    type = models.CharField(max_length=100, choices=[('email', 'Email'), ('sms', 'SMS'), ('push', 'Push Notification')])
+    name = models.CharField(max_length=255)
+    subject = models.CharField(max_length=255, blank=True)
+    body = RichTextUploadingField(help_text="Используйте инструменты редактора для форматирования текста.")
+
+    def __str__(self):
+        return self.name
 class PerformerGroup(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
