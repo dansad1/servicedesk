@@ -141,8 +141,30 @@ STATICFILES_DIRS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-CKEDITOR_UPLOAD_PATH = "uploads/"
-CKEDITOR_RESTRICT_BY_USER = True    # Limit file access to the user's uploaded files
+CKEDITOR_UPLOAD_PATH = 'uploads/'  # Subdirectory of MEDIA_ROOT for storing uploaded files
+CKEDITOR_RESTRICT_BY_USER = True  # Limit file access to the user's own uploaded files
+CKEDITOR_CONFIGS = {
+    'default': {
+        # Default CKEditor toolbar configurations and other settings
+        'toolbar': 'full',
+        'height': 300,
+        'width': '100%',
+    },
+    'custom': {
+        # Specific toolbar configuration for custom settings
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            ['Bold', 'Italic', 'Underline'],
+            ['Link', 'Unlink'],
+            ['Undo', 'Redo'],
+            ['Source']
+        ],
+        'extraPlugins': 'sourcedialog',  # Enables source code dialog if not included by default
+        'removePlugins': 'about',  # Removes the 'About CKEditor' plugin
+        'customConfig': '/static/js/ckeditor_custom_config.js'  # Path to your custom CKEditor config file
+    }
+}
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
