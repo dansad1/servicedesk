@@ -6,8 +6,8 @@ from django.conf.urls.static import static  # Import static for serving media fi
 import service.models
 from service.views.chat_views import chat_view
 from service.views.asset_type_views import *
-from service.views.asset_views import create_asset, edit_asset, delete_asset, asset_list, get_attributes_by_asset_type
-from service.views.attribute_views import attribute_create, attribute_delete, attribute_edit
+from service.views.asset_views import *
+from service.views.attribute_views import *
 from service.views.doc_views import upload_document, document_list, analyze_document
 from service.views.file_views import file_view
 from service.views.request_views import *
@@ -99,11 +99,11 @@ urlpatterns = [
     path('groups/<int:pk>/delete/', performer_group_delete, name='performer_group_delete'),
 
     #Активы
+    path('assets/', asset_list, name='asset_list'),
     path('assets/create/', create_asset, name='create_asset'),
-    path('assets/edit/<int:pk>/', edit_asset, name='edit_asset'),
-    path('assets/delete/<int:pk>/', delete_asset, name='delete_asset'),
-    path('assets/', asset_list, name='assets_list'),
-    path('asset-types/<int:asset_type_id>/attributes/', get_attributes_by_asset_type,name='get_attributes_by_asset_type'),
+    path('assets/<int:pk>/edit/', edit_asset, name='edit_asset'),
+    path('assets/<int:pk>/delete/', delete_asset, name='delete_asset'),
+    path('assets/types/<int:asset_type_id>/attributes/', get_attributes_by_asset_type, name='attributes_by_type'),
 
     # Маршруты для типов активов
     path('asset_types/create/', asset_type_create, name='asset_type_create'),
@@ -113,9 +113,11 @@ urlpatterns = [
 
     # Маршруты для атрибутов
     path('attributes/edit/<int:pk>/', attribute_edit, name='attribute_edit'),
-    path('attributes/delete/<int:pk>/', attribute_delete, name='attribute_delete'),
+    path('attributes/delete/type/<int:pk>/<int:asset_type_id>/', attribute_delete_from_type,name='attribute_delete_from_type'),
+    path('attributes/delete/asset/<int:pk>/<int:asset_id>/', attribute_delete_from_asset,name='attribute_delete_from_asset'),
     path('asset_types/<int:asset_type_id>/attributes/create/', service.views.attribute_views.attribute_create, name='attribute_create'),
 path('asset-types/<int:asset_type_id>/attributes/', get_attributes_by_asset_type, name='get_attributes_by_asset_type'),
+path('assets/<int:asset_id>/attributes/', get_attributes_by_asset, name='get_attributes_by_asset'),
 
 # URL-паттерны для отделов
     path('department/<int:company_pk>/create_department/', department_create, name='department_create'),

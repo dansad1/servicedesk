@@ -3,6 +3,28 @@
 {% block content %}
   <h2>Тип актива "{{ asset_type.name }}"</h2>
 
+  <!-- JavaScript для удаления атрибута из типа актива -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script>
+    function deleteAttributeFromType(attributeId, assetTypeId, event) {
+      event.preventDefault(); // Предотвращаем стандартное поведение ссылки
+      if (confirm('Вы уверены, что хотите удалить этот атрибут из типа актива?')) {
+        $.ajax({
+          url: "{% url 'attribute_delete_from_type' 9999 9999 %}".replace('9999/9999', attributeId + '/' + assetTypeId),
+          type: 'POST',
+          data: { csrfmiddlewaretoken: '{{ csrf_token }}' },
+          success: function() {
+            $(`tr[data-attribute-id="${attributeId}"]`).remove(); // Удаляем строку из таблицы
+            alert('Атрибут успешно удалён из типа актива.');
+          },
+          error: function(xhr) {
+            alert('Ошибка при удалении атрибута из типа актива: ' + xhr.responseText);
+          }
+        });
+      }
+    }
+  </script>
+
   <!-- Таблица атрибутов -->
   <table class="table">
     <thead>
@@ -14,12 +36,12 @@
     </thead>
     <tbody>
       {% for asset_type_attr in asset_type.type_attributes.all %}
-        <tr>
+        <tr data-attribute-id="{{ asset_type_attr.attribute.id }}">
           <td>{{ asset_type_attr.attribute.name }}</td>
           <td>{{ asset_type_attr.attribute.get_attribute_type_display }}</td>
           <td>
             <a href="{% url 'attribute_edit' asset_type_attr.attribute.id %}">Редактировать</a>
-            <a href="{% url 'attribute_delete' asset_type_attr.attribute.id %}" onclick="return confirm('Вы уверены, что хотите удалить этот атрибут?');">Удалить</a>
+            <a href="#" onclick="deleteAttributeFromType({{ asset_type_attr.attribute.id }}, {{ asset_type.id }}, event)">Удалить</a>
           </td>
         </tr>
       {% empty %}

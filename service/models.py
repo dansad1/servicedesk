@@ -235,7 +235,6 @@ class EmailSettings(models.Model):
     @property
     def use_ssl(self):
         return self.connection_type == 'ssl'
-from django.db import models
 
 class Event(models.Model):
     EVENT_CHOICES = [
@@ -321,14 +320,14 @@ class Asset(models.Model):
 
 class AssetTypeAttribute(models.Model):
     asset_type = models.ForeignKey(AssetType, on_delete=models.CASCADE, related_name='type_attributes')
-    attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE)
+    attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE, related_name='asset_types')
 
     def __str__(self):
         return f"{self.asset_type.name} - {self.attribute.name}"
-
 class AssetAttribute(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name='asset_attributes')
     attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE)
+
     value_text = models.TextField(blank=True, null=True)
     value_number = models.FloatField(blank=True, null=True)
     value_date = models.DateField(blank=True, null=True)
@@ -336,20 +335,22 @@ class AssetAttribute(models.Model):
     value_email = models.EmailField(null=True, blank=True)
     value_url = models.URLField(null=True, blank=True)
     value_json = models.JSONField(null=True, blank=True)
-def __str__(self):
-     return f"{self.attribute.name} for {self.asset.name}: {self.get_value()}"
+    value_asset_reference = models.ForeignKey(Asset, on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
+    value_attribute_reference = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
 
-def get_value(self):
+    def __str__(self):
+        return f"{self.attribute.name} для {self.asset.name}: {self.get_value()}"
+
+    def get_value(self):
         """ Возвращает значение атрибута в зависимости от его типа. """
         type_map = {
             Attribute.TEXT: self.value_text,
             Attribute.NUMBER: self.value_number,
             Attribute.DATE: self.value_date,
-            Attribute.BOOLEAN: self.value_boolean,  # предполагается, что это поле также добавлено в модель
-            Attribute.EMAIL: self.value_email,  # аналогично
-            Attribute.URL: self.value_url,  # аналогично
+            Attribute.BOOLEAN: self.value_boolean,
+            Attribute.EMAIL: self.value_email,
+            Attribute.URL: self.value_url,
             Attribute.JSON: self.value_json,
-            # JSON поля могут требовать специальной обработки или сериализации/десериализации
             Attribute.ASSET_REFERENCE: self.value_asset_reference.name if self.value_asset_reference else None,
             Attribute.ATTRIBUTE_REFERENCE: self.value_attribute_reference.get_value() if self.value_attribute_reference else None,
         }

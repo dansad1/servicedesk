@@ -3,7 +3,8 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render, get_object_or_404
 from service.forms.Asset_Forms import AttributeForm
 from service.models import Attribute, AssetType, AssetAttribute, AssetTypeAttribute
-
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 
 # Создание атрибута
 def attribute_create(request, asset_type_id):
@@ -28,26 +29,17 @@ def attribute_edit(request, pk):
         if form.is_valid():
             form.save()
             # Предполагаем, что есть URL с именем 'asset_type_list' для перенаправления
-            # или вам может потребоваться перенаправить на другой URL в зависимости от вашей логики приложения
             return redirect('asset_type_list')
     else:
         form = AttributeForm(instance=attribute)
     return render(request, 'attributes/attribute_edit.html', {'form': form})
 
 # Удаление атрибута
-# views.py
-def attribute_delete(request, pk):
-    attribute = get_object_or_404(Attribute, pk=pk)
-    asset_type_id = attribute.asset_types.first().id if attribute.asset_types.exists() else None
-    if request.method == 'POST':
-        attribute.delete()
-        if asset_type_id:
-            return redirect('asset_type_edit', pk=asset_type_id)
-        else:
-            return redirect('asset_type_list')
-    # Если это GET-запрос, то предоставляем страницу с подтверждением удаления
-    context = {
-        'attribute': attribute,
-        'asset_type_id': asset_type_id,
-    }
-    return render(request, 'attributes/attribute_delete.html', context)
+@require_POST
+def attribute_delete_from_type(request, pk, asset_type_id):
+    AssetTypeAttribute.objects.filter(asset_type_id=asset_type_id, attribute_id=pk).delete()
+    return JsonResponse({'status': 'success'})
+@require_POST
+def attribute_delete_from_asset(request, pk, asset_id):
+    AssetAttribute.objects.filter(asset_id=asset_id, attribute_id=pk).delete()
+    return JsonResponse({'status': 'success'})
