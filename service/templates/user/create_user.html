@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
+<h2 class="max-w-2xl m-auto text-center p-10 text-4xl">Создание нового пользователя</h2>
 <div class="container mt-3">
-  <h2>Создать нового пользователя</h2>
+  
   <form method="post">
     {% csrf_token %}
     <div class="row">

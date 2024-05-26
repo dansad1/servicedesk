@@ -1,5 +1,7 @@
 {% block content %}
-<div class="container">
+
+
+<div class="container mt-10">
   <h2 style="font-size: 1.5em;">Редактировать профиль пользователя</h2>
   <form method="post">
     {% csrf_token %}
@@ -54,12 +56,15 @@
     <button type="submit" class="btn btn-primary">Сохранить изменения</button>
   </form>
 </div>
+</div>
+
 <style>
 .container {
     max-width: 800px;
     margin: auto;
+    margin-top: 80px;
     padding: 20px;
-    background-color: #fff;
+    background-color: rgba(226 232 240 );
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
