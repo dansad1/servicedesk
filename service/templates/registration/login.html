@@ -1,13 +1,35 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h2>Вход</h2>
-    <form method="post" class="login-form">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Войти</button>
-    </form>
-    <p>
-        <a href="{% url 'password_reset' %}">Забыли пароль?</a>
-    </p>
+<div class="m-auto max-w-2xl my-48">
+    <h2 class=" text-center font-semibold text-4xl p-10 " >Вход в систему</h2>
+</div>
+
+<form method="post" class="bg-slate-200 p-10  max-w-2xl m-auto rounded-lg flex pt-5  flex-col gap-2">
+    {% csrf_token %}
+    <div class="flex flex-col gap-2">
+        Имя пользователя:
+        <div class="flex items-center">
+            <i class="fas fa-user size-8"></i>
+            {{ form.username }}
+        </div>
+        {{ form.username.errors }}
+    </div>
+      
+    <div class="flex flex-col gap-2">
+        Пароль:
+        <div class=" flex items-center">
+            <i class="fas fa-lock size-8"></i>
+            {{ form.password }}
+        </div>
+        {{ form.password.errors }}
+    </div>
+        
+    <nav class="nav text-left ">
+        <a class="nav-link text-left px-0" href="{% url 'password_reset' %}">Забыли пароль?</a>
+    </nav>
+    <button type="submit" class="btn btn-primary">Войти</button>
+        
+</form>
+
 {% endblock %}

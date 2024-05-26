@@ -20,16 +20,21 @@ from service.views.role_views import role_delete
 from service.views.email_notification_views import email_settings_view, notification_overview
 from service.views.perform_views import *
 from service.views.chat_views import *
+from service.views.user_views import CustomLoginView
+
 urlpatterns = [
+
 # URL-паттерны для регистрации
     path('admin/', admin.site.urls),
-    path('', auth_views.LoginView.as_view(), name='login'),
+    path('login/', CustomLoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('register/', register, name='register'),
-# URL-паттерны для профидя
+
+# URL-паттерны для профиля
     path('profile/edit/', edit_profile, name='edit_own_profile'),
     re_path(r'^profile/edit/(?P<pk>\d+)?/$', edit_profile, name='edit_profile'),
     path('users/<int:pk>/delete/', user_delete, name='user_delete'),
+    path('', profile, name='home'),
     path('profile/', profile, name='profile'),
     path('user/', user_list, name='user_list'),
     path('create_user/', create_user_view, name='create_user'),
@@ -42,7 +47,7 @@ urlpatterns = [
     path('request/update/<int:pk>/', request_edit, name='request_edit'),
     path('requests/<int:pk>/delete/', request_delete, name='request_delete'),
     path('request/<int:pk>/comment/', add_comment, name='add_comment'),
-   path('ckeditor/', include('ckeditor_uploader.urls')),
+    path('ckeditor/', include('ckeditor_uploader.urls')),
 
     #Компании
     path('company/create/', company_create, name='create_company'),
@@ -115,7 +120,7 @@ urlpatterns = [
     path('attributes/edit/<int:pk>/', attribute_edit, name='attribute_edit'),
     path('attributes/delete/<int:pk>/', attribute_delete, name='attribute_delete'),
     path('asset_types/<int:asset_type_id>/attributes/create/', service.views.attribute_views.attribute_create, name='attribute_create'),
-path('asset-types/<int:asset_type_id>/attributes/', get_attributes_by_asset_type, name='get_attributes_by_asset_type'),
+    path('asset-types/<int:asset_type_id>/attributes/', get_attributes_by_asset_type, name='get_attributes_by_asset_type'),
 
 # URL-паттерны для отделов
     path('department/<int:company_pk>/create_department/', department_create, name='department_create'),

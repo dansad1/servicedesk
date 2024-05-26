@@ -4,8 +4,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from service.forms.User_forms import CustomUserCreationForm, User  # Assuming you have this form
 from service.models import CustomUser
-
-
+from service.forms.User_forms import CustomLoginForm
+from django.contrib.auth import views as auth_views
+from django.urls import reverse_lazy
 
 # Создание нового пользователя
 @login_required
@@ -40,3 +41,12 @@ def user_delete(request, pk):
     user.delete()
     messages.success(request, "Пользователь успешно удален.")
     return redirect('user_list')
+
+
+
+class CustomLoginView(auth_views.LoginView):
+    form_class = CustomLoginForm
+    template_name = 'registration/login.html'
+    
+    def get_success_url(self) -> str:
+        return reverse_lazy('home')

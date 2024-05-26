@@ -1,10 +1,103 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h2>Регистрация</h2>
-    <form method="post" class="registration-form">
+<div class="m-auto max-w-2xl">
+    <h2 class=" text-center font-semibold text-4xl p-10 " >Регистрация</h2>
+</div>
+    <form method="post" class="registration-form bg-slate-200 p-10  max-w-2xl m-auto rounded-lg flex pt-5  flex-col gap-2">
         {% csrf_token %}
-        {{ form.as_p }}
+        {{ form.non_field_errors }}
+
+        <div class="flex flex-col gap-2">
+            Имя пользователя:
+            <div class="flex flex-row items-center">
+                <i class="fas fa-user size-8"></i>
+                {{ form.username }}
+            </div>
+            {{ form.username.errors }}
+        </div>
+
+        <div class="flex flex-col gap-2">
+            Почта:
+            <div class="flex flex-row items-center">
+                <i class="fas fa-envelope size-8"></i>
+                {{ form.email }}
+            </div>
+            {{ form.email.errors}}
+        </div>
+
+        <div class="flex flex-col gap-2">
+            Имя:
+            <div class="flex flex-row items-center">
+                <i class="fas fa-user-tag size-8"></i></span> <!-- Иконка имени -->
+                {{ form.first_name }}
+            </div>
+            {{ form.first_name.errors }}
+        </div>
+
+        <div class="flex flex-col gap-2">
+            Фамилия:
+            <div class="flex flex-row items-center">
+                <i class="fas fa-user-tag size-8"></i>
+                {{ form.last_name }}
+            </div>
+            {{ form.last_name.errors }}
+        </div>
+
+        <div class="flex flex-col gap-2">
+            Телефон:
+            <div class="flex flex-row items-center">
+                <i class="fas fa-phone size-8"></i>
+                {{ form.phone_number }}
+            </div>
+            {{ form.phone_number.errors }}
+        </div>
+
+        <div class="flex flex-col gap-2">
+            Адрес:
+            <div class="flex flex-row items-center">
+                <i class="fas fa-home size-8"></i>
+                {{ form.address }}
+            </div>
+            {{ form.address.errors }}
+        </div>
+
+        <div class="flex flex-col gap-2">
+            Название компании:
+            <div class="flex flex-row items-center">
+                <i class="fas fa-building size-8"></i>
+                {{ form.company }}
+            </div>
+            {{ form.company.errors }}
+        </div>
+
+        <div class="flex flex-col gap-2">
+            Группа:
+            <div class="flex flex-row items-center">
+                <i class="fas fa-users size-8"></i>
+                {{ form.group }}
+            </div>
+            {{ form.group.errors }}
+        </div>
+
+        <div class="flex flex-col gap-2">
+            Пароль:
+            <div class="flex flex-row items-center">
+                <i class="fas fa-lock size-8"></i></span> <!-- Иконка пароля -->
+                {{ form.password1 }}
+            </div>
+            {{ form.password1.errors }}
+        </div>
+
+        <div class="flex flex-col gap-2">
+            Подтверждение пароля:
+            <div class="flex flex-row items-center">
+                <i class="fas fa-lock size-8"></i>
+                {{ form.password2 }}
+            </div>
+            {{ form.password2.errors }}
+        </div>
+        
         <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
     </form>
 {% endblock %}
