@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container mt-5">
-  <h2>Создание новой компании</h2>
+  <h2 class="m-auto max-w-2xl text-center p-10 text-5xl">Создание новой компании</h2>
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
