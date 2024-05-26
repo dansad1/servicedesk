@@ -28,6 +28,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -51,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'service.middleware.LoginRequiredMiddleware',
 ]
 
 ROOT_URLCONF = 'servicedesk.urls'
@@ -136,6 +138,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'service.CustomUser'
 LOGOUT_REDIRECT_URL = 'register'  # Имя, используемое в 'name' в urls.py
 LOGIN_REDIRECT_URL = 'profile'  # Предполагая, что у вас есть такое имя URL-адреса в urls.py
+LOGIN_URL = '/login/'
+
 
 STATIC_URL = '/static/'
 
