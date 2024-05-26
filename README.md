@@ -11,3 +11,5 @@ docker-compose -f docker-compose.yaml -p service-desk up --build service-desk-my
 # Окно аутентификации сделано
 
 # Чат выглядит нормально
+
+# Список пользователей, создание и редактирование выглядит нормально

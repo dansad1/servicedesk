@@ -1,67 +1,68 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-3">
-    <h2>Редактировать группу: {{ group.name }}</h2>
+<h2 class="m-auto max-w-4xl text-center text-4xl p-10">Редактирование группы: {{ group.name }}</h2>
+
+<div class="container mt-3 max-w-4xl m-auto bg-slate-200 p-10 rounded-xl">
     <form method="post" novalidate>
         {% csrf_token %}
         <div class="form-group">
-            <label for="{{ form.name.id_for_label }}">Название:</label>
+            <label class="py-2 text-2xl" for="{{ form.name.id_for_label }}">Название группы:</label>
             {{ form.name }}
         </div>
         <div class="form-group">
-            <label for="{{ form.description.id_for_label }}">Описание:</label>
+            <label class="py-2 text-2xl" for="{{ form.description.id_for_label }}">Описание:</label>
             {{ form.description }}
         </div>
 
-        <h3>Выберите пользователей</h3>
+        <h3 class="my-3 text-2xl">Выберите пользователей:</h3>
         <table class="table">
             <thead>
                 <tr>
-                    <th>Выбор</th>
-                    <th>Имя пользователя</th>
-                    <th>Email</th>
+                    <th class="text-center">Выбор</th>
+                    <th class="text-center">Имя пользователя</th>
+                    <th class="text-center">Email</th>
                 </tr>
             </thead>
             <tbody>
                 {% for user in custom_users %}
-                <tr>
-                    <td>
-                        <input type="checkbox" name="selected_members" value="{{ user.id }}"
+                <tr class="align-middle">
+                    <td class="text-center">
+                        <input class="border-black form-check-input" type="checkbox" name="selected_members" value="{{ user.id }}"
                                {% if user.id in selected_member_ids %} checked {% endif %}>
                     </td>
-                    <td>{{ user.username }}</td>
-                    <td>{{ user.email }}</td>
+                    <td class="text-center">{{ user.username }}</td>
+                    <td class="text-center">{{ user.email }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
 
-        <h3>Выберите компании</h3>
+        <h3 class="my-3 text-2xl">Выберите компании:</h3>
         <table class="table">
             <thead>
-                <tr>
-                    <th>Выбор</th>
-                    <th>Название компании</th>
-                    <th>Адрес</th>
+                <tr >
+                    <th class="text-center">Выбор</th>
+                    <th class="text-center">Название компании</th>
+                    <th class="text-center">Адрес</th>
                 </tr>
             </thead>
             <tbody>
                 {% for company in companies %}
-                <tr>
-                    <td>
-                        <input type="checkbox" name="selected_companies" value="{{ company.id }}"
+                <tr class="align-middle">
+                    <td class="text-center ">
+                        <input class="border-black form-check-input" type="checkbox" name="selected_companies" value="{{ company.id }}"
                                {% if company.id in selected_company_ids %} checked {% endif %}>
                     </td>
-                    <td>{{ company.name }}</td>
-                    <td>{{ company.address }}</td>
+                    <td class="text-center">{{ company.name }}</td>
+                    <td class="text-center">{{ company.address }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
 
-        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
-        <a href="{% url 'performer_group_list' %}" class="btn btn-secondary">Назад к списку</a>
+        <button type="submit" class="btn btn-success">Сохранить изменения</button>
+        <button onclick="window.location.href='{% url 'performer_group_list' %}'" type="button" class="btn btn-secondary">Назад к списку</button>
     </form>
 </div>
 {% endblock %}
