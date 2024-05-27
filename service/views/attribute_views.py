@@ -32,7 +32,7 @@ def attribute_edit(request, pk):
             return redirect('asset_type_list')
     else:
         form = AttributeForm(instance=attribute)
-    return render(request, 'attributes/attribute_edit.html', {'form': form})
+    return render(request, 'attributes/attribute_edit.html', {'form': form, 'attribute': attribute})
 
 # Удаление атрибута
 # views.py
