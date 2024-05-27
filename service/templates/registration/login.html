@@ -28,7 +28,8 @@
     <nav class="nav text-left ">
         <a class="nav-link text-left px-0" href="{% url 'password_reset' %}">Забыли пароль?</a>
     </nav>
-    <button type="submit" class="btn btn-primary">Войти</button>
+    <button type="submit" class="btn btn-success">Войти</button>
+    <button type="button" onclick="window.location.href='{% url 'register' %}'" class="btn btn-primary">Зарегестрироваться</button>
         
 </form>
 

@@ -1,11 +1,62 @@
 {% extends 'settings/settings_sidebar.html' %}
 {% block content %}
-<h2>{% if form.instance.pk %}Edit{% else %}Create{% endif %} Status</h2>
+<h2 class="m-auto max-w-4xl text-4xl text-center p-10">{% if form.instance.pk %}Редактирование{% else %}Создание{% endif %} статуса</h2>
 <form method="post" novalidate>
   {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Save Status</button>
+
+  <div class="flex flex-col gap-2">
+    Название статуса:
+    <div class="flex items-center align-middle gap-2">
+        {{ form.name }}
+    </div>
+    {{ form.name.errors }}
+  </div>
+
+  <div class="flex flex-col gap-2">
+    Цвет статуса:
+    <div class="flex items-center align-middle gap-2">
+        <input id="color-input" maxlength="7" name="color" class="border-none items-center rounded-b-xl" type="color" >
+        {{ form.color }}
+    </div>
+    {{ form.color.errors }}
+  </div>
+
+  <div class="flex flex-col gap-2">
+    Описание:
+    <div class="flex items-center align-middle gap-2">
+        
+        {{ form.description }}
+    </div>
+    {{ form.description.errors }}
+  </div>
+
+
+  <button class="btn btn-success" type="submit">Сохранить статус</button>
 </form>
-<a href="{% url 'status_list' %}">Список статусов</a>
+<a class="btn btn-secondary" href="{% url 'status_list' %}">Назад к списку статусов</a>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const colorInput = document.getElementById('color-input');
+      const colorField = document.getElementById('id_color');
+
+      // Set initial value
+      if (colorField.value) {
+          colorInput.value = colorField.value;
+      }
+
+      // Update color input when color field changes
+      colorField.addEventListener('input', function() {
+          colorInput.value = colorField.value;
+      });
+
+      // Update color field when color input changes
+      colorInput.addEventListener('input', function() {
+          colorField.value = colorInput.value;
+      });
+  });
+</script>
+
 
 {% endblock %}

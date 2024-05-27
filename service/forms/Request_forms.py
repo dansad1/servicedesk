@@ -16,6 +16,7 @@ class RequestForm(forms.ModelForm):
         widget=forms.HiddenInput(),
         required=False
     )
+    
     class Meta:
         model = Request
         # Исключаем 'request_type' из списка отображаемых полей
@@ -37,6 +38,8 @@ class RequestForm(forms.ModelForm):
         # Adjust status field based on current status
         self.adjust_status_field(current_status)
         self.fields['request_type'].widget = forms.HiddenInput()
+    
+    
     def adjust_status_field(self, current_status):
         if current_status:
             # Limit status choices to valid next statuses
@@ -111,6 +114,8 @@ class RequestFilterForm(forms.Form):
         widget=SelectMultiple(attrs={'class': 'select2'}),
         required=False
     )
+    
+    
 class SavedFilterForm(forms.ModelForm):
     class Meta:
         model = SavedFilter

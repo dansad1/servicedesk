@@ -72,6 +72,20 @@ Django = ">=3.2"
 django-js-asset = ">=2.0"
 
 [[package]]
+name = "django-colorfield"
+version = "0.11.0"
+description = "color field for django models with a nice color-picker in the admin."
+optional = false
+python-versions = "*"
+files = [
+    {file = "django-colorfield-0.11.0.tar.gz", hash = "sha256:05c38c8eb2a94938b810a19b2011846391a4ce71d1c92e88a35974fbcc8fc62e"},
+    {file = "django_colorfield-0.11.0-py3-none-any.whl", hash = "sha256:460f40e6123b6ae0fb51a4eb86fc258fcdc0ea28f75102b685e8209b1eae9ec3"},
+]
+
+[package.dependencies]
+Pillow = ">=9.0.0"
+
+[[package]]
 name = "django-cors-headers"
 version = "4.3.1"
 description = "django-cors-headers is a Django application for handling the server headers required for Cross-Origin Resource Sharing (CORS)."
@@ -533,4 +547,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "e287ca3d97d120222b9d7ebe81b6074ce3757eee34d5869c062a9ed8d2664076"
+content-hash = "5e9082648a0960f1c638dfc19f6d4f56d28e625d354099e2c7ea8a2af52eec94"

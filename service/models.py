@@ -10,6 +10,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.translation import gettext_lazy as _
 from model_utils import FieldTracker
 from servicedesk import settings
+from colorfield.fields import ColorField
+
 
 
 class Company(models.Model):
@@ -127,7 +129,7 @@ class GroupPermission(models.Model):
 
 class Status(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    color = models.CharField(max_length=20, blank=True, null=True)
+    color = ColorField(verbose_name="Color")
     description = models.TextField(blank=True, null=True)
 
     def __str__(self):

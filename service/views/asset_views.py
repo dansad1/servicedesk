@@ -70,15 +70,14 @@ def edit_asset(request, pk):
 # Функция удаления актива
 def delete_asset(request, pk):
     asset = get_object_or_404(Asset, pk=pk)
-    if request.method == 'POST':
-        asset.delete()
-        return HttpResponseRedirect(reverse('assets'))  # Перенаправление на список активов
-    return render(request, 'assets/delete_asset.html', {'asset': asset})
+    asset.delete()
+    return redirect("assets_list")
 
 # Функция вывода списка активов
 def asset_list(request):
     assets = Asset.objects.prefetch_related('components', 'asset_attributes').all()
     return render(request, 'assets/asset_list.html', {'assets': assets})
+
 def get_attributes_by_asset_type(request, asset_type_id):
     attributes = list(AssetTypeAttribute.objects.filter(asset_type_id=asset_type_id).values('id', 'attribute__name', 'attribute__attribute_type'))
     return JsonResponse(attributes, safe=False)

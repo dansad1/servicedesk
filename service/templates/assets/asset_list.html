@@ -1,27 +1,30 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Список активов</h2>
+<h2 class="m-auto max-w-4xl text-center text-4xl p-10">Список активов</h2>
 <table class="table">
   <thead>
     <tr>
-      <th>Имя актива</th>
-      <th>Тип актива</th>
-      <th>Родительский актив</th>
-      <th>Действия</th>
+      <th class="text-center">Имя актива</th>
+      <th class="text-center">Тип актива</th>
+      <th class="text-center">Родительский актив</th>
+      <th class="text-center">Действия</th>
     </tr>
   </thead>
   <tbody>
     {% for asset in assets %}
-    <tr>
-      <td>{{ asset.name }}</td>
-      <td>
-        <a href="{% url 'asset_type_edit' asset.asset_type.id %}">{{ asset.asset_type.name }}</a>
+    <tr class="align-middle">
+      <td class="text-center">{{ asset.name }}</td>
+      <td class="text-center">
+        <a href="{% url 'asset_type_edit' asset.asset_type.id %}"> <span class="badge text-bg-success px-8 py-2 hover:scale-110">{{ asset.asset_type.name }} </span></a>
       </td>
-      <td>{{ asset.parent_asset.name|default:"N/A" }}</td>
-      <td>
-        <a href="{% url 'edit_asset' asset.id %}">Редактировать</a>
-        <a href="{% url 'delete_asset' asset.id %}" onclick="return confirm('Вы уверены?');">Удалить</a>
+      <td class="text-center">{{ asset.parent_asset.name|default:"N/A" }}</td>
+      <td class="flex justify-evenly ">
+        <button onclick="window.location.href='{% url 'edit_asset' asset.id %}'" type="button" class="btn btn-primary" href="{% url 'edit_asset' asset.id %}" >Редактировать</button>
+        <form id="delete-form-{{ asset.id }}" action="{% url 'delete_asset' asset.id %}" method="post" class="mb-0" style="display: inline;">
+          {% csrf_token %}
+          <button type="button" class="btn btn-danger" onclick="confirmDelete({{ asset.id }})">Удалить</button>
+      </form>
       </td>
     </tr>
     {% empty %}
@@ -31,6 +34,16 @@
     {% endfor %}
   </tbody>
 </table>
-<a href="{% url 'create_asset' %}" class="btn btn-primary">Добавить новый актив</a>
-<a href="{% url 'asset_type_list' %}" class="btn btn-secondary">Посмотреть типы активов</a>
+<button onclick="window.location.href='{% url 'create_asset' %}'" type="button" class="btn btn-success">Добавить новый актив</button>
+<button onclick="window.location.href='{% url 'asset_type_list' %}'" type="button" class="btn btn-secondary">Посмотреть типы активов</button>
+
+<script>
+  function confirmDelete(assetId) {
+      const isConfirmed = confirm('Вы уверены?');
+      if (isConfirmed) {
+          document.getElementById('delete-form-' + assetId).submit();
+      }
+  }
+  </script>
+
 {% endblock %}
