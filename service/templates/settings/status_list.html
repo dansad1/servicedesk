@@ -1,7 +1,7 @@
 {% extends 'settings/settings_sidebar.html' %}
 
 {% block settings_content %}
-<div class="settings-content  my-10">
+<div class="  my-10">
     <h2 class="m-auto text-center  p-10 text-4xl">Список статусов</h2>
     
 
@@ -37,7 +37,7 @@
             </tbody>
         </table>
     </div>
-    <a href="{% url 'create_status' %}" class="btn btn-success">Создать новый статус</a>
+    <button onclick="window.location.href='{% url 'create_status' %}'" type="button" class="btn btn-success">Создать новый статус</button>
 </div>
 
 <style>
