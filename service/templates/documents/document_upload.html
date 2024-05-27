@@ -5,10 +5,19 @@ Upload Document
 {% endblock %}
 
 {% block content %}
-<h1>Upload a New Document</h1>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Upload</button>
-</form>
+<h1 class="text-center max-w-4xl p-10 text-4xl m-auto">Загрузить новый документ</h1>
+<div class=" max-w-4xl p-10 rounded-xl m-auto bg-slate-200">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="{{ form.title.id_for_label }}">Название документа:</label>
+            {{ form.title }}
+        </div>
+        <div class="form-group">
+            <label for="{{ form.doc_file.id_for_label }}">Файл:</label>
+            {{ form.doc_file }}
+        </div>
+        <button class="btn btn-success" type="submit">Загрузить</button>
+    </form>
+</div>
 {% endblock %}

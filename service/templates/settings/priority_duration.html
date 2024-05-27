@@ -1,12 +1,12 @@
 {% extends 'settings/settings_sidebar.html' %}
 
 {% block settings_content %}
-    <div class="settings-content">
-        <h1>{% if form.instance.pk %}Редактировать{% else %}Создать{% endif %} продолжительность приоритета</h1>
-        <form method="post" class="priority-duration-form">
+    <h1 class="m-auto max-w-4xl text-center text-4xl p-10">{% if form.instance.pk %}Редактировать{% else %}Создать{% endif %} продолжительность приоритета</h1>
+    <div class="m-auto max-w-4xl p-10 rounded-xl bg-slate-200">
+        <form method="post" class="priority-duration-form flex flex-col gap-4">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <button type="submit" class="btn btn-success">Сохранить</button>
         </form>
     </div>
 {% endblock %}

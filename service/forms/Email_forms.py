@@ -16,13 +16,22 @@ class EmailSettingsForm(forms.ModelForm):
         initial='tls'
     )
 
-    test_email_to = forms.EmailField(required=False, help_text="Введите адрес для тестового письма")
+    test_email_to = forms.EmailField(
+        required=False, 
+        help_text="Введите адрес для тестового письма:",
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'example@example.com'})
+    )
+    
     class Meta:
      model = EmailSettings
      fields = ['server', 'port', 'login', 'password', 'email_from', 'connection_type']
      widgets = {
-        'password': forms.PasswordInput(),  # Скрыть ввод пароля
-    }
+            'server': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите сервер'}),
+            'port': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Введите порт'}),
+            'login': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите логин'}),
+            'password': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Введите пароль'}),  # Скрыть ввод пароля
+            'email_from': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'example@example.com'}),
+        }
 
      def clean(self):
          cleaned_data = super().clean()

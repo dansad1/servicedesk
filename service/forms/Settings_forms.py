@@ -10,6 +10,8 @@ class RequestTypeForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control'}),
         }
+
+
 class PriorityForm(forms.ModelForm):
     class Meta:
         model = Priority
@@ -24,10 +26,11 @@ class PriorityDurationForm(forms.ModelForm):
         model = PriorityDuration
         fields = ['request_type', 'priority', 'duration_in_hours']
 
-
-class ColorInput(forms.widgets.Input):
-    input_type = "color"
-
+        widgets = {
+            'request_type': forms.Select(attrs={'class': 'form-control'}),
+            'priority': forms.Select(attrs={'class': 'form-control'}),
+            'duration_in_hours': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Введите количество часов'}),
+        }
 
 class StatusForm(forms.ModelForm):
     class Meta:
@@ -41,14 +44,18 @@ class StatusForm(forms.ModelForm):
             
         }
         
-        #color=forms.CharField(max_length=7,widget=forms.TextInput(attrs={"type": "color", }))
-
     def __init__(self, *args, **kwargs):
         super(StatusForm, self).__init__(*args, **kwargs)
+
 
 class StatusTransitionForm(forms.ModelForm):
     class Meta:
         model = StatusTransition
         fields = ['from_status', 'to_status', 'allowed_groups']
 
+        widgets = {
+            'from_status': forms.Select(attrs={'class': 'form-control'}),
+            'to_status': forms.Select(attrs={'class': 'form-control'}),
+            'allowed_groups': forms.SelectMultiple(attrs={'class': 'form-control'}),
+        }
 

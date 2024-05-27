@@ -1,30 +1,31 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>List of Uploaded Documents</h1>
-<a href="{% url 'upload_document' %}">Загрузить новый документ</a>
+<h1 class="m-auto max-w-4xl text-center p-10 text-4xl">Список загруженных документов</h1>
+
 <table>
     <thead>
         <tr>
-            <th>Title</th>
-            <th>Document</th>
-            <th>Action</th>
+            <th class="text-center">Title</th>
+            <th class="text-center">Document</th>
+            <th class="text-center">Action</th>
         </tr>
     </thead>
     <tbody>
         {% for document in documents %}
-    <tr>
-        <td>{{ document.title }}</td>
-        <td><a href="{{ document.doc_file.url }}">Download</a></td>
-        <td>
+    <tr class="align-middle">
+        <td class="text-center">{{ document.title }}</td>
+        <td class="text-center"><button onclick="window.location.href='{{ document.doc_file.url }}'" type="button" class="btn btn-primary">Скачать документ</button></td>
+        <td class="text-center">
             {% if document.analyzed %}
-                <a href="{% url 'analyze_document' document.id %}">View Analysis</a>  <!-- Updated link to view analysis -->
+                <button onclick="window.location.href='{% url 'analyze_document' document.id %}'" type="button" class='btn btn-primary'>Посмотреть анализ</и>  <!-- Updated link to view analysis -->
             {% else %}
-                <button onclick="location.href='{% url 'analyze_document' document.id %}'">Analyze</button>
+                <button onclick="location.href='{% url 'analyze_document' document.id %}'" class='btn btn-primary'>Анализировать</button>
             {% endif %}
         </td>
     </tr>
 {% endfor %}
     </tbody>
 </table>
+<a onclick="window.location.href='{% url 'upload_document' %}'" type="button" class="btn btn-success">Загрузить новый документ</a>
 {% endblock %}
