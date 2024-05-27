@@ -15,6 +15,8 @@ class AssetTypeForm(forms.ModelForm):
         super(AssetTypeForm, self).__init__(*args, **kwargs)
         # Добавление пустого выбора для поля 'parent' для поддержки создания корневых типов активов
         self.fields['parent'].empty_label = "Выберите родительский тип (если необходимо)"
+
+
 class AttributeForm(forms.ModelForm):
     class Meta:
         model = Attribute
