@@ -1,15 +1,90 @@
 {% extends 'settings/settings_sidebar.html' %} {% block settings_content %}
-<main>
-    <h1>Настройки электронной почты</h1>
-    <form method="post" id="emailSettingsForm">
-        {% csrf_token %} {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Сохранить настройки</button>
-    </form>
+<main class="settings-content mt-10">
+    <h1 class="m-auto max-w-2xl text-center text-4xl p-10">Настройки электронной почты</h1>
+    
+    <div class="max-w-4xl p-10 m-auto rounded-xl bg-slate-200">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="{{ form.server.id_for_label }}">Сервер:</label>
+                {{ form.server }}
+                {% if form.server.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.server.errors }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.port.id_for_label }}">Порт:</label>
+                {{ form.port }}
+                {% if form.port.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.port.errors }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.login.id_for_label }}">Логин:</label>
+                {{ form.login }}
+                {% if form.login.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.login.errors }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.password.id_for_label }}">Пароль:</label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.password.errors }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.email_from.id_for_label }}">Email от :</label>
+                {{ form.email_from }}
+                {% if form.email_from.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.email_from.errors }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label>{{ form.connection_type.label }}</label>
+                <div class="form-check">
+                    {{ form.connection_type }}
+                    {% if form.connection_type.errors %}
+                        <div class="invalid-feedback">
+                            {{ form.connection_type.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.test_email_to.id_for_label }}">Тестовый Email:</label>
+                {{ form.test_email_to }}
+                {% if form.test_email_to.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.test_email_to.errors }}
+                    </div>
+                {% endif %}
+            </div>
 
-    <!-- Дополнительная кнопка для отправки тестового письма -->
-    <button type="button" class="btn btn-secondary" id="sendTestEmailButton">
-        Отправить тестовое письмо
-    </button>
+            <button type="submit" class="btn btn-primary">Сохранить настройки</button>
+        </form
+        <!-- Дополнительная кнопка для отправки тестового письма -->
+        <button type="button" class="btn btn-success" id="sendTestEmailButton">
+            Отправить тестовое письмо
+        </button>
+    </div>
 </main>
 
 <script>
