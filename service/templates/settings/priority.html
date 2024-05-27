@@ -1,21 +1,19 @@
-{{% extends 'settings/settings_sidebar.html' %}
+{% extends 'settings/settings_sidebar.html' %}
 
 {% block settings_content %}
-    <h1>{% if priority %}Редактировать{% else %}Создать{% endif %} приоритет</h1>
+    <h1 class="m-auto max-w-4xl text-center p-10 text-4xl">{% if priority %}Редактировать{% else %}Создать{% endif %} приоритет</h1>
+    
+    <div class="max-w-2xl m-auto bg-slate-200 rounded-xl p-10 flex flex-col ">
+        
+        <form method="post" class='flex flex-col gap-4'>
+            {% csrf_token %}
+            <div class="flex flex-col gap-2">
+                Название приоритета:
+                {{form.name}}
+            </div>
+            <button type="submit" class="btn btn-primary">{% if priority %}Сохранить изменения{% else %}Создать приоритет{% endif %}</button>
+        </form>
 
-    {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-                <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">{% if priority %}Сохранить изменения{% else %}Создать приоритет{% endif %}</button>
-    </form>
-
-    <a href="{% url 'priority_list' %}" class="btn btn-secondary">Вернуться к списку приоритетов</a>
+        <button onclick="window.location.href='{% url 'priority_list' %}'" type="button" class="btn btn-secondary">Вернуться к списку приоритетов</button>
+    </div>
 {% endblock %}

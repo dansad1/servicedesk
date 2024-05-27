@@ -14,6 +14,11 @@ class PriorityForm(forms.ModelForm):
     class Meta:
         model = Priority
         fields = ['name']
+        
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите название'}),
+        }
+        
 class PriorityDurationForm(forms.ModelForm):
     class Meta:
         model = PriorityDuration
