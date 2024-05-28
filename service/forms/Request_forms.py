@@ -76,7 +76,7 @@ class CommentForm(forms.ModelForm):
         }
 
 class RequestFilterForm(forms.Form):
-    title = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'class': 'form-control'}), label="Заголовок")
+    
     filter_name = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'class': 'form-control'}), label="Название фильтра")
 
     requester = forms.ModelMultipleChoiceField(
@@ -133,8 +133,25 @@ class RequestFilterForm(forms.Form):
         required=False
     )
     
+    def clean(self):
+        cleaned_data = super().clean()
+        # Remove filter_name from cleaned_data to avoid using it in filters
+        cleaned_data.pop('filter_name', None)
+        return cleaned_data
     
 class SavedFilterForm(forms.ModelForm):
     class Meta:
         model = SavedFilter
         fields = ['filter_name', 'filter_data']
+        
+        widgets = {
+            'filter_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Введите название фильтра',
+            }),
+            'filter_data': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Введите данные фильтра',
+                'rows': 5,
+            }),
+        }

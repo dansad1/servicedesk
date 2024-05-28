@@ -3,6 +3,7 @@
 {% block content %}
 <div class="container">
     <h2 class="m-auto max-w-4xl text-4xl text-center p-10 ">Выберите тип заявки</h2>
+    {% if types %}
     <div class="list-group m-auto max-w-xl flex flex-col gap-4 rounded-xl bg-slate-200 p-10">
         {% for type in types %}
         <button class="list-group-item list-group-item-action text-center rounded-none" onclick="selectType({{ type.id }})">
@@ -10,6 +11,11 @@
         </button>
         {% endfor %}
     </div>
+    {% else %}
+    <div class="text-center m-auto max-w-xl bg-slate-200 p-10 rounded-xl">
+        <p class="text-xl">Типы заявок отсутствуют.</p>
+    </div>
+    {% endif %}
 </div>
 
 <script>
