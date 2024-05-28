@@ -261,23 +261,27 @@
         <header>
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
             <!-- Общая навигация сайта -->
-            <nav>
+            {% comment %} <nav>
             <!-- Ссылки на общедоступные разделы -->
-                <ul>
-                    <li><a href="{% url 'request_list' %}">Список заявок</a></li>
+                 <ul>
+                    
                     <!-- Другие общедоступные ссылки -->
-                </ul>
-            </nav>
+                </ul> 
+            </nav> 
+            {% endcomment %}
             
             {% if request.user.is_authenticated %}
             <nav>
                 <!-- Ссылки для аутентифицированных пользователей -->
                 <ul>
+                    <li><a href="{% url 'request_list' %}">Список заявок</a></li>
                     <li><a href="{% url 'profile' %}">Профиль</a></li>
                     <li><a href="{% url 'settings_sidebar' %}">Настройки</a></li>
                     <li><a href="{% url 'role_list' %}">Управление ролями</a></li>
                     <li><a href="{% url 'assets_list' %}">Список активов</a></li>
                     <li><a href="{% url 'chat_view' %}">Чат</a></li> <!-- Добавленная ссылка на чат -->
+                    <li><a href="{% url 'user_list' %}">Список пользователей</a></li>
+                    <li><a href="{% url 'company_list' %}">Список компаний</a></li>
 
                     <!-- Дополнительные персональные ссылки -->
                 </ul>

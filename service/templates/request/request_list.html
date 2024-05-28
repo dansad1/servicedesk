@@ -10,7 +10,7 @@
   <!-- Кнопка для открытия фильтров -->
   
 <!-- Фоновая панель для модального окна -->
-<div id="modalBackdrop" class="modal-backdrop">
+<div id="modalBackdrop" class="modal-backdrop relative">
   <!-- Блок с фильтрами (изначально скрыт) -->
   <div id="filters" class="modal">
     <!-- Форма фильтрации -->
@@ -18,9 +18,11 @@
       <div class='mb-2 flex flex-col gap-4'>
         {{ filter_form.as_p }}
       </div>
-      <button class="btn btn-secondary"  type="submit">Применить фильтры</button>
+      <button class="btn btn-secondary"  type="submit">Применить фильтр</button>
       <button class="btn btn-success" type="button" id="saveFilter">Сохранить фильтр</button>
-      <button class="btn btn-danger" id="closeFilters">Закрыть фильтры</button>
+      <button class="close btn btn-danger absolute top-2 right-1 rounded-full " id="closeFilters" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
     </form>
 
     <!-- Кнопка для закрытия фильтров -->
@@ -44,7 +46,7 @@
 <div class="requests-list">
     <h3 class="text-center text-4xl p-10 max-w-4xl m-auto">Список заявок</h3>
     {% if not requests_with_action %}
-      <p class="text-center text-xl p-4 max-w-4xl m-auto">У вас нет прав на просмотр списка заявок.</p>
+      <p class="text-center text-xl p-4 max-w-4xl m-auto">Нет доступных заявок</p>
     {% else %} 
       <table>
         <thead>

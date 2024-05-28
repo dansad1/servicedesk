@@ -34,38 +34,33 @@ from reportlab.lib import colors
 from reportlab.pdfbase.ttfonts import TTFont
 from django.utils.formats import date_format
 
+
 def handle_filters(request, initial_requests):
     load_filter_id = request.GET.get('load_filter')
     loaded_filters = {}
+    print(load_filter_id)
     if load_filter_id:
         try:
             saved_filter = SavedFilter.objects.get(id=load_filter_id, user=request.user)
-
-            # Проверка типа filter_data
-            if isinstance(saved_filter.filter_data, dict):
-                loaded_filters = saved_filter.filter_data
-            else:
-                loaded_filters = json.loads(saved_filter.filter_data)  # предполагается, что это JSON-строка
-
-            # Удаление ненужных ключей
-            loaded_filters.pop('unknown', None)
+            loaded_filters = json.loads(saved_filter.filter_data)  # предполагается, что это JSON-строка
+            print(loaded_filters)
             loaded_filters.pop('filter_name', None)
-
+            print(loaded_filters)
             initial_requests = apply_filters(initial_requests, loaded_filters)
         except (SavedFilter.DoesNotExist, json.JSONDecodeError):
             pass
 
-    filter_form = RequestFilterForm(request.GET or None, initial=request.session.get('saved_filters', {}))
+    filter_form = RequestFilterForm(request.GET or None)
 
     if request.method == "GET" and filter_form.is_valid():
         filters = filter_form.cleaned_data
-        filters.pop('filter_name', None)
+        filters.pop('filter_name', None)  # Исключаем filter_name из фильтров
+        print(filters)
         filtered_requests = apply_filters(initial_requests, filters)
     else:
         filtered_requests = initial_requests
 
     return filtered_requests, filter_form
-# Основная функция для отображения списка заявок
 
 
 def apply_filters(queryset, filters):
@@ -78,6 +73,8 @@ def apply_filters(queryset, filters):
             else:
                 queryset = queryset.filter(**{field: value})
     return queryset
+
+
 def select_request_type(request):
     types = RequestType.objects.all()
     return render(request, 'request/select_request_type.html', {'types': types})
@@ -125,6 +122,8 @@ def request_create(request, type_id):
         'request_type': request_type
     }
     return render(request, 'request/request_create.html', context)
+
+
 @login_required
 def add_comment(request, pk):
     request_instance = get_object_or_404(Request, pk=pk)
@@ -151,6 +150,9 @@ def add_comment(request, pk):
         'request_type': request_instance.request_type  # Или другой контекст, необходимый для шаблона
     }
     return render(request, 'request/request_create.html', context)
+
+
+
 @login_required
 def request_edit(request, pk):
     request_instance = get_object_or_404(Request, pk=pk)
@@ -212,6 +214,8 @@ def request_list(request):
         'requests_with_action': requests_with_action,
         'filter_form': filter_form
     })
+    
+    
 def request_delete(request, pk):
     request_instance = get_object_or_404(Request, pk=pk)
 
