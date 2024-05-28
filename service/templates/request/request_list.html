@@ -5,28 +5,30 @@
 <script src="https://cdn.jsdelivr.net/npm/select2/dist/js/select2.min.js"></script>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
-   <h2>Список заявок</h2>
+   
 
   <!-- Кнопка для открытия фильтров -->
-  <button id="openFilters">Открыть фильтры</button>
-<button id="exportPdf">Экспорт в PDF</button>
+  
 <!-- Фоновая панель для модального окна -->
 <div id="modalBackdrop" class="modal-backdrop">
   <!-- Блок с фильтрами (изначально скрыт) -->
   <div id="filters" class="modal">
     <!-- Форма фильтрации -->
-    <form method="get" id="filterForm">
-      {{ filter_form.as_p }}
-      <button type="submit">Применить фильтры</button>
-      <button type="button" id="saveFilter">Сохранить фильтр</button>
+    <form method="get" id="filterForm" class="max-w-4xl m-auto">
+      <div class='mb-2 flex flex-col gap-4'>
+        {{ filter_form.as_p }}
+      </div>
+      <button class="btn btn-secondary"  type="submit">Применить фильтры</button>
+      <button class="btn btn-success" type="button" id="saveFilter">Сохранить фильтр</button>
+      <button class="btn btn-danger" id="closeFilters">Закрыть фильтры</button>
     </form>
 
     <!-- Кнопка для закрытия фильтров -->
-    <button id="closeFilters">Закрыть фильтры</button>
+    
 
     <!-- Список сохраненных фильтров -->
-    <div id="savedFilters">
-      <h3>Сохраненные фильтры:</h3>
+    <div id="savedFilters" class="m-auto max-w-4xl ">
+      <h3 class="text-2xl  p-10 text-center" >Сохраненные фильтры:</h3>
       <ul>
         {% for saved_filter in saved_filters %}
           <li>
@@ -40,47 +42,54 @@
 </div>
 
 <div class="requests-list">
-    <h3>Список заявок</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Название заявки</th>
-          <th>Тип</th>
-          <th>Приоритет</th>
-          <th>Исполнитель</th>
-          <th>Заявитель</th>
-          <th>Статус</th>
-          <th>Срок выполнения</th>
-          <th>Время обновления</th>
-        </tr>
-      </thead>
-      <tbody>
-    {% for item in requests_with_action %}
-        <tr>
-            <td><a href="{% url 'request_edit' item.request.pk %}">{{ item.request.title }}</a></td>
-            <td>{{ item.request.request_type }}</td>
-            <td>{{ item.request.priority }}</td>
-            <td>{{ item.request.assignee }}</td>
-            <td>{{ item.request.requester }}</td>
-            <td>{{ item.request.status }}</td>
-            <td>{% if item.request.due_date %}{{ item.request.due_date|date:"d.m.Y" }}{% else %}Не указано{% endif %}</td>
-            <td>{% if item.request.updated_at %}{{ item.request.updated_at|date:"d.m.Y H:i" }}{% else %}Не указано{% endif %}</td>
-            <!-- Кнопка удаления теперь в своей ячейке -->
-            <td>
-                <form action="{% url 'request_delete' item.request.pk %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit" class="delete-btn">Удалить</button>
-                </form>
-            </td>
-        </tr>
-    {% endfor %}
-</tbody>
-    </table>
+    <h3 class="text-center text-4xl p-10 max-w-4xl m-auto">Список заявок</h3>
+    {% if not requests_with_action %}
+      <p class="text-center text-xl p-4 max-w-4xl m-auto">У вас нет прав на просмотр списка заявок.</p>
+    {% else %} 
+      <table>
+        <thead>
+          <tr>
+            <th class="text-center">Название заявки</th>
+            <th class="text-center">Тип</th>
+            <th class="text-center">Приоритет</th>
+            <th class="text-center">Исполнитель</th>
+            <th class="text-center">Заявитель</th>
+            <th class="text-center">Статус</th>
+            <th class="text-center">Срок выполнения</th>
+            <th class="text-center">Время обновления</th>
+            <th class="text-center">Действия</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in requests_with_action %}
+          <tr class="align-middle">
+              <td class="text-center">{{ item.request.title }}</a></td>
+              <td class="text-center">{{ item.request.request_type }}</td>
+              <td class="text-center">{{ item.request.priority }}</td>
+              <td class="text-center">{{ item.request.assignee }}</td>
+              <td class="text-center">{{ item.request.requester }}</td>
+              <td class="text-center">{{ item.request.status }}</td>
+              <td class="text-center">{% if item.request.due_date %}{{ item.request.due_date|date:"d.m.Y" }}{% else %}Не указано{% endif %}</td>
+              <td class="text-center">{% if item.request.updated_at %}{{ item.request.updated_at|date:"d.m.Y H:i" }}{% else %}Не указано{% endif %}</td>
+              <!-- Кнопка удаления теперь в своей ячейке -->
+              <td class="flex gap-2 justify-evenly">
+                  <button onclick="window.location.href='{% url 'request_edit' item.request.pk %}'" type="button" class="btn btn-primary">Редактировать</button>
+                  <form action="{% url 'request_delete' item.request.pk %}" class="mb-0" method="post" onsubmit="return confirm('Вы уверены, что хотите удалить эту роль?');">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-danger">Удалить</button>
+                  </form>
+              </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    <button onclick="window.location.href='{% url 'select_request_type' %}'" class="btn btn-success" type="button">Создать новую заявку</button>
+    <button class="btn btn-primary" id="openFilters">Открыть фильтры</button>
+    <button class="btn btn-secondary" id="exportPdf">Экспорт в PDF</button>
 </div>
 
-{% if not requests_with_action %}
-  <p>У вас нет прав на просмотр списка заявок.</p>
-{% endif %}
+
 
 <script>
  document.addEventListener('DOMContentLoaded', function() {
