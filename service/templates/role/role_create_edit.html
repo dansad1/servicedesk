@@ -1,11 +1,334 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block content %}
+<div class="role">
+    <h1>Полномичия для роли {{role.id}}</h1>
+    <div class="button_group">
+        <button id="button_requests" class="btn active" onclick="showBlock('requests', this)">По заявкам</button>
+        <button class="btn" onclick="showBlock('users', this)">По пользователям/ группам пользователей</button>
+        <button class="btn" onclick="showBlock('companies', this)">По компаниям</button>
+        <button class="btn" onclick="showBlock('roles', this)">По ролям</button>
+        <button class="btn" onclick="showBlock('assets', this)">По активам</button>
+        <button class="btn" onclick="showBlock('profile', this)">По профилю</button>
+        <button class="btn" onclick="showBlock('settings', this)">По настройкам</button>
+        <button class="btn" onclick="showBlock('interface', this)">По интерфейсу</button>
+    </div>
 
-{% block content %}
-    <h2>{{ group.id|default:"Создание" }} Роли</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
+    <div id="requests" class="form_style active">
+        <h2>Полномочия по заявкам</h2>
+        <div class="service_authority">
+            <label>
+                <input type="checkbox"></input>
+                Создавать заявки
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Удалять заявки 
+            </label>
+        </div>
 
-        <button type="submit">Сохранить</button>
-    </form>
-{% endblock %}
+        <div>
+            <h4>Просматривать заявки</h4>
+            <label>
+                <input type="radio"></input>
+                Только свои
+            </label>
+            <label>
+                <input type="radio"></input>
+                Своего отдела
+            </label>
+            <label>
+                <input type="radio"></input>
+                Своего отдела с дочерним 
+            </label>
+            <label>
+                <input type="radio"></input>
+                Своей компании 
+            </label>
+            <label>
+                <input type="radio"></input>
+                Все заявки 
+            </label>
+        </div>
+
+        <div>
+            <h4>Редактировать заявки</h4>
+            <label>
+                <input type="radio"></input>
+                Только свои
+            </label>
+            <label>
+                <input type="radio"></input>
+                Своего отдела
+            </label>
+            <label>
+                <input type="radio"></input>
+                Своего отдела с дочерним</del> 
+            </label>
+            <label>
+                <input type="radio"></input>
+                Своей компании 
+            </label>
+            <label>
+                <input type="radio"></input>
+                Все заявки 
+            </label>
+        </div>
+    
+        <h4>Карточка заявки. Исполнение заявок</h4>
+        <div class="service_authority">
+            <label>
+                <input type="checkbox"></input>
+                Назначать исполнителей и группу исполнителей
+            </label>
+        </div>
+
+    </div>
+
+    <div id="profile" class="form_style">
+        <h2>Профиль</h2>
+            <label>
+                <input type="checkbox"></input>
+                Редактировать свой профиль 
+            </label>
+    </div>
+
+    <div id="settings" class="form_style">
+    
+        <h2>Настройки типов заявок</h2>
+        <div class="service_authority">
+            <label>
+                <input type="checkbox"></input>
+                Редактировать типы заявок 
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Удалять типы заявок 
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Создавать типы заявок 
+            </label>        
+            <h2>Настройки приоритетов заявок</h2>
+            <label>
+                <input type="checkbox"></input>
+                Редактировать приоритеты заявок 
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Удалять приоритеты заявок 
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Создавать приоритеты заявок 
+            </label>
+            <h2>Настройки списков статусов</h2>
+            <label>
+                <input type="checkbox"></input>
+                Редактировать списки статусов 
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Удалять списки статусов 
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Создавать списки статусов 
+            </label>
+            <h2>Настройки переходов статусов</h2>
+            <label>
+                <input type="checkbox"></input>
+                Удалять переходы статусов 
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Создавать переходы статусов 
+            </label>         
+            <h2>Настройки SMTP</h2>
+            <label>
+                <input type="checkbox"></input>
+                Показывать настройки SMTP 
+            </label>
+            <h2>Настройки списка документов</h2>
+            <label>
+                <input type="checkbox"></input>
+                Показывать списки документов 
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Загружать документы 
+            </label>
+            <h2>Настройки обзора уведомлений</h2>
+            <label>
+                <input type="checkbox"></input>
+                Показывать обзор уведомлений 
+            </label>                                                  
+        </div> 
+    </div>
+
+    <div id="users" class="form_style">
+        <h2>Полномочия по пользователям/группам пользователей</h2>
+        <div class="service_authority">
+            <label>
+                <input type="checkbox"></input>
+                Редактировать пользователей и группы исполнителей
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Создавать пользователей и группы исполнителей 
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Удалять пользователей и группы исполнителей 
+            </label>
+        </div> 
+    </div>
+
+    <div id="companies" class="form_style">
+        <h2>Полномочия по компаниям</h2>
+        <div class="service_authority">
+            <label>
+                <input type="checkbox"></input>
+                Редактировать компании
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Создавать компании 
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Удалять компании 
+            </label>
+            <h2>Полномочия по отделам</h2>
+            <label>
+                <input type="checkbox"></input>
+                Редактировать отделы
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Создавать отделы
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Удалять отделы
+            </label>    
+        </div> 
+    </div>
+
+    <div id="roles" class="form_style">
+        <h2>Полномочия по ролям</h2>
+        <div class="service_authority">
+            <label>
+                <input type="checkbox"></input>
+                Редактировать роли
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Создавать роли 
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Удалять роли 
+            </label>
+        </div> 
+    </div>
+
+    <div id="assets" class="form_style">
+        <h2>Полномочия по активам</h2>
+        <div class="service_authority">
+            <label>
+                <input type="checkbox"></input>
+                Редактировать активы
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Создавать активы 
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Удалять активы 
+            </label>
+            <h2>Полномочия по типам активов</h2>
+            <label>
+                <input type="checkbox"></input>
+                Создавать типы активов
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Редактировать типы активов
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Удалять типы активов
+            </label>
+            <h2>Полномочия по атрибутам типов активов</h2>    
+            <label>
+                <input type="checkbox"></input>
+                Создавать атрибуты
+            </label>
+        </div> 
+    </div>
+
+    <div id="interface" class="form_style">
+        <h2>Интерфейс</h2>
+        <div class="service_authority">
+            <label>
+                <input type="checkbox"></input>
+                Показывать раздел "Список активов" 
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Показывать раздел "Список заявок" 
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Показывать раздел "Настройки" 
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Показывать раздел "Чат" 
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Показывать раздел "Список компаний" 
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Показывать раздел "Список пользователей" 
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Показывать раздел "Профиль" 
+            </label>
+            <label>
+                <input type="checkbox"></input>
+                Показывать раздел "Управление ролями" 
+            </label>
+        </div> 
+    </div>
+
+</div>
+
+<script>
+    function showBlock(blockId, button) {
+        document.querySelectorAll('.form_style').forEach(function(block) {
+            block.classList.remove('active');
+        });
+        document.getElementById(blockId).classList.add('active');
+
+        document.querySelectorAll('.btn').forEach(function(btn) {
+            btn.classList.remove('active');
+        });
+
+        // Добавить активный класс к нажатой кнопке
+        button.classList.add('active');
+    }
+
+</script>
+
+{% comment %}
+<h2>{{ group.id|default:"Создание" }} Роли</h2>
+<form method="post">
+  {% csrf_token %} {{ form.as_p }}
+
+  <button type="submit">Сохранить</button>
+</form>
+{% endcomment %} {% endblock %}
