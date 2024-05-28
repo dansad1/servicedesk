@@ -1,7 +1,7 @@
 {% extends 'base.html' %} {% block content %}
 <div class="role">
-    <h1>Полномичия для роли {{role.id}}</h1>
-    <div class="button_group">
+    <h1 class='m-auto max-w-4xl p-10 text-4xl text-center'>Полномичия для роли {{group.name}}</h1>
+    <div class="button_group p-10">
         <button id="button_requests" class="btn active" onclick="showBlock('requests', this)">По заявкам</button>
         <button class="btn" onclick="showBlock('users', this)">По пользователям/ группам пользователей</button>
         <button class="btn" onclick="showBlock('companies', this)">По компаниям</button>
@@ -12,9 +12,9 @@
         <button class="btn" onclick="showBlock('interface', this)">По интерфейсу</button>
     </div>
 
-    <div id="requests" class="form_style active">
-        <h2>Полномочия по заявкам</h2>
-        <div class="service_authority">
+    <div id="requests" class="form_style active max-w-5xl  m-auto p-10 bg-slate-200">
+        <h2 class="text-2xl">Полномочия по заявкам</h2>
+        <div class="service_authority gap-2 text-xl">
             <label>
                 <input type="checkbox"></input>
                 Создавать заявки
@@ -26,55 +26,59 @@
         </div>
 
         <div>
-            <h4>Просматривать заявки</h4>
-            <label>
-                <input type="radio"></input>
-                Только свои
-            </label>
-            <label>
-                <input type="radio"></input>
-                Своего отдела
-            </label>
-            <label>
-                <input type="radio"></input>
-                Своего отдела с дочерним 
-            </label>
-            <label>
-                <input type="radio"></input>
-                Своей компании 
-            </label>
-            <label>
-                <input type="radio"></input>
-                Все заявки 
-            </label>
+            <h4 class="text-2xl mt-5">Просматривать заявки</h4>
+            <div class="text-xl">
+                <label>
+                    <input type="radio"></input>
+                    Только свои
+                </label>
+                <label>
+                    <input type="radio"></input>
+                    Своего отдела
+                </label>
+                <label>
+                    <input type="radio"></input>
+                    Своего отдела с дочерним 
+                </label>
+                <label>
+                    <input type="radio"></input>
+                    Своей компании 
+                </label>
+                <label>
+                    <input type="radio"></input>
+                    Все заявки 
+                </label>
+            </div>
         </div>
 
         <div>
-            <h4>Редактировать заявки</h4>
-            <label>
-                <input type="radio"></input>
-                Только свои
-            </label>
-            <label>
-                <input type="radio"></input>
-                Своего отдела
-            </label>
-            <label>
-                <input type="radio"></input>
-                Своего отдела с дочерним</del> 
-            </label>
-            <label>
-                <input type="radio"></input>
-                Своей компании 
-            </label>
-            <label>
-                <input type="radio"></input>
-                Все заявки 
-            </label>
+            <h4 class="text-2xl mt-5">Редактировать заявки</h4>
+            <div class="text-xl">
+                <label>
+                    <input type="radio"></input>
+                    Только свои
+                </label>
+                <label>
+                    <input type="radio"></input>
+                    Своего отдела
+                </label>
+                <label>
+                    <input type="radio"></input>
+                    Своего отдела с дочерним</del> 
+                </label>
+                <label>
+                    <input type="radio"></input>
+                    Своей компании 
+                </label>
+                <label>
+                    <input type="radio"></input>
+                    Все заявки 
+                </label>
+            </div>
         </div>
     
-        <h4>Карточка заявки. Исполнение заявок</h4>
-        <div class="service_authority">
+        <h4 class="text-2xl mt-5">Карточка заявки. Исполнение заявок</h4>
+        <div class="service_authority text-xl">
             <label>
                 <input type="checkbox"></input>
                 Назначать исполнителей и группу исполнителей
@@ -83,18 +87,18 @@
 
     </div>
 
-    <div id="profile" class="form_style">
-        <h2>Профиль</h2>
-            <label>
+    <div id="profile" class="form_style max-w-5xl  m-auto p-10 bg-slate-200">
+        <h2 class="text-2xl" >Профиль</h2>
+            <label class="text-xl">
                 <input type="checkbox"></input>
                 Редактировать свой профиль 
             </label>
     </div>
 
-    <div id="settings" class="form_style">
+    <div id="settings" class="form_style max-w-5xl  m-auto p-10 bg-slate-200">
     
-        <h2>Настройки типов заявок</h2>
-        <div class="service_authority">
+        <h2 class="text-2xl">Настройки типов заявок</h2>
+        <div class="service_authority text-xl">
             <label>
                 <input type="checkbox"></input>
                 Редактировать типы заявок 
@@ -107,7 +111,7 @@
                 <input type="checkbox"></input>
                 Создавать типы заявок 
             </label>        
-            <h2>Настройки приоритетов заявок</h2>
+            <h2 class="text-2xl">Настройки приоритетов заявок</h2>
             <label>
                 <input type="checkbox"></input>
                 Редактировать приоритеты заявок 
@@ -120,7 +124,7 @@
                 <input type="checkbox"></input>
                 Создавать приоритеты заявок 
             </label>
-            <h2>Настройки списков статусов</h2>
+            <h2 class="text-2xl">Настройки списков статусов</h2>
             <label>
                 <input type="checkbox"></input>
                 Редактировать списки статусов 
@@ -133,7 +137,7 @@
                 <input type="checkbox"></input>
                 Создавать списки статусов 
             </label>
-            <h2>Настройки переходов статусов</h2>
+            <h2 class="text-2xl">Настройки переходов статусов</h2>
             <label>
                 <input type="checkbox"></input>
                 Удалять переходы статусов 
@@ -142,12 +146,12 @@
                 <input type="checkbox"></input>
                 Создавать переходы статусов 
             </label>         
-            <h2>Настройки SMTP</h2>
+            <h2 class="text-2xl">Настройки SMTP</h2>
             <label>
                 <input type="checkbox"></input>
                 Показывать настройки SMTP 
             </label>
-            <h2>Настройки списка документов</h2>
+            <h2 class="text-2xl">Настройки списка документов</h2>
             <label>
                 <input type="checkbox"></input>
                 Показывать списки документов 
@@ -156,7 +160,7 @@
                 <input type="checkbox"></input>
                 Загружать документы 
             </label>
-            <h2>Настройки обзора уведомлений</h2>
+            <h2 class="text-2xl">Настройки обзора уведомлений</h2>
             <label>
                 <input type="checkbox"></input>
                 Показывать обзор уведомлений 
@@ -164,9 +168,9 @@
         </div> 
     </div>
 
-    <div id="users" class="form_style">
-        <h2>Полномочия по пользователям/группам пользователей</h2>
-        <div class="service_authority">
+    <div id="users" class="form_style max-w-5xl  m-auto p-10 bg-slate-200">
+        <h2 class="text-2xl">Полномочия по пользователям/группам пользователей</h2>
+        <div class="service_authority text-xl">
             <label>
                 <input type="checkbox"></input>
                 Редактировать пользователей и группы исполнителей
@@ -182,9 +186,9 @@
         </div> 
     </div>
 
-    <div id="companies" class="form_style">
-        <h2>Полномочия по компаниям</h2>
-        <div class="service_authority">
+    <div id="companies" class="form_style max-w-5xl  m-auto p-10 bg-slate-200">
+        <h2 class="text-2xl">Полномочия по компаниям</h2>
+        <div class="service_authority text-xl">
             <label>
                 <input type="checkbox"></input>
                 Редактировать компании
@@ -197,7 +201,7 @@
                 <input type="checkbox"></input>
                 Удалять компании 
             </label>
-            <h2>Полномочия по отделам</h2>
+            <h2 class="text-2xl">Полномочия по отделам</h2>
             <label>
                 <input type="checkbox"></input>
                 Редактировать отделы
@@ -213,9 +217,9 @@
         </div> 
     </div>
 
-    <div id="roles" class="form_style">
-        <h2>Полномочия по ролям</h2>
-        <div class="service_authority">
+    <div id="roles" class="form_style max-w-5xl  m-auto p-10 bg-slate-200">
+        <h2 class="text-2xl">Полномочия по ролям</h2>
+        <div class="service_authority text-xl">
             <label>
                 <input type="checkbox"></input>
                 Редактировать роли
@@ -231,9 +235,9 @@
         </div> 
     </div>
 
-    <div id="assets" class="form_style">
-        <h2>Полномочия по активам</h2>
-        <div class="service_authority">
+    <div id="assets" class="form_style max-w-5xl  m-auto p-10 bg-slate-200">
+        <h2 class="text-2xl">Полномочия по активам</h2>
+        <div class="service_authority text-xl">
             <label>
                 <input type="checkbox"></input>
                 Редактировать активы
@@ -246,7 +250,7 @@
                 <input type="checkbox"></input>
                 Удалять активы 
             </label>
-            <h2>Полномочия по типам активов</h2>
+            <h2 class="text-2xl">Полномочия по типам активов</h2>
             <label>
                 <input type="checkbox"></input>
                 Создавать типы активов
@@ -259,7 +263,7 @@
                 <input type="checkbox"></input>
                 Удалять типы активов
             </label>
-            <h2>Полномочия по атрибутам типов активов</h2>    
+            <h2 class="text-2xl">Полномочия по атрибутам типов активов</h2>    
             <label>
                 <input type="checkbox"></input>
                 Создавать атрибуты
@@ -267,9 +271,9 @@
         </div> 
     </div>
 
-    <div id="interface" class="form_style">
-        <h2>Интерфейс</h2>
-        <div class="service_authority">
+    <div id="interface" class="form_style max-w-5xl  m-auto p-10 bg-slate-200">
+        <h2 class="text-2xl">Интерфейс</h2>
+        <div class="service_authority text-xl">
             <label>
                 <input type="checkbox"></input>
                 Показывать раздел "Список активов" 
@@ -304,7 +308,10 @@
             </label>
         </div> 
     </div>
-
+    
+    <div class="max-w-5xl m-auto mt-4">
+        <button class="btn btn-success " type="submit">Сохранить</button>
+    </div>
 </div>
 
 <script>
