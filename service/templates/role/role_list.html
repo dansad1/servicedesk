@@ -2,14 +2,14 @@
 
 {% block content %}
     <div class="container mt-4">
-        <h2>Список Ролей</h2>
-        <a href="{% url 'role_create' %}" class="btn btn-primary btn-block mb-2">Создать Новую Роль</a>
+        <h2 class="max-w-4xl m-auto text-4xl text-center p-10">Список Ролей</h2>
+        
         <div class="list-group">
             {% for group in groups %}
                 <div class="list-group-item d-flex justify-content-between align-items-center">
                     {{ group.name }}
                     <div>
-                        <a href="{% url 'role_edit' group.id %}" class="btn btn-secondary btn-sm mr-2">Редактировать</a>
+                        <a href="{% url 'role_edit' group.id %}" class="btn btn-primary btn-sm mr-2">Редактировать</a>
                         <form action="{% url 'role_delete' group.id %}" method="post" class="d-inline" onsubmit="return confirm('Вы уверены, что хотите удалить эту роль?');">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
@@ -20,6 +20,7 @@
                 <div class="list-group-item">Роли не найдены.</div>
             {% endfor %}
         </div>
+        <button onclick="window.location.href='{% url 'role_create' %}'" type="button" class="btn btn-success mt-4">Создать Новую Роль</button>
     </div>
 <style>
 .list-group-item {
