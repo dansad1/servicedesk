@@ -42,5 +42,33 @@ services:
     env_file:
       - .env
 
+  chromadb:
+    image: chromadb/chroma
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./rag/data/chroma-data:/chroma/chroma
+
+
+  rag-pipeline:
+    build:
+      context: .
+      dockerfile: rag/src/rag_pipeline/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - chromadb
+    env_file:
+      - rag/config/giga_chat_api.env
+    ports:
+      - "8085:8085"
+    volumes:
+      - ./rag/src/rag_pipeline/:/opt/app-root/rag/src/rag_pipeline:rw
+      - ./rag/src/embeddings/:/opt/app-root/rag/src/embeddings:rw
+      - ./rag/src/file_processing/:/opt/app-root/rag/src/file_processing:rw
+      - ./rag/src/giga_chat/:/opt/app-root/rag/src/giga_chat:rw
+      - ./rag/not_included_data/:/opt/app-root/rag/not_included_data:rw
 volumes:
   data:
+  chroma-data:
+    driver: local
