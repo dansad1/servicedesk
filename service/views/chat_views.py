@@ -8,7 +8,7 @@ import requests as r
 def get_response(response: str):
     url = "http://rag-pipeline:8085/rag_router/rag_final_response"
     data = {
-        "text": 'sads',
+        "text": response,
         "encoding_model": "gigachat",
         "n_results": 10,
         "include_embeddings": "false"
@@ -25,7 +25,6 @@ def get_response(response: str):
         return data[0]
     else:
         return "Error: bad connection "
-
 
 
 def chat_view(request):
