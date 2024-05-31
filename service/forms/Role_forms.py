@@ -2,51 +2,43 @@ from django import forms
 from django.contrib.auth.models import Group
 
 from service.models import CustomPermission
-
+from service.models import GroupPermission
 
 class GroupForm(forms.ModelForm):
-    action_permissions = forms.ModelMultipleChoiceField(
-        queryset=CustomPermission.objects.filter(code_name__startswith='action_'),
-        widget=forms.CheckboxSelectMultiple(),
-        required=False,
-        label='Разрешения Действий'
-    )
-    section_permissions = forms.ModelMultipleChoiceField(
-        queryset=CustomPermission.objects.filter(code_name__startswith='section_'),
-        widget=forms.CheckboxSelectMultiple(),
-        required=False,
-        label='Разрешения для Разделов'
-    )
-
     class Meta:
         model = Group
         fields = ['name']
 
+class GroupPermissionForm(forms.ModelForm):
+    
+    custompermission = forms.ModelMultipleChoiceField(
+        queryset=CustomPermission.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+        label="Полномочия"
+    )
+    
     def __init__(self, *args, **kwargs):
-        group = kwargs.get('instance')
-        super(GroupForm, self).__init__(*args, **kwargs)
-        print(group)
-        # Инициализация начальных значений для разрешений действий
-        if group:
-            self.initial['action_permissions'] = group.grouppermission_set.filter(
-                custompermission__code_name__startswith='action_'
-            ).values_list('custompermission__id', flat=True)
-            # Инициализация начальных значений для разрешений разделов
-            self.initial['section_permissions'] = group.grouppermission_set.filter(
-                custompermission__code_name__startswith='section_'
-            ).values_list('custompermission__id', flat=True)
-        print(self.initial)
-        
-        # Добавляем динамические поля для уровней доступа
-        for permission in CustomPermission.objects.filter(code_name__startswith='action_'):
+        super().__init__(*args, **kwargs)
+        for permission in self.fields['custompermission'].queryset:
+            
             field_name = f'access_level_{permission.id}'
             self.fields[field_name] = forms.ChoiceField(
-                choices=[('global', 'Global'), ('company', 'Company'), ('department', 'Department'), ('personal', 'Personal')],
-                required=False,
-                label='Уровень доступа для ' + permission.name
+                choices=GroupPermission.ACCESS_LEVEL_CHOICES,
+                initial='personal',  # Установите здесь значение по умолчанию
+                widget=forms.RadioSelect,
+                label=f"Уровень доступа для {permission.code_name}"
             )
-            # Установка начального значения для уровня доступа, если группа уже имеет это разрешение
-            if group:
-                access_level = group.grouppermission_set.filter(custompermission=permission).first()
-                if access_level:
-                    self.initial[field_name] = access_level.access_level
+            
+        requests_2_permissions = self.fields['custompermission'].queryset.filter(code_name="requests_2")
+         # Получить значения id для каждого custompermission с code_name "requests_2"
+        requests_2_permission_ids = list(requests_2_permissions.values_list('id', flat=True))
+        # Установить эти id в качестве значений по умолчанию для поля custompermission
+        self.initial['custompermission'] = requests_2_permission_ids
+    
+    
+    
+    class Meta:
+        model = GroupPermission
+        fields = ['group', 'custompermission']
+        

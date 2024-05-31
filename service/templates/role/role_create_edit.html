@@ -2,97 +2,82 @@
 <div class="role">
     <h1 class='m-auto max-w-4xl p-10 text-4xl text-center'>Полномичия для роли {{group.name}}</h1>
     <div class="button_group p-10">
-        <button id="button_requests" class="btn active" onclick="showBlock('requests', this)">По заявкам</button>
-        <button class="btn" onclick="showBlock('users', this)">По пользователям/ группам пользователей</button>
-        <button class="btn" onclick="showBlock('companies', this)">По компаниям</button>
-        <button class="btn" onclick="showBlock('roles', this)">По ролям</button>
-        <button class="btn" onclick="showBlock('assets', this)">По активам</button>
-        <button class="btn" onclick="showBlock('profile', this)">По профилю</button>
-        <button class="btn" onclick="showBlock('settings', this)">По настройкам</button>
-        <button class="btn" onclick="showBlock('interface', this)">По интерфейсу</button>
+        <button id="button_requests" type='button' class="btn active" onclick="showBlock('requests', this)">По заявкам</button>
+        <button class="btn" type="button" onclick="showBlock('users', this)">По пользователям/ группам пользователей</button>
+        <button class="btn" type="button" onclick="showBlock('companies', this)">По компаниям</button>
+        <button class="btn" type="button" onclick="showBlock('roles', this)">По ролям</button>
+        <button class="btn" type="button" onclick="showBlock('assets', this)">По активам</button>
+        <button class="btn" type="button" onclick="showBlock('profile', this)">По профилю</button>
+        <button class="btn" type="button" onclick="showBlock('settings', this)">По настройкам</button>
+        <button class="btn" type="button" onclick="showBlock('interface', this)">По интерфейсу</button>
     </div>
+    <form method="post">
+        {% csrf_token %}
 
-    <div id="requests" class="form_style active max-w-5xl  m-auto p-10 bg-slate-200">
-        <h2 class="text-2xl">Полномочия по заявкам</h2>
-        <div class="service_authority gap-2 text-xl">
-            <label>
-                <input type="checkbox"></input>
-                Создавать заявки
-            </label>
-            <label>
-                <input type="checkbox"></input>
-                Удалять заявки 
-            </label>
+        <div class="form-group">
+            <label for="id_name">Название роли:</label>
+            {{ group_form.name }}
         </div>
 
-        <div>
-            <h4 class="text-2xl mt-5">Просматривать заявки</h4>
-            <div class="text-xl">
-                <label>
-                    <input type="radio"></input>
-                    Только свои
-                </label>
-                <label>
-                    <input type="radio"></input>
-                    Своего отдела
-                </label>
-                <label>
-                    <input type="radio"></input>
-                    Своего отдела с дочерним 
-                </label>
-                <label>
-                    <input type="radio"></input>
-                    Своей компании 
-                </label>
-                <label>
-                    <input type="radio"></input>
-                    Все заявки 
-                </label>
-            </div>
+        <div id="requests" class="form_style active max-w-5xl  m-auto p-10 bg-slate-200">
+            <h2 class="text-2xl">Полномочия по заявкам</h2>
+            <div class="service_authority gap-4 text-xl">
+                
+                    {% for permission in  permission_form.fields.custompermission.queryset %}
+                    
+                    {% if 'requests_1' in permission.code_name %}
+                    <div>
+                        <label>
+                            <input type="checkbox" name="permissions[]" value="{{ permission.code_name }}">
+                            {{ permission.name }}
+                        </label>
+                    </div>
+                    {% endif %}
+                    
+                    {% if 'requests_2' in permission.code_name %}
+                    <div>
+                        <h1 class="text-2xl">{{ permission.name }}</h1>
+                        <input class="hidden" type="checkbox" name="permissions[]" value="{{permission.code_name}}" checked>
+                        {% for choice in access_levels_choices %}
+                        <label>
+                            <input type="radio" name="access_level_{{ permission.id }}" value="{{ choice.0 }}"
+                                {% if forloop.first %}checked{% endif %}>
+                                {{ choice.1 }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% if 'requests_can_add_executors' in permission.code_name %}
+                    <div>
+                        <h1 class="text-2xl">Карточка заявки. Исполнение заявок</h1>
+                        <label>
+                            <input type="checkbox" name="permissions[]" value="{{ permission.code_name }}">
+                            {{ permission.name }}
+                        </label>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+            </div>            
         </div>
 
-        <div>
-            <h4 class="text-2xl mt-5">Редактировать заявки</h4>
-            <div class="text-xl">
-                <label>
-                    <input type="radio"></input>
-                    Только свои
-                </label>
-                <label>
-                    <input type="radio"></input>
-                    Своего отдела
-                </label>
-                <label>
-                    <input type="radio"></input>
-                    Своего отдела с дочерним</del> 
-                </label>
-                <label>
-                    <input type="radio"></input>
-                    Своей компании 
-                </label>
-                <label>
-                    <input type="radio"></input>
-                    Все заявки 
-                </label>
-            </div>
-        </div>
-    
-        <h4 class="text-2xl mt-5">Карточка заявки. Исполнение заявок</h4>
-        <div class="service_authority text-xl">
-            <label>
-                <input type="checkbox"></input>
-                Назначать исполнителей и группу исполнителей
-            </label>
-        </div>
-
-    </div>
+        <div class="max-w-5xl m-auto mt-4">
+            <button class="btn btn-success" type="submit" >Сохранить</button>
+        </div>        
 
     <div id="profile" class="form_style max-w-5xl  m-auto p-10 bg-slate-200">
         <h2 class="text-2xl" >Профиль</h2>
-            <label class="text-xl">
-                <input type="checkbox"></input>
-                Редактировать свой профиль 
+        {% for permission in  permission_form.fields.custompermission.queryset %}
+                    
+        {% if 'profile' in permission.code_name %}
+        <div>
+            <label>
+                <input type="checkbox" name="permissions[]" value="{{ permission.code_name }}">
+                {{ permission.name }}
             </label>
+        </div>
+        {% endif %}
+        {% endfor %}
     </div>
 
     <div id="settings" class="form_style max-w-5xl  m-auto p-10 bg-slate-200">
@@ -170,69 +155,59 @@
 
     <div id="users" class="form_style max-w-5xl  m-auto p-10 bg-slate-200">
         <h2 class="text-2xl">Полномочия по пользователям/группам пользователей</h2>
-        <div class="service_authority text-xl">
+        {% for permission in  permission_form.fields.custompermission.queryset %}
+                    
+        {% if 'users' in permission.code_name %}
+        <div>
             <label>
-                <input type="checkbox"></input>
-                Редактировать пользователей и группы исполнителей
+                <input type="checkbox" name="permissions[]" value="{{ permission.code_name }}">
+                {{ permission.name }}
             </label>
-            <label>
-                <input type="checkbox"></input>
-                Создавать пользователей и группы исполнителей 
-            </label>
-            <label>
-                <input type="checkbox"></input>
-                Удалять пользователей и группы исполнителей 
-            </label>
-        </div> 
+        </div>
+        {% endif %}
+        {% endfor %}
     </div>
 
     <div id="companies" class="form_style max-w-5xl  m-auto p-10 bg-slate-200">
         <h2 class="text-2xl">Полномочия по компаниям</h2>
-        <div class="service_authority text-xl">
+        {% for permission in  permission_form.fields.custompermission.queryset %}
+                    
+        {% if 'companies_can' in permission.code_name %}
+        <div>
             <label>
-                <input type="checkbox"></input>
-                Редактировать компании
+                <input type="checkbox" name="permissions[]" value="{{ permission.code_name }}">
+                {{ permission.name }}
             </label>
+        </div>
+        {% endif %}
+        {% endfor %}
+        
+        <h2 class="text-2xl">Полномочия по отделам</h2>
+        {% for permission in  permission_form.fields.custompermission.queryset %}
+        {% if 'departments' in permission.code_name %}
+        <div>
             <label>
-                <input type="checkbox"></input>
-                Создавать компании 
+                <input type="checkbox" name="permissions[]" value="{{ permission.code_name }}">
+                {{ permission.name }}
             </label>
-            <label>
-                <input type="checkbox"></input>
-                Удалять компании 
-            </label>
-            <h2 class="text-2xl">Полномочия по отделам</h2>
-            <label>
-                <input type="checkbox"></input>
-                Редактировать отделы
-            </label>
-            <label>
-                <input type="checkbox"></input>
-                Создавать отделы
-            </label>
-            <label>
-                <input type="checkbox"></input>
-                Удалять отделы
-            </label>    
-        </div> 
+        </div>
+        {% endif %}
+        {% endfor %}
+        
     </div>
 
     <div id="roles" class="form_style max-w-5xl  m-auto p-10 bg-slate-200">
         <h2 class="text-2xl">Полномочия по ролям</h2>
-        <div class="service_authority text-xl">
+        {% for permission in  permission_form.fields.custompermission.queryset %}
+        {% if 'roles_can' in permission.code_name %}
+        <div>
             <label>
-                <input type="checkbox"></input>
-                Редактировать роли
+                <input type="checkbox" name="permissions[]" value="{{ permission.code_name }}">
+                {{ permission.name }}
             </label>
-            <label>
-                <input type="checkbox"></input>
-                Создавать роли 
-            </label>
-            <label>
-                <input type="checkbox"></input>
-                Удалять роли 
-            </label>
-        </div> 
+        </div>
+        {% endif %}
+        {% endfor %}
     </div>
 
     <div id="assets" class="form_style max-w-5xl  m-auto p-10 bg-slate-200">
@@ -274,44 +249,21 @@
     <div id="interface" class="form_style max-w-5xl  m-auto p-10 bg-slate-200">
         <h2 class="text-2xl">Интерфейс</h2>
         <div class="service_authority text-xl">
+            {% for permission in  permission_form.fields.custompermission.queryset %}
+        {% if 'interface' in permission.code_name %}
+        <div>
             <label>
-                <input type="checkbox"></input>
-                Показывать раздел "Список активов" 
+                <input type="checkbox" name="permissions[]" value="{{ permission.code_name }}">
+                {{ permission.name }}
             </label>
-            <label>
-                <input type="checkbox"></input>
-                Показывать раздел "Список заявок" 
-            </label>
-            <label>
-                <input type="checkbox"></input>
-                Показывать раздел "Настройки" 
-            </label>
-            <label>
-                <input type="checkbox"></input>
-                Показывать раздел "Чат" 
-            </label>
-            <label>
-                <input type="checkbox"></input>
-                Показывать раздел "Список компаний" 
-            </label>
-            <label>
-                <input type="checkbox"></input>
-                Показывать раздел "Список пользователей" 
-            </label>
-            <label>
-                <input type="checkbox"></input>
-                Показывать раздел "Профиль" 
-            </label>
-            <label>
-                <input type="checkbox"></input>
-                Показывать раздел "Управление ролями" 
-            </label>
+        </div>
+        {% endif %}
+        {% endfor %}
         </div> 
     </div>
     
-    <div class="max-w-5xl m-auto mt-4">
-        <button class="btn btn-success " type="submit">Сохранить</button>
-    </div>
+    
+</form>
 </div>
 
 <script>

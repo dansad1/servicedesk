@@ -79,6 +79,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     address = models.CharField(max_length=255, blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
     group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True, blank=True, related_name="users")
     company = models.ForeignKey('Company', on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Компания')
     department = models.ForeignKey('Department', null=True, blank=True, on_delete=models.SET_NULL)
@@ -90,6 +91,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
+
 
 
 class Department(models.Model):
@@ -114,11 +116,20 @@ class CustomPermission(models.Model):
         return self.name
 
 class GroupPermission(models.Model):
+    
+    ACCESS_LEVEL_CHOICES = [
+        ('personal', 'Только свои'),
+        ('department', 'Своего отдела'),
+        ('department_with_subs', 'Своего отдела с дочерним'),
+        ('company', 'Своей компании'),
+        ('global', 'Все заявки')
+    ]
+    
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     custompermission = models.ForeignKey(CustomPermission, on_delete=models.CASCADE)
     access_level = models.CharField(
         max_length=50,
-        choices=[('global', 'Global'), ('company', 'Company'), ('department', 'Department'), ('personal', 'Personal')],
+        choices=ACCESS_LEVEL_CHOICES,
         blank=True,
         null=True
     )

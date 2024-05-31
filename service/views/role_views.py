@@ -7,41 +7,74 @@ from service.forms.Role_forms import *
 
 
 # Создание роли 
-def role_create(request):
-    if request.method == 'POST':
-        form = GroupForm(request.POST)
-        print(form.is_valid())
-        if form.is_valid():
-            print(form.data)
-            new_group = form.save()
-            # Сохранение уровней доступа для каждого разрешения действий
-            for permission in form.cleaned_data['action_permissions']:
-                access_level = request.POST.get(f'access_level_{permission.id}', 'personal')
+# def role_create(request):
+#     if request.method == 'POST':
+#         form = GroupForm(request.POST)
+#         print(form.is_valid())
+#         if form.is_valid():
+#             print(form.data)
+#             new_group = form.save()
+#             # Сохранение уровней доступа для каждого разрешения действий
+#             for permission in form.cleaned_data['action_permissions']:
+#                 access_level = request.POST.get(f'access_level_{permission.id}', 'personal')
+#                 GroupPermission.objects.create(
+#                     group=new_group,
+#                     custompermission=permission,
+#                     access_level=access_level
+#                 )
+#             # Сохранение разрешений для разделов
+#             for section_permission in form.cleaned_data['section_permissions']:
+#                 GroupPermission.objects.create(
+#                     group=new_group,
+#                     custompermission=section_permission
+#                 )
+#             return redirect('role_list')
+#     else:
+#         existing_group_id = request.GET.get('group_id')  # Assuming you pass the group_id in the request
+#         existing_group = get_object_or_404(Group, id=existing_group_id) if existing_group_id else None
+#         print(existing_group_id)
+#         # Pass the existing Group instance to the form
+#         form = GroupForm(instance=existing_group)
+#     print(request.method)
+#     print(form.data)
+#     print(request.user.get_user_permissions())
+#     print("__________________________")
+#     print(request.user.get_group_permissions())
+#     return render(request, 'role/role_create_edit.html', {'form': form})
+
+
+def role_create(request, group_id=None):
+    if group_id:
+        group = get_object_or_404(Group, id=group_id)
+    else:
+        group = None
+    
+    if request.method == "POST":
+        group_form = GroupForm(request.POST, instance=group)
+        permission_form = GroupPermissionForm(request.POST)
+        if group_form.is_valid() and permission_form.is_valid():
+            group = group_form.save()
+            permissions = request.POST.getlist('permissions[]')
+           
+            for permission in permissions:
+                access_level_field_name = f'access_level_{permission.code_name}'
+                access_level = permission_form.cleaned_data.get(access_level_field_name)
                 GroupPermission.objects.create(
-                    group=new_group,
+                    group=group,
                     custompermission=permission,
                     access_level=access_level
                 )
-            # Сохранение разрешений для разделов
-            for section_permission in form.cleaned_data['section_permissions']:
-                GroupPermission.objects.create(
-                    group=new_group,
-                    custompermission=section_permission
-                )
             return redirect('role_list')
     else:
-        existing_group_id = request.GET.get('group_id')  # Assuming you pass the group_id in the request
-        existing_group = get_object_or_404(Group, id=existing_group_id) if existing_group_id else None
-        print(existing_group_id)
-        # Pass the existing Group instance to the form
-        form = GroupForm(instance=existing_group)
-    print(request.method)
-    print(form.data)
-    print(request.user.get_user_permissions())
-    print("__________________________")
-    print(request.user.get_group_permissions())
-    return render(request, 'role/role_create_edit.html', {'form': form})
-
+        group_form = GroupForm(instance=group)
+        permission_form = GroupPermissionForm()
+    
+    return render(request, 'role/role_create_edit.html', {
+        'group_form': group_form,
+        'permission_form': permission_form,
+        'group': group,
+        'access_levels_choices': GroupPermission.ACCESS_LEVEL_CHOICES
+    })
 
 
 # Редактирование роли
