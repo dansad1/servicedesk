@@ -3,11 +3,18 @@ from django.contrib.auth.models import Group
 
 from service.models import CustomPermission
 from service.models import GroupPermission
+from django.forms import TextInput
 
 class GroupForm(forms.ModelForm):
     class Meta:
         model = Group
         fields = ['name']
+        widgets = {
+            'name': TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Введите название роли'
+            })
+        }
 
 class GroupPermissionForm(forms.ModelForm):
     

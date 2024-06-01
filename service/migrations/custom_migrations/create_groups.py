@@ -32,5 +32,5 @@ def add_group_permissions(apps, schema_editor):
         GroupPermission.objects.create(
             group=user_group,
             custompermission=custom_permission,
-            access_level='public'
+            access_level='personal'
         )
