@@ -1,4 +1,5 @@
 import asyncio
+import os
 from typing import List
 
 from fastapi import Query
@@ -30,11 +31,9 @@ async def rag_final_response(request: SearchRequest,
                              n_results: int = Query(10),
                              include_embeddings: bool = Query(False),
                              ids: List[str] = Query([], alias="id"), ):
-
     results = await search(request, encoding_model, n_results, include_embeddings, ids)
-
-    print('res = ',results)
-
+    if not results:
+        return "data base is empty", ''
     context = '\n'.join(results['documents'][0])
 
     output = await rag_prompt(request.text, context)
@@ -56,8 +55,17 @@ async def compose_SaveDatasetRequest(file_path, encoding_model):
     return SaveDataRequest(encoding_model=encoding_model, documents=docs, metadatas=metadatas)
 
 
-async def fill_rag_db(encoding_model: str = Query('gigachat', enum=('gigachat', 'local_all_12', 'openai'))):
+async def fill_rag_db_old(encoding_model: str = Query('gigachat', enum=('gigachat', 'local_all_12', 'openai'))):
     file_path: str = '/opt/app-root/rag/not_included_data/инструкция.docx'
     request = await compose_SaveDatasetRequest(file_path, encoding_model)
     await add_vectors_to_db(request)
 
+
+async def fill_rag_db(encoding_model: str = Query('gigachat', enum=('gigachat', 'local_all_12', 'openai'))):
+    directory: str = '/opt/app-root/rag/not_included_data'
+    for filename in os.listdir(directory):
+        file_path = os.path.join(directory, filename)
+        if filename.endswith('docx'):
+            request = await compose_SaveDatasetRequest(file_path, encoding_model)
+            await add_vectors_to_db(request)
+        os.remove(file_path)

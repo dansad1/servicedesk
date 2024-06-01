@@ -54,14 +54,16 @@ async def search(
 
     where = {'id': {'$in': ids}} if ids else None
     include = ["metadatas", "documents", "distances"] + (["embeddings"] if include_embeddings else [])
-
-    return collection.query(
-        query_texts=request.text,
-        # query_embeddings=gigachat_embedding_function([request.text]),
-        n_results=n_results,
-        include=include,
-        where=where
-    )
+    try:
+        return collection.query(
+            query_texts=request.text,
+            # query_embeddings=gigachat_embedding_function([request.text]),
+            n_results=n_results,
+            include=include,
+            where=where
+        )
+    except Exception as e:
+        return None
 
 
 async def top_chunks(

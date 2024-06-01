@@ -26,6 +26,23 @@ def get_response(response: str):
     else:
         return "Error: bad connection "
 
+def update_chroma():
+    url = "http://rag-pipeline:8085/rag_router/fill_db"
+    data = {
+        "encoding_model": "gigachat"
+    }
+
+    headers = {
+        "Content-Type": "application/json"
+    }
+
+    response = r.post(url, data=json.dumps(data), headers=headers)
+
+    if response.status_code == 200:
+        return "db succsessfully updated"
+    else:
+        return "Error: bad connection "
+
 
 def chat_view(request):
     if request.method == 'POST':
@@ -35,10 +52,20 @@ def chat_view(request):
             chat_message.user = request.user
             chat_message.save()
 
-            chat_message1 = ChatMessage()
-            chat_message1.user = request.user
-            chat_message1.message = get_response(chat_message.message)
-            chat_message1.save()
+            if chat_message.message == r"\clear":
+                ChatMessage.objects.filter(user=request.user).delete()
+            elif chat_message.message == r"\update":
+                status = update_chroma()
+                chat_message1 = ChatMessage()
+                chat_message1.user = request.user
+                chat_message1.message = status
+                chat_message1.save()
+
+            else:
+                chat_message1 = ChatMessage()
+                chat_message1.user = request.user
+                chat_message1.message = get_response(chat_message.message)
+                chat_message1.save()
 
             return redirect('chat_view')
     else:
