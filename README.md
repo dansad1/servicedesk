@@ -17,3 +17,8 @@ docker-compose -f docker-compose.yaml -p service-desk up --build service-desk-my
 # Список групп исполнителей окей
 
 # Переделал статусы
+
+```bash
+
+docker-compose -f docker-compose.yaml -p service-desk up --build service-desk-mysql service-desk-backend chromadb rag-pipeline
+```
