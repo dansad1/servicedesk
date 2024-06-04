@@ -21,18 +21,31 @@
         $('#id_asset_type').change(function() {
             var assetTypeId = $(this).val(); // Получаем ID выбранного типа актива
             if (assetTypeId) {
+                var url = `{% url 'get_attributes_by_asset_type' 9999 %}`.replace('9999', assetTypeId);
                 $.ajax({
-                    url: `{% url 'get_attributes_by_asset_type' 0 %}`.replace('0', assetTypeId),
+                    url: url,
                     success: function(data) {
                         $('#dynamicAttributesContainer').empty(); // Очищаем контейнер
                         data.forEach(function(attr) {
-                            var fieldHtml = '<div><label>' + attr.attribute__name + ':</label>';
-                            // Подбор поля в зависимости от типа атрибута
-                            fieldHtml += '<input type="text" name="attribute_' + attr.id + '_value" class="form-control"';
-                            fieldHtml += ' value="' + (attr.value || '') + '"/>'; // Установить значение, если оно есть
+                            var fieldHtml = '<div class="form-group"><label>' + attr.attribute__name + ':</label>';
+                            switch(attr.attribute__attribute_type) {
+                                case 'text':
+                                    fieldHtml += '<input type="text" name="attributes[' + attr.id + ']" class="form-control"/>';
+                                    break;
+                                case 'number':
+                                    fieldHtml += '<input type="number" name="attributes[' + attr.id + ']" class="form-control"/>';
+                                    break;
+                                case 'date':
+                                    fieldHtml += '<input type="date" name="attributes[' + attr.id + ']" class="form-control"/>';
+                                    break;
+                                // Добавьте другие типы данных по необходимости
+                            }
                             fieldHtml += '</div>';
                             $('#dynamicAttributesContainer').append(fieldHtml);
                         });
+                    },
+                    error: function() {
+                        alert('Не удалось загрузить атрибуты для выбранного типа актива.');
                     }
                 });
             } else {

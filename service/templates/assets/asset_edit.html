@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Редактирование актива "{{ asset.name }}"</h2>
+<form method="post" enctype="multipart/form-data" id="assetForm">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div id="dynamicAttributesContainer">
+        <!-- Динамически загружаемые атрибуты -->
+    </div>
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            <strong>Ошибка!</strong> Пожалуйста, исправьте ошибки ниже.
+        </div>
+    {% endif %}
+    <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+</form>
+<a href="{% url 'asset_list' %}" class="btn btn-secondary">Вернуться к списку активов</a>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        loadAttributes();
+
+        function loadAttributes() {
+            var assetId = "{{ asset.id }}";
+            $.ajax({
+                url: `{% url 'get_attributes_by_asset' asset.id %}`,
+                success: function(data) {
+                    data.forEach(function(attr) {
+                        var fieldHtml = '<div class="form-group"><label>' + attr.attribute_name + ':</label>';
+                        fieldHtml += getInputField(attr);
+                        fieldHtml += '</div>';
+                        $('#dynamicAttributesContainer').append(fieldHtml);
+                    });
+                }
+            });
+        }
+
+        function getInputField(attr) {
+            var fieldHtml = '';
+            switch(attr.attribute_type) {
+                case 'text':
+                    fieldHtml += '<input type="text" name="attributes[' + attr.id + ']" value="' + (attr.value || '') + '" class="form-control"/>';
+                    break;
+                case 'number':
+                    fieldHtml += '<input type="number" name="attributes[' + attr.id + ']" value="' + (attr.value || '') + '" class="form-control"/>';
+                    break;
+                case 'date':
+                    fieldHtml += '<input type="date" name="attributes[' + attr.id + ']" value="' + (attr.value || '') + '" class="form-control"/>';
+                    break;
+                // Добавьте другие типы данных по необходимости
+            }
+            return fieldHtml;
+        }
+    });
+</script>
+{% endblock %}
