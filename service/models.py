@@ -48,35 +48,7 @@ class Company(models.Model):
     class Meta:
         verbose_name = _("компания")
         verbose_name_plural = _("компании")
-    # Общие данные
-    name = models.CharField(_("Название компании"), max_length=255, unique=True)
-    region = models.CharField(_("Регион"), max_length=255, default="Не указан")
-
-    # Контактные данные
-    address = models.CharField(_("Адрес"), max_length=1024, blank=True)
-    phone = models.CharField(_("Телефон"), max_length=20, blank=True)
-    email = models.EmailField(_("Электронная почта"), blank=True)
-    website = models.URLField(_("Веб-сайт"), blank=True)
-
-    # Дополнительные данные
-    description = models.TextField(_("Описание"), blank=True)
-
-    # Новые поля
-    ceo = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='company_ceo',
-                            on_delete=models.SET_NULL, null=True, blank=True,
-                            verbose_name=_("Генеральный директор"))
-    deputy = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='company_deputy',
-                               on_delete=models.SET_NULL, null=True, blank=True,
-                               verbose_name=_("Заместитель генерального директора"))
-    contact_person = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='company_contact_person',
-                                       on_delete=models.SET_NULL, null=True, blank=True,
-                                       verbose_name=_("Контактное лицо"))
-    timezone = models.CharField(_("Часовой пояс"), max_length=50, default='UTC')
-
-    class Meta:
-        verbose_name = _("компания")
-        verbose_name_plural = _("компании")
-
+    
     def __str__(self):
         return self.name
 
@@ -171,13 +143,8 @@ class GroupPermission(models.Model):
     def __str__(self):
         return f"{self.group.name} - {self.custom_permission.name} - {self.access_level}"
 
-
-        return f"{self.group.name} - {self.custom_permission.name} - {self.access_level}"
-
-
 class Status(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    color = ColorField(verbose_name="Color")
     color = ColorField(verbose_name="Color")
     description = models.TextField(blank=True, null=True)
 
@@ -266,8 +233,6 @@ class Comment(models.Model):
         return f'Comment by {self.author.username} on {self.request.title}'
 
 
-
-
 class StatusTransition(models.Model):
     from_status = models.ForeignKey(Status, related_name='from_transitions', on_delete=models.CASCADE)
     to_status = models.ForeignKey(Status, related_name='to_transitions', on_delete=models.CASCADE)
@@ -292,172 +257,6 @@ class SavedFilter(models.Model):
         return self.filter_name
 
 
-class EmailSettings(models.Model):
-    CONNECTION_TYPE_CHOICES = [
-        ('tls', 'TLS'),
-        ('ssl', 'SSL'),
-    ]
-
-    server = models.CharField(max_length=255)
-    port = models.IntegerField()
-    login = models.EmailField()
-    password = models.CharField(max_length=255)
-    email_from = models.EmailField()
-    connection_type = models.CharField(
-        max_length=3,
-        choices=CONNECTION_TYPE_CHOICES,
-        default='tls',
-    )
-
-    def __str__(self):
-        return self.server
-
-    @property
-    def use_tls(self):
-        return self.connection_type == 'tls'
-
-    @property
-    def use_ssl(self):
-        return self.connection_type == 'ssl'
-
-
-from django.db import models
-
-class Event(models.Model):
-    EVENT_CHOICES = [
-        ('create_request', 'Создание заявки'),
-        ('update_request', 'Изменение полей заявки'),
-        ('add_comment', 'Добавление комментария'),
-        ('deadline_expiration', 'Истечение срока заявки'),
-        ('status_change', 'Смена статуса заявки'),
-    ]
-    name = models.CharField(max_length=255, choices=EVENT_CHOICES, unique=True)
-    description = models.TextField()
-
-    def __str__(self):
-        return self.get_name_display()
-
-
-class NotificationSetting(models.Model):
-    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='notification_settings')
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    email_template = models.TextField(blank=True, null=True)  # Пустой шаблон означает неактивное уведомление
-
-    def __str__(self):
-        return f"{self.group.name} - {self.event.name}"
-
-
-class PerformerGroup(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
-    members = models.ManyToManyField(CustomUser, related_name='performer_groups')
-    companies = models.ManyToManyField(Company, related_name='service_groups')
-
-    def __str__(self):
-        return self.name
-
-class AssetType(models.Model):
-    name = models.CharField(max_length=255)
-    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
-
-    def __str__(self):
-        return self.name
-
-
-class Attribute(models.Model):
-    TEXT = 'text'
-    NUMBER = 'number'
-    DATE = 'date'
-    BOOLEAN = 'boolean'
-    EMAIL = 'email'
-    URL = 'url'
-    JSON = 'json'
-    ASSET_REFERENCE = 'asset_ref'
-    ATTRIBUTE_REFERENCE = 'attr_ref'
-
-    ATTRIBUTE_TYPES = [
-        (TEXT, 'Текст'),
-        (NUMBER, 'Число'),
-        (DATE, 'Дата'),
-        (BOOLEAN, 'Логический'),
-        (EMAIL, 'Электронная почта'),
-        (URL, 'Ссылка'),
-        (JSON, 'JSON'),
-        (ASSET_REFERENCE, 'Ссылка на актив'),
-        (ATTRIBUTE_REFERENCE, 'Ссылка на атрибут'),
-    ]
-
-    name = models.CharField(max_length=255)
-    attribute_type = models.CharField(max_length=50, choices=ATTRIBUTE_TYPES)
-
-    def __str__(self):
-        return f"{self.name} ({self.get_attribute_type_display()})"
-
-class Asset(models.Model):
-    name = models.CharField(max_length=255)
-    asset_type = models.ForeignKey(AssetType, on_delete=models.CASCADE, related_name='assets')
-    parent_asset = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='components')
-
-    def __str__(self):
-        return self.name
-
-class AssetTypeAttribute(models.Model):
-    asset_type = models.ForeignKey(AssetType, on_delete=models.CASCADE, related_name='type_attributes')
-    attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"{self.asset_type.name} - {self.attribute.name}"
-
-class AssetAttribute(models.Model):
-    asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name='asset_attributes')
-    attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE)
-    value_text = models.TextField(blank=True, null=True)
-    value_number = models.FloatField(blank=True, null=True)
-    value_date = models.DateField(blank=True, null=True)
-    value_boolean = models.BooleanField(null=True, blank=True)
-    value_email = models.EmailField(null=True, blank=True)
-    value_url = models.URLField(null=True, blank=True)
-    value_json = models.JSONField(null=True, blank=True)
-
-    def __str__(self):
-        return f"{self.attribute.name} for {self.asset.name}: {self.get_value()}"
-
-    def get_value(self):
-        """ Возвращает значение атрибута в зависимости от его типа. """
-        type_map = {
-            Attribute.TEXT: self.value_text,
-            Attribute.NUMBER: self.value_number,
-            Attribute.DATE: self.value_date,
-            Attribute.BOOLEAN: self.value_boolean,  # предполагается, что это поле также добавлено в модель
-            Attribute.EMAIL: self.value_email,  # аналогично
-            Attribute.URL: self.value_url,  # аналогично
-            Attribute.JSON: self.value_json,
-            # JSON поля могут требовать специальной обработки или сериализации/десериализации
-            Attribute.ASSET_REFERENCE: self.value_asset_reference.name if self.value_asset_reference else None,
-            Attribute.ATTRIBUTE_REFERENCE: self.value_attribute_reference.get_value() if self.value_attribute_reference else None,
-        }
-        return type_map.get(self.attribute.attribute_type)
-    
-    
-class ChatMessage(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    message = models.TextField()
-    timestamp = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.message[:50]  # Вывод первых 50 символов сообщения
-
-
-class Doc(models.Model):
-    title = models.CharField(max_length=255)
-    doc_file = models.FileField(upload_to='documents/%Y/%m/%d/')
-    analyzed = models.BooleanField(default=False)
-    text_content = models.TextField(blank=True, null=True)
-    image_urls = models.TextField(blank=True, null=True)
-    tables = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return self.title
 class EmailSettings(models.Model):
     CONNECTION_TYPE_CHOICES = [
         ('tls', 'TLS'),

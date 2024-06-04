@@ -41,6 +41,8 @@ def asset_type_edit(request, pk):
         'attributes': [attr.attribute for attr in attributes]  # Преобразование в список атрибутов
     }
     return render(request, 'asset_types/asset_type_edit.html', context)
+
+
 def asset_type_delete(request, pk):
     asset_type = get_object_or_404(AssetType, pk=pk)
     asset_type.delete()

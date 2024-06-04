@@ -1,8 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Chat Interface</title>
+{% extends "base.html" %}
+{% block content %}
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -59,9 +56,9 @@
             background-color: #4a54e1;
         }
     </style>
-</head>
-<body>
-    <div class="chat-container">
+    <div class="mt-20">
+    <div class="chat-container p-4">
+        <a href="{% url 'home' %}" class="close-button size-10">&times;</a>
         <div class="chat-messages">
             {% for message in messages %}
             <div class="chat-message {% if message.user == request.user %}sent{% else %}received{% endif %}">
@@ -69,10 +66,10 @@
             </div>
             {% endfor %}
         </div>
-        <form method="post" action="{% url 'chat_view' %}" class="chat-input">
+        <form method="post" action="{% url 'chat_view' %}" class="chat-input p-4 flex gap-2 input-group">
             {% csrf_token %}
-            <input type="text" name="message" placeholder="Type your message here..." required>
+            <input type="text" name="message" placeholder="Type your message here..." required class="form-control">
             <button type="submit">Send</button>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

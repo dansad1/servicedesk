@@ -17,14 +17,14 @@ class CustomUserCreationForm(UserCreationForm):
             'address': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Address'}),
             'company': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Company'}),
             'group': forms.Select(attrs={'class': 'form-control'}),
-            'password1': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}),
-            'password2': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password Confirm'}),
+            'password1': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password', 'label': 'Пароль:'}),
+            'password2': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password Confirm', 'label': 'Пароль'}),
         }
     password1 = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'})
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}), label="Пароль"
     )
     password2 = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm Password'})
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm Password', 'label': '123'}), label="Подтверждение пароля"
     )
 
 class CustomUserEditForm(UserChangeForm):
