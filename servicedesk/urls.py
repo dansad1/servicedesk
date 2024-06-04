@@ -17,7 +17,7 @@ from service.views.user_views import user_list,create_user_view,user_delete
 from service.views.settings_views import types_list
 from service.views.settings_views import *
 from service.views.role_views import role_delete
-from service.views.email_notification_views import email_settings_view, notification_overview
+from service.views.email_notification_views import *
 from service.views.perform_views import *
 from service.views.chat_views import *
 from service.views.user_views import CustomLoginView
@@ -146,8 +146,14 @@ urlpatterns = [
     path('reset/done/', service.views.profile_views.CustomPasswordResetCompleteView.as_view(), name='password_reset_complete'),
 
 #уведомления
-    path('notifications/', notification_overview, name='notification_overview'),
+    path('notifications/', notification_table_overview, name='notification_overview'),
+    path('notifications/detail/<int:group_id>/', notification_table_detail, name='notification_detail'),
+    path('templates/<int:pk>/edit/', notification_template_edit, name='template_edit'),
+    path('templates/', notification_template_list, name='template_list'),  # URL для списка шаблонов уведомлений
+ path('templates/create/', notification_template_create, name='template_create'),
+    path('templates/<int:pk>/delete/', notification_template_delete, name='template_delete'),
 ]
+
 
 
 

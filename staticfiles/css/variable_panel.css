@@ -1,0 +1,31 @@
+/* static/css/styles.css */
+
+.variable-panel {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-top: 20px;
+}
+
+.variable-list {
+    height: 200px;
+    overflow-y: scroll;
+}
+
+.variable-category h4 {
+    margin-top: 0;
+}
+
+.variable-category ul {
+    list-style: none;
+    padding: 0;
+}
+
+.variable-category li {
+    cursor: pointer;
+    padding: 5px;
+    border-bottom: 1px solid #eee;
+}
+
+.variable-category li:hover {
+    background-color: #f0f0f0;
+}
