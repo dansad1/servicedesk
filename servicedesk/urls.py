@@ -7,7 +7,7 @@ import service.models
 from service.views.chat_views import chat_view
 from service.views.asset_type_views import *
 from service.views.asset_views import create_asset, edit_asset, delete_asset, asset_list, get_attributes_by_asset_type
-from service.views.attribute_views import attribute_create, attribute_delete, attribute_edit
+from service.views.attribute_views import attribute_create,  attribute_edit
 from service.views.doc_views import upload_document, document_list, analyze_document
 from service.views.file_views import file_view
 from service.views.request_views import *
@@ -89,8 +89,8 @@ urlpatterns = [
     #Роли
     path('role/', service.views.role_views.role_list, name='role_list'),
     path('role/create/', service.views.role_views.role_create, name='role_create'),
-    path('role/<int:group_id>/edit/', service.views.role_views.role_edit, name='role_edit'),
-    path('role/<int:group_id>/delete/', service.views.role_views.role_delete, name='role_delete'),
+    path('role/<int:role_id>/edit/', service.views.role_views.role_edit, name='role_edit'),
+    path('role/<int:role_id>/delete/', service.views.role_views.role_delete, name='role_delete'),
 
 
     path('export_pdf/', service.views.request_views.export_requests_pdf, name='export_pdf'),
@@ -118,7 +118,6 @@ urlpatterns = [
 
     # Маршруты для атрибутов
     path('attributes/edit/<int:pk>/', attribute_edit, name='attribute_edit'),
-    path('attributes/delete/<int:pk>/', attribute_delete, name='attribute_delete'),
     path('asset_types/<int:asset_type_id>/attributes/create/', service.views.attribute_views.attribute_create, name='attribute_create'),
     path('asset-types/<int:asset_type_id>/attributes/', get_attributes_by_asset_type, name='get_attributes_by_asset_type'),
 

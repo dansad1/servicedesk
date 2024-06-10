@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="role">
+    <h1 class='m-auto max-w-4xl p-10 text-4xl text-center'>Редактирование роли {{ group_form.instance.name }}</h1>
+    <div class="button_group p-10">
+        <button id="button_requests" type='button' class="btn active" onclick="showBlock('requests', this)">По заявкам</button>
+        <button class="btn" type="button" onclick="showBlock('users', this)">По пользователям/ группам пользователей</button>
+        <button class="btn" type="button" onclick="showBlock('companies', this)">По компаниям</button>
+        <button class="btn" type="button" onclick="showBlock('roles', this)">По ролям</button>
+        <button class="btn" type="button" onclick="showBlock('assets', this)">По активам</button>
+        <button class="btn" type="button" onclick="showBlock('profile', this)">По профилю</button>
+        <button class="btn" type="button" onclick="showBlock('settings', this)">По настройкам</button>
+        <button class="btn" type="button" onclick="showBlock('interface', this)">По интерфейсу</button>
+    </div>
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group m-auto max-w-5xl mb-5">
+            <label class="mb-2" for="id_name">Название роли:</label>
+            {{ group_form.name }}
+        </div>
+
+        <div id="requests" class="form_style active max-w-5xl м-auto p-10 bg-slate-200">
+            <h2 class="text-2xl">Полномочия по заявкам</h2>
+            <div class="service_authority gap-4 text-xl">
+                {% for permission in permission_form.fields.custompermission.queryset %}
+                    {% if 'requests_' in permission.code_name %}
+                        <div>
+                            <label>
+                                <input type="checkbox" name="custompermission" value="{{ permission.id }}" {% if permission.id in permission_form.initial.custompermission %}checked{% endif %}>
+                                {{ permission.name }}
+                            </label>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl">{{ permission.name }}</h1>
+                            {% for choice in dynamic_fields.access_level_{{ permission.id }}.choices %}
+                                <label>
+                                    <input type="radio" name="access_level_{{ permission.id }}" value="{{ choice.0 }}" {% if choice.0 == permission_form.initial.access_level_{{ permission.id }} %}checked{% endif %}>
+                                    {{ choice.1 }}
+                                </label>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Повторите для других разделов, таких как профиль, настройки и т. д. -->
+        <div id="profile" class="form_style max-w-5xl м-auto p-10 bg-slate-200">
+            <h2 class="text-2xl">Профиль</h2>
+            <div class="service_authority gap-4 text-xl">
+                {% for permission in permission_form.fields.custompermission.queryset %}
+                    {% if 'profile' in permission.code_name %}
+                        <div>
+                            <label>
+                                <input type="checkbox" name="custompermission" value="{{ permission.id }}" {% if permission.id in permission_form.initial.custompermission %}checked{% endif %}>
+                                {{ permission.name }}
+                            </label>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="settings" class="form_style max-w-5xl м-auto p-10 bg-slate-200">
+            <h2 class="text-2xl">Настройки</h2>
+            <div class="service_authority gap-4 text-xl">
+                {% for permission in permission_form.fields.custompermission.queryset %}
+                    {% if 'settings_' в permission.code_name %}
+                        <div>
+                            <label>
+                                <input type="checkbox" name="custompermission" value="{{ permission.id }}" {% if permission.id in permission_form.initial.custompermission %}checked{% endif %}>
+                                {{ permission.name }}
+                            </label>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="users" class="form_style max-w-5xl м-auto p-10 bg-slate-200">
+            <h2 class="text-2xl">Пользователи</h2>
+            <div class="service_authority gap-4 text-xl">
+                {% for permission in permission_form.fields.custompermission.queryset %}
+                    {% if 'users_' в permission.code_name %}
+                        <div>
+                            <label>
+                                <input type="checkbox" name="custompermission" value="{{ permission.id }}" {% if permission.id in permission_form.initial.custompermission %}checked{% endif %}>
+                                {{ permission.name }}
+                            </label>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="companies" class="form_style max-w-5xl м-auto p-10 bg-slate-200">
+            <h2 class="text-2xl">Компании</h2>
+            <div class="service_authority gap-4 text-xl">
+                {% for permission in permission_form.fields.custompermission.queryset %}
+                    {% if 'companies_' в permission.code_name %}
+                        <div>
+                            <label>
+                                <input type="checkbox" name="custompermission" value="{{ permission.id }}" {% if permission.id in permission_form.initial.custompermission %}checked{% endif %}>
+                                {{ permission.name }}
+                            </label>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="roles" class="form_style max-w-5xl м-auto p-10 bg-slate-200">
+            <h2 class="text-2xl">Роли</h2>
+            <div class="service_authority gap-4 text-xl">
+                {% for permission in permission_form.fields.custompermission.queryset %}
+                    {% if 'roles_' в permission.code_name %}
+                        <div>
+                            <label>
+                                <input type="checkbox" name="custompermission" value="{{ permission.id }}" {% if permission.id in permission_form.initial.custompermission %}checked{% endif %}>
+                                {{ permission.name }}
+                            </label>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="assets" class="form_style max-w-5xl м-auto p-10 bg-slate-200">
+            <h2 class="text-2xl">Активы</h2>
+            <div class="service_authority gap-4 text-xl">
+                {% for permission in permission_form.fields.custompermission.queryset %}
+                    {% if 'assets_' в permission.code_name %}
+                        <div>
+                            <label>
+                                <input type="checkbox" name="custompermission" value="{{ permission.id }}" {% if permission.id in permission_form.initial.custompermission %}checked{% endif %}>
+                                {{ permission.name }}
+                            </label>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="interface" class="form_style max-w-5xl м-auto p-10 bg-slate-200">
+            <h2 class="text-2xl">Интерфейс</h2>
+            <div class="service_authority gap-4 text-xl">
+                {% for permission in permission_form.fields.custompermission.queryset %}
+                    {% if 'interface_' в permission.code_name %}
+                        <div>
+                            <label>
+                                <input type="checkbox" name="custompermission" value="{{ permission.id }}" {% if permission.id in permission_form.initial.custompermission %}checked{% endif %}>
+                                {{ permission.name }}
+                            </label>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="max-w-5xl м-auto mt-4">
+            <button class="btn btn-success" type="submit">Сохранить</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function showBlock(blockId, button) {
+        document.querySelectorAll('.form_style').forEach(function(block) {
+            block.classList.remove('active');
+        });
+        document.getElementById(blockId).classList.add('active');
+
+        document.querySelectorAll('.btn').forEach(function(btn) {
+            btn.classList.remove('active');
+        });
+
+        button.classList.add('active');
+    }
+</script>
+
+{% endblock %}

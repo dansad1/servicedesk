@@ -33,7 +33,22 @@ def email_settings_view(request):
 
 
 # Отправка тестового письма
-@require_POST
+def email_settings_view(request):
+    if request.method == 'POST':
+        form = EmailSettingsForm(request.POST)
+        if form.is_valid():
+            form.save()
+            email_settings = EmailSettings.objects.last()
+            form = EmailSettingsForm(instance=email_settings)
+            return render(request, 'settings/email_settings.html', {'form': form, 'success': True})
+    else:
+        email_settings = EmailSettings.objects.last()
+        form = EmailSettingsForm(instance=email_settings)
+
+    return render(request, 'settings/email_settings.html', {'form': form})
+
+
+@csrf_exempt
 def send_test_email(request):
     try:
         email_settings = EmailSettings.objects.last()
@@ -43,7 +58,6 @@ def send_test_email(request):
         test_email = request.POST.get('test_email_to')
         if not test_email:
             return JsonResponse({'success': False, 'error': 'Не указан адрес электронной почты для теста'})
-
 
         # Создание настраиваемого подключения на основе сохраненных настроек
         connection = get_connection(
@@ -67,12 +81,9 @@ def send_test_email(request):
         email.send()
 
         return JsonResponse({'success': True})
-    
+
     except Exception as e:  # Это поймает любые исключения, включая BadHeaderError
-        return JsonResponse({'success': False,
-                             'error': f'Ошибка отправки письма: {e}, {email_settings.email_from, email_settings.login, email_settings.password}'})
-
-
+        return JsonResponse({'success': False, 'error': f'Ошибка отправки письма: {e}'})
 def notification_table_overview(request):
     groups = Group.objects.all().order_by('id')
     events = Event.objects.all().order_by('id')

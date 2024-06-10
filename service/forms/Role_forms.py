@@ -17,35 +17,34 @@ class GroupForm(forms.ModelForm):
         }
 
 class GroupPermissionForm(forms.ModelForm):
-    
     custompermission = forms.ModelMultipleChoiceField(
         queryset=CustomPermission.objects.all(),
         widget=forms.CheckboxSelectMultiple,
         required=False,
         label="Полномочия"
     )
-    
+
     def __init__(self, *args, **kwargs):
+        group = kwargs.get('instance', None)
         super().__init__(*args, **kwargs)
-        for permission in self.fields['custompermission'].queryset:
-            
-            field_name = f'access_level_{permission.id}'
-            self.fields[field_name] = forms.ChoiceField(
-                choices=GroupPermission.ACCESS_LEVEL_CHOICES,
-                initial='personal',  # Установите здесь значение по умолчанию
-                widget=forms.RadioSelect,
-                label=f"Уровень доступа для {permission.code_name}"
-            )
-            
-        requests_2_permissions = self.fields['custompermission'].queryset.filter(code_name="requests_2")
-         # Получить значения id для каждого custompermission с code_name "requests_2"
-        requests_2_permission_ids = list(requests_2_permissions.values_list('id', flat=True))
-        # Установить эти id в качестве значений по умолчанию для поля custompermission
-        self.initial['custompermission'] = requests_2_permission_ids
-    
-    
-    
+
+        if group:
+            group_permissions = GroupPermission.objects.filter(group=group)
+            self.initial['custompermission'] = [gp.custompermission.id for gp in group_permissions]
+
+            for permission in self.fields['custompermission'].queryset:
+                field_name = f'access_level_{permission.id}'
+                self.fields[field_name] = forms.ChoiceField(
+                    choices=GroupPermission._meta.get_field('access_level').choices,
+                    widget=forms.RadioSelect,
+                    required=False,
+                    label=f"Уровень доступа для {permission.name}"
+                )
+
+                for gp in group_permissions:
+                    if gp.custompermission.id == permission.id:
+                        self.initial[field_name] = gp.access_level
+
     class Meta:
         model = GroupPermission
-        fields = ['group', 'custompermission']
-        
+        fields = ['custompermission']

@@ -1,11 +1,18 @@
-{% extends 'settings/settings_sidebar.html' %} {% block settings_content %}
+{% extends 'settings/settings_sidebar.html' %}
+
+{% block settings_content %}
 <main class="settings-content mt-10">
     <h1 class="m-auto max-w-2xl text-center text-4xl p-10">Настройки электронной почты</h1>
-    
-    <div class="max-w-4xl p-10 m-auto rounded-xl bg-slate-200">
-        <form method="post">
+
+    <div class="max-w-4xl p-10 м-auto rounded-xl bg-slate-200">
+        {% if success %}
+            <div class="alert alert-success">
+                Настройки успешно сохранены!
+            </div>
+        {% endif %}
+        <form method="post" id="emailSettingsForm">
             {% csrf_token %}
-            
+
             <div class="form-group">
                 <label for="{{ form.server.id_for_label }}">Сервер:</label>
                 {{ form.server }}
@@ -15,7 +22,7 @@
                     </div>
                 {% endif %}
             </div>
-            
+
             <div class="form-group">
                 <label for="{{ form.port.id_for_label }}">Порт:</label>
                 {{ form.port }}
@@ -25,7 +32,7 @@
                     </div>
                 {% endif %}
             </div>
-            
+
             <div class="form-group">
                 <label for="{{ form.login.id_for_label }}">Логин:</label>
                 {{ form.login }}
@@ -35,7 +42,7 @@
                     </div>
                 {% endif %}
             </div>
-            
+
             <div class="form-group">
                 <label for="{{ form.password.id_for_label }}">Пароль:</label>
                 {{ form.password }}
@@ -45,9 +52,9 @@
                     </div>
                 {% endif %}
             </div>
-            
+
             <div class="form-group">
-                <label for="{{ form.email_from.id_for_label }}">Email от :</label>
+                <label for="{{ form.email_from.id_for_label }}">Email от:</label>
                 {{ form.email_from }}
                 {% if form.email_from.errors %}
                     <div class="invalid-feedback">
@@ -55,7 +62,7 @@
                     </div>
                 {% endif %}
             </div>
-            
+
             <div class="form-group">
                 <label>{{ form.connection_type.label }}</label>
                 <div class="form-check">
@@ -67,7 +74,7 @@
                     {% endif %}
                 </div>
             </div>
-            
+
             <div class="form-group">
                 <label for="{{ form.test_email_to.id_for_label }}">Тестовый Email:</label>
                 {{ form.test_email_to }}
@@ -79,7 +86,8 @@
             </div>
 
             <button type="submit" class="btn btn-primary">Сохранить настройки</button>
-        </form
+        </form>
+
         <!-- Дополнительная кнопка для отправки тестового письма -->
         <button type="button" class="btn btn-success" id="sendTestEmailButton">
             Отправить тестовое письмо
@@ -98,7 +106,8 @@
         }
 
         var data = new FormData(document.getElementById('emailSettingsForm'));
-        fetch('{% url 'send_test_email' %}', {
+        data.append('test_email_to', testEmail); // Ensure test email is part of form data
+        fetch('{% url "send_test_email" %}', {
             method: 'POST',
             body: data,
             credentials: 'same-origin',
@@ -106,22 +115,22 @@
                 'X-CSRFToken': getCookie('csrftoken')
             }
         })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Сетевая ошибка при попытке отправить запрос');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    alert('Тестовое письмо успешно отправлено.');
-                } else {
-                    alert('Ошибка при отправке письма: ' + data.error);
-                }
-            })
-            .catch(error => {
-                alert('Произошла ошибка: ' + error.message);
-            });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Сетевая ошибка при попытке отправить запрос');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                alert('Тестовое письмо успешно отправлено.');
+            } else {
+                alert('Ошибка при отправке письма: ' + data.error);
+            }
+        })
+        .catch(error => {
+            alert('Произошла ошибка: ' + error.message);
+        });
     }
 
     function getCookie(name) {

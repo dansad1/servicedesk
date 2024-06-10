@@ -1,6 +1,8 @@
-{% extends 'base.html' %} {% block content %}
+{{% extends 'base.html' %}
+
+{% block content %}
 <div class="role">
-    <h1 class='m-auto max-w-4xl p-10 text-4xl text-center'>Полномичия для роли {{group.name}}</h1>
+    <h1 class='m-auto max-w-4xl p-10 text-4xl text-center'>Создание новой роли</h1>
     <div class="button_group p-10">
         <button id="button_requests" type='button' class="btn active" onclick="showBlock('requests', this)">По заявкам</button>
         <button class="btn" type="button" onclick="showBlock('users', this)">По пользователям/ группам пользователей</button>
@@ -31,7 +33,7 @@
                                 </label>
                             </div>
                         {% endif %}
-                    
+
                         {% if 'requests_2' in permission.code_name %}
                             <div>
                                 <h1 class="text-2xl">{{ permission.name }}</h1>
@@ -56,16 +58,16 @@
                             </div>
                         {% endif %}
                     {% endfor %}
-            </div>            
+            </div>
         </div>
 
-                
+
 
         <div id="profile" class="form_style max-w-5xl  m-auto p-10 bg-slate-200">
             <h2 class="text-2xl" >Профиль</h2>
             <div class="service_authority gap-4 text-xl">
                 {% for permission in  permission_form.fields.custompermission.queryset %}
-                    
+
                     {% if 'profile' in permission.code_name %}
                     <div>
                         <label>
@@ -123,7 +125,7 @@
                             </label>
                         </div>
                     {% endif %}
-                {% endfor %}   
+                {% endfor %}
                 <h2 class="text-2xl">Настройки SMTP</h2>
                 {% for permission in  permission_form.fields.custompermission.queryset %}
                     {% if 'smtp' in permission.code_name %}
@@ -134,7 +136,7 @@
                             </label>
                         </div>
                     {% endif %}
-                {% endfor %}   
+                {% endfor %}
                 <h2 class="text-2xl">Настройки списка документов</h2>
                 {% for permission in  permission_form.fields.custompermission.queryset %}
                     {% if 'docs' in permission.code_name %}
@@ -145,7 +147,7 @@
                             </label>
                         </div>
                     {% endif %}
-                {% endfor %}   
+                {% endfor %}
                 <h2 class="text-2xl">Настройки обзора уведомлений</h2>
                 {% for permission in  permission_form.fields.custompermission.queryset %}
                     {% if 'notifications' in permission.code_name %}
@@ -156,14 +158,14 @@
                             </label>
                         </div>
                     {% endif %}
-                {% endfor %}                                              
-            </div> 
+                {% endfor %}
+            </div>
         </div>
 
         <div id="users" class="form_style max-w-5xl  m-auto p-10 bg-slate-200">
             <h2 class="text-2xl">Полномочия по пользователям/группам пользователей</h2>
             <div class="service_authority gap-4 text-xl mt-2">
-                {% for permission in  permission_form.fields.custompermission.queryset %}    
+                {% for permission in  permission_form.fields.custompermission.queryset %}
                     {% if 'users_can' in permission.code_name %}
                         <div>
                             <label>
@@ -179,7 +181,7 @@
         <div id="companies" class="form_style max-w-5xl  m-auto p-10 bg-slate-200">
             <h2 class="text-2xl">Полномочия по компаниям</h2>
             <div class="service_authority gap-2 text-xl">
-                {% for permission in  permission_form.fields.custompermission.queryset %}    
+                {% for permission in  permission_form.fields.custompermission.queryset %}
                     {% if 'companies_can' in permission.code_name %}
                         <div>
                             <label>
@@ -189,7 +191,7 @@
                         </div>
                     {% endif %}
                 {% endfor %}
-        
+
                 <h2 class="text-2xl">Полномочия по отделам</h2>
                 {% for permission in  permission_form.fields.custompermission.queryset %}
                     {% if 'departments' in permission.code_name %}
@@ -244,7 +246,7 @@
                         </div>
                     {% endif %}
                 {% endfor %}
-                <h2 class="text-2xl">Полномочия по атрибутам типов активов</h2>    
+                <h2 class="text-2xl">Полномочия по атрибутам типов активов</h2>
                     {% for permission in  permission_form.fields.custompermission.queryset %}
                         {% if 'assets_types_attr' in permission.code_name %}
                             <div>
@@ -255,7 +257,7 @@
                             </div>
                         {% endif %}
                     {% endfor %}
-            </div> 
+            </div>
         </div>
 
         <div id="interface" class="form_style max-w-5xl  m-auto p-10 bg-slate-200">
@@ -271,13 +273,13 @@
                         </div>
                     {% endif %}
                 {% endfor %}
-            </div> 
+            </div>
         </div>
-    
+
         <div class="max-w-5xl m-auto mt-4">
             <button class="btn btn-success" type="submit" >Сохранить</button>
         </div>
-    
+
     </form>
 </div>
 
