@@ -1,4 +1,4 @@
-{{% extends 'base.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
 <div class="role">
@@ -16,53 +16,43 @@
     <form method="post">
         {% csrf_token %}
 
-        <div class="form-group m-auto max-w-5xl mb-5 ">
+        <div class="form-group m-auto max-w-5xl mb-5">
             <label class="mb-2" for="id_name">Название роли:</label>
             {{ group_form.name }}
+            {% if group_form.name.errors %}
+                <div class="alert alert-danger">
+                    {{ group_form.name.errors }}
+                </div>
+            {% endif %}
         </div>
 
-        <div id="requests" class="form_style active max-w-5xl  m-auto p-10 bg-slate-200">
+       <<div id="requests" class="form_style active max-w-5xl м-auto p-10 bg-slate-200">
             <h2 class="text-2xl">Полномочия по заявкам</h2>
             <div class="service_authority gap-4 text-xl">
-                    {% for permission in  permission_form.fields.custompermission.queryset %}
-                        {% if 'requests_1' in permission.code_name %}
-                            <div>
-                                <label>
-                                    <input type="checkbox" name="permissions[]" value="{{ permission.id }}">
-                                    {{ permission.name }}
-                                </label>
-                            </div>
-                        {% endif %}
-
-                        {% if 'requests_2' in permission.code_name %}
-                            <div>
-                                <h1 class="text-2xl">{{ permission.name }}</h1>
-                                <input class="hidden" type="checkbox" name="permissions[]" value="{{permission.id}}" checked>
-                                {% for choice in access_levels_choices %}
-                                    <label>
-                                        <input type="radio" name="access_level_{{ permission.id }}" value="{{ choice.0 }}"
-                                        {% if forloop.first %}checked{% endif %}>
-                                            {{ choice.1 }}
-                                    </label>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-
-                        {% if 'requests_can_add_executors' in permission.code_name %}
-                            <div>
-                                <h1 class="text-2xl">Карточка заявки. Исполнение заявок</h1>
-                                <label>
-                                    <input type="checkbox" name="permissions[]" value="{{ permission.id }}">
-                                    {{ permission.name }}
-                                </label>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
+                {% for permission in permission_form.fields.custompermission.queryset %}
+                    {% if 'requests_' in permission.code_name %}
+                        <div>
+                            <label>
+                                <input type="checkbox" name="custompermission" value="{{ permission.id }}" {% if permission.id in permission_form.initial.custompermission %}checked{% endif %}>
+                                {{ permission.name }}
+                            </label>
+                        </div>
+                    {% endif %}
+                {% endfor %}
             </div>
         </div>
-
-
-
+                    {% if 'requests_can_add_executors' in permission.code_name %}
+                        <div>
+                            <h1 class="text-2xl">Карточка заявки. Исполнение заявок</h1>
+                            <label>
+                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}">
+                                {{ permission.name }}
+                            </label>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
         <div id="profile" class="form_style max-w-5xl  m-auto p-10 bg-slate-200">
             <h2 class="text-2xl" >Профиль</h2>
             <div class="service_authority gap-4 text-xl">
@@ -276,35 +266,26 @@
             </div>
         </div>
 
-        <div class="max-w-5xl m-auto mt-4">
-            <button class="btn btn-success" type="submit" >Сохранить</button>
-        </div>
 
+        <div class="max-w-5xl м-auto mt-4">
+            <button class="btn btn-success" type="submit">Создать</button>
+        </div>
     </form>
 </div>
 
 <script>
     function showBlock(blockId, button) {
         document.querySelectorAll('.form_style').forEach(function(block) {
-            block.classList.remove('active');
+            block.style.display = 'none';
         });
-        document.getElementById(blockId).classList.add('active');
+        document.getElementById(blockId).style.display = 'block';
 
         document.querySelectorAll('.btn').forEach(function(btn) {
             btn.classList.remove('active');
         });
 
-        // Добавить активный класс к нажатой кнопке
         button.classList.add('active');
     }
-
 </script>
 
-{% comment %}
-<h2>{{ group.id|default:"Создание" }} Роли</h2>
-<form method="post">
-  {% csrf_token %} {{ form.as_p }}
-
-  <button type="submit">Сохранить</button>
-</form>
-{% endcomment %} {% endblock %}
+{% endblock %}

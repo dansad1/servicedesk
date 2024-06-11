@@ -6,13 +6,22 @@ def create_permissions(apps, schema_editor):
     # Полномочия для заявок
     CustomPermission.objects.create(code_name="requests_1_can_create", name="Создавать заявки")
     CustomPermission.objects.create(code_name="requests_1_can_delete", name="Удалять заявки")
-    
-    # Просмотр заявок
-    CustomPermission.objects.create(code_name="requests_2_can_view", name="Просматривать заявки")
-    
+
+    CustomPermission.objects.create(code_name="requests_view_personal", name="Просматривать свои заявки")
+    CustomPermission.objects.create(code_name="requests_view_department", name="Просматривать заявки своего отдела")
+    CustomPermission.objects.create(code_name="requests_view_department_with_subs",
+                                    name="Просматривать заявки своего отдела с дочерними")
+    CustomPermission.objects.create(code_name="requests_view_company", name="Просматривать заявки своей компании")
+    CustomPermission.objects.create(code_name="requests_view_global", name="Просматривать все заявки")
+
     # Редактирование заявок
-    CustomPermission.objects.create(code_name="requests_2_can_edit", name="Редактировать заявки")
-    
+    CustomPermission.objects.create(code_name="requests_edit_personal", name="Редактировать свои заявки")
+    CustomPermission.objects.create(code_name="requests_edit_department", name="Редактировать заявки своего отдела")
+    CustomPermission.objects.create(code_name="requests_edit_department_with_subs",
+                                    name="Редактировать заявки своего отдела с дочерними")
+    CustomPermission.objects.create(code_name="requests_edit_company", name="Редактировать заявки своей компании")
+    CustomPermission.objects.create(code_name="requests_edit_global", name="Редактировать все заявки")
+
     # Назначать исполнителей
     CustomPermission.objects.create(code_name="requests_can_add_executors", name="Назначать исполнителей и группы исполнителей")
     
@@ -51,29 +60,29 @@ def create_permissions(apps, schema_editor):
     CustomPermission.objects.create(code_name="profile_can_edit", name="Редактировать свой профиль")
     
     # Полномочия по настройкам
-    CustomPermission.objects.create(code_name="requests_types_can_create", name="Создавать типы заявок")
-    CustomPermission.objects.create(code_name="requests_types_can_edit", name="Редактировать типы заявок")
-    CustomPermission.objects.create(code_name="requests_types_can_delete", name="Удалять типы заявок")
+    CustomPermission.objects.create(code_name="settings_requests_types_can_create", name="Создавать типы заявок")
+    CustomPermission.objects.create(code_name="settings_requests_types_can_edit", name="Редактировать типы заявок")
+    CustomPermission.objects.create(code_name="settings_requests_types_can_delete", name="Удалять типы заявок")
     
-    CustomPermission.objects.create(code_name="requests_priority_can_create", name="Создавать приоритеты заявок")
-    CustomPermission.objects.create(code_name="requests_priority_can_edit", name="Редактировать приоритеты заявок")
-    CustomPermission.objects.create(code_name="requests_priority_can_delete", name="Удалять типы заявок")
+    CustomPermission.objects.create(code_name="settings_requests_priority_can_create", name="Создавать приоритеты заявок")
+    CustomPermission.objects.create(code_name="settings_requests_priority_can_edit", name="Редактировать приоритеты заявок")
+    CustomPermission.objects.create(code_name="settings_requests_priority_can_delete", name="Удалять типы заявок")
     
-    CustomPermission.objects.create(code_name="status_list_can_create", name="Создавать списки статусов")
-    CustomPermission.objects.create(code_name="status_list_can_edit", name="Редактировать списки статусов")
-    CustomPermission.objects.create(code_name="status_list_can_delete", name="Удалять списки статусов")
+    CustomPermission.objects.create(code_name="settings_status_list_can_create", name="Создавать списки статусов")
+    CustomPermission.objects.create(code_name="settings_status_list_can_edit", name="Редактировать списки статусов")
+    CustomPermission.objects.create(code_name="settings_status_list_can_delete", name="Удалять списки статусов")
     
-    CustomPermission.objects.create(code_name="status_trans_can_create", name="Создавать переходы статусов")
+    CustomPermission.objects.create(code_name="settings_status_trans_can_create", name="Создавать переходы статусов")
     #CustomPermission.objects.create(code_name="can_edit_status_trans", name="Can Edit Status List")
-    CustomPermission.objects.create(code_name="status_tran_can_delete", name="Удалять переходы статусов")
+    CustomPermission.objects.create(code_name="settings_status_tran_can_delete", name="Удалять переходы статусов")
     
-    CustomPermission.objects.create(code_name="smtp_can_show", name="Показывать настройки SMTP")
+    CustomPermission.objects.create(code_name="settings_smtp_can_show", name="Показывать настройки SMTP")
     
     
-    CustomPermission.objects.create(code_name="docs_can_show", name="Показывать списки документов")
-    CustomPermission.objects.create(code_name="docs_can_download", name="Загружать документы")
+    CustomPermission.objects.create(code_name="settings_docs_can_show", name="Показывать списки документов")
+    CustomPermission.objects.create(code_name="settings_docs_can_download", name="Загружать документы")
     
-    CustomPermission.objects.create(code_name="notifications_can_show", name="Показывать обзор уведомлений")
+    CustomPermission.objects.create(code_name="settings_notifications_can_show", name="Показывать обзор уведомлений")
     
     # Полномочия по интерфейсу
     CustomPermission.objects.create(code_name="interface_can_view_assets", name='Показывать раздел "Список заявок"')
