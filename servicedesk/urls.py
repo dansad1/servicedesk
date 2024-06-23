@@ -16,7 +16,7 @@ from service.views.profile_views import *
 from service.views.user_views import user_list,create_user_view,user_delete
 from service.views.settings_views import types_list
 from service.views.settings_views import *
-from service.views.role_views import role_delete
+from service.views.role_views import role_delete, role_edit
 from service.views.email_notification_views import *
 from service.views.perform_views import *
 from service.views.chat_views import *
@@ -89,8 +89,8 @@ urlpatterns = [
     #Роли
     path('role/', service.views.role_views.role_list, name='role_list'),
     path('role/create/', service.views.role_views.role_create, name='role_create'),
-    path('role/<int:role_id>/edit/', service.views.role_views.role_edit, name='role_edit'),
-    path('role/<int:role_id>/delete/', service.views.role_views.role_delete, name='role_delete'),
+    path('role/<int:group_id>/edit/', service.views.role_views.role_edit, name='role_edit'),
+    path('role/<int:group_id>/delete/', service.views.role_views.role_delete, name='role_delete'),
 
 
     path('export_pdf/', service.views.request_views.export_requests_pdf, name='export_pdf'),

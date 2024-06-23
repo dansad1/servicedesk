@@ -1,89 +1,99 @@
 from django.contrib import messages
-from django.contrib import messages
 from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth.models import Group, Permission
-from django.contrib.auth.models import Group, Permission
-from ..models import GroupPermission, CustomPermission
 from service.forms.Role_forms import *
 
 
-def role_create(request):
-    if request.method == 'POST':
-        form = GroupForm(request.POST)
+def role_create(request, group_id=None):
+    if group_id:
+        group = get_object_or_404(Group, id=group_id)
+    else:
+        group = None
+
+    if request.method == "POST":
+        group_form = GroupForm(request.POST, instance=group)
         permission_form = GroupPermissionForm(request.POST)
 
-        if form.is_valid() and permission_form.is_valid():
-            role = form.save()
-            selected_permissions = permission_form.cleaned_data['custompermission']
-            role.permissions.set(selected_permissions)
+        print("POST data:", request.POST)
 
-            for permission in selected_permissions:
-                access_level = permission_form.cleaned_data.get(f'access_level_{permission.id}', 'personal')
+        if group_form.is_valid():
+            group = group_form.save()
+            permissions = request.POST.getlist('permissions[]')
+
+            for permission in permissions:
+                access_level_field_name = f'access_level_{permission}'
+                access_level = request.POST.get(access_level_field_name)
+                custompermission = CustomPermission.objects.get(id=permission)
+                if access_level == None:
+                    access_level = 'personal'
                 GroupPermission.objects.create(
-                    group=role,
-                    custompermission=permission,
+                    group=group,
+                    custompermission=custompermission,
                     access_level=access_level
                 )
-
             return redirect('role_list')
     else:
-        form = GroupForm()
+        group_form = GroupForm(instance=group)
         permission_form = GroupPermissionForm()
 
-    context = {
-        'group_form': form,
+    return render(request, 'role/role_create_edit.html', {
+        'group_form': group_form,
         'permission_form': permission_form,
-    }
-    return render(request, 'role/role_create.html', context)
+        'group': group,
+        'access_levels_choices': GroupPermission.ACCESS_LEVEL_CHOICES
+    })
 
 
-def role_edit(request, role_id):
-    role = get_object_or_404(Group, id=role_id)
+# Редактирование роли
+def role_edit(request, group_id):
+    group = get_object_or_404(Group, id=group_id)
 
     if request.method == 'POST':
-        form = GroupForm(request.POST, instance=role)
-        permission_form = GroupPermissionForm(request.POST, instance=role)
+        group_form = GroupForm(request.POST, instance=group)
+        permission_form = GroupPermissionForm(request.POST)
 
-        if form.is_valid() and permission_form.is_valid():
-            role = form.save()
-            selected_permissions = permission_form.cleaned_data['custompermission']
-            role.permissions.set(selected_permissions)
+        if group_form.is_valid():
+            group = group_form.save()
 
-            for permission in selected_permissions:
-                access_level = permission_form.cleaned_data.get(f'access_level_{permission.id}', 'personal')
-                GroupPermission.objects.update_or_create(
-                    group=role,
-                    custompermission=permission,
-                    defaults={'access_level': access_level}
-                )
+            # Удаление старых разрешений перед сохранением новых
+            GroupPermission.objects.filter(group=group).delete()
+
+            permissions = request.POST.getlist('permissions[]')
+
+            for permission_id in permissions:
+                try:
+                    custompermission = CustomPermission.objects.get(id=permission_id)
+                    access_level_field_name = f'access_level_{custompermission.id}'
+                    access_level = request.POST.get(access_level_field_name, 'personal')
+
+                    GroupPermission.objects.create(
+                        group=group,
+                        custompermission=custompermission,
+                        access_level=access_level
+                    )
+                except CustomPermission.DoesNotExist:
+                    # Обработка случая, если разрешение не найдено
+                    # logger.warning(f"Permission with id {permission_id} does not exist.")
+                    continue
 
             return redirect('role_list')
+
     else:
-        form = GroupForm(instance=role)
-        permission_form = GroupPermissionForm(instance=role)
+        group_form = GroupForm(instance=group)
+        permission_form = GroupPermissionForm()
 
-    # Подготовка динамических полей для шаблона
-    dynamic_fields = []
-    for permission in permission_form.fields['custompermission'].queryset:
-        field_name = f'access_level_{permission.id}'
-        dynamic_fields.append({
-            'permission': permission,
-            'field': permission_form[field_name],
-            'choices': permission_form.fields[field_name].choices,
-            'initial': permission_form.initial.get(field_name, 'personal')
-        })
-
-    context = {
-        'group_form': form,
+    return render(request, 'role/role_create_edit.html', {
+        'group_form': group_form,
         'permission_form': permission_form,
-        'dynamic_fields': dynamic_fields,
-    }
-    return render(request, 'role/role_edit.html', context)
+        'group': group,
+        'access_levels_choices': GroupPermission.ACCESS_LEVEL_CHOICES
+    })
+
+
 # Вывод списка ролей
 def role_list(request):
     groups = Group.objects.all()
     return render(request, 'role/role_list.html', {'groups': groups})
-
 
 
 # Удаление ролей

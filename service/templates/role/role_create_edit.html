@@ -1,8 +1,6 @@
-{{% extends 'base.html' %}
-
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 <div class="role">
-    <h1 class='m-auto max-w-4xl p-10 text-4xl text-center'>Создание новой роли</h1>
+    <h1 class='m-auto max-w-4xl p-10 text-4xl text-center'>Полномичия для роли {{group.name}}</h1>
     <div class="button_group p-10">
         <button id="button_requests" type='button' class="btn active" onclick="showBlock('requests', this)">По заявкам</button>
         <button class="btn" type="button" onclick="showBlock('users', this)">По пользователям/ группам пользователей</button>
