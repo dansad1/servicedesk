@@ -1,68 +1,198 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2 class="m-auto max-w-4xl text-center text-4xl p-10">Редактирование группы: {{ group.name }}</h2>
+<link href="https://cdn.jsdelivr.net/npm/select2/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2/dist/js/select2.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
 
 <div class="container mt-3 max-w-4xl m-auto bg-slate-200 p-10 rounded-xl">
+    <h2 class="text-center text-4xl p-10">Редактирование группы: {{ group.name }}</h2>
     <form method="post" novalidate>
         {% csrf_token %}
+        {{ form.non_field_errors }}
+
         <div class="form-group">
             <label class="py-2 text-2xl" for="{{ form.name.id_for_label }}">Название группы:</label>
             {{ form.name }}
+            {{ form.name.errors }}
         </div>
+
         <div class="form-group">
-            <label class="py-2 text-2xl" for="{{ form.description.id_for_label }}">Описание:</label>
+            <label class="py-2 text-2xl" for="{{ form.description.id_for_label }}">Описание группы:</label>
             {{ form.description }}
+            {{ form.description.errors }}
         </div>
 
-        <h3 class="my-3 text-2xl">Выберите пользователей:</h3>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th class="text-center">Выбор</th>
-                    <th class="text-center">Имя пользователя</th>
-                    <th class="text-center">Email</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for user in custom_users %}
-                <tr class="align-middle">
-                    <td class="text-center">
-                        <input class="border-black form-check-input" type="checkbox" name="selected_members" value="{{ user.id }}"
-                               {% if user.id in selected_member_ids %} checked {% endif %}>
-                    </td>
-                    <td class="text-center">{{ user.username }}</td>
-                    <td class="text-center">{{ user.email }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <input type="hidden" id="selectedUsers" name="selected_users" value="{% if request.POST.selected_users %}{{ request.POST.selected_users }}{% else %}{% for user in selected_member_ids %}{{ user }} {% endfor %}{% endif %}">
+        <input type="hidden" id="selectedCompanies" name="selected_companies" value="{% if request.POST.selected_companies %}{{ request.POST.selected_companies }}{% else %}{% for company in selected_company_ids %}{{ company }} {% endfor %}{% endif %}">
 
-        <h3 class="my-3 text-2xl">Выберите компании:</h3>
-        <table class="table">
-            <thead>
-                <tr >
-                    <th class="text-center">Выбор</th>
-                    <th class="text-center">Название компании</th>
-                    <th class="text-center">Адрес</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for company in companies %}
-                <tr class="align-middle">
-                    <td class="text-center ">
-                        <input class="border-black form-check-input" type="checkbox" name="selected_companies" value="{{ company.id }}"
-                               {% if company.id in selected_company_ids %} checked {% endif %}>
-                    </td>
-                    <td class="text-center">{{ company.name }}</td>
-                    <td class="text-center">{{ company.address }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <h3 class="my-3 text-2xl">Выбранные пользователи:</h3>
+        <div id="selectedUsersList" class="mb-3">
+            <!-- Здесь будет отображаться список выбранных пользователей -->
+        </div>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#selectUsersModal">Выбрать пользователей</button>
 
-        <button type="submit" class="btn btn-success">Сохранить изменения</button>
-        <button onclick="window.location.href='{% url 'performer_group_list' %}'" type="button" class="btn btn-secondary">Назад к списку</button>
+        <h3 class="my-3 text-2xl">Выбранные компании:</h3>
+        <div id="selectedCompaniesList" class="mb-3">
+            <!-- Здесь будет отображаться список выбранных компаний -->
+        </div>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#selectCompaniesModal">Выбрать компании</button>
+
+        <button type="submit" class="btn btn-success mt-3">Сохранить изменения</button>
+        <button onclick="window.location.href='{% url 'performer_group_list' %}'" type="button" class="btn btn-secondary mt-3">Назад к списку</button>
     </form>
 </div>
+
+<!-- Модальное окно для выбора пользователей -->
+<div class="modal fade" id="selectUsersModal" tabindex="-1" aria-labelledby="selectUsersModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="selectUsersModalLabel">Выберите пользователей</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <table id="usersTable" class="display">
+          <thead>
+            <tr>
+              <th class="text-center">Выбор</th>
+              <th class="text-center">Имя пользователя</th>
+              <th class="text-center">Email</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in custom_users %}
+            <tr class="align-middle">
+              <td class="text-center"><input class="form-check-input user-checkbox" type="checkbox" name="members" value="{{ user.id }}" data-username="{{ user.username }}" data-email="{{ user.email }}" {% if user.id in selected_member_ids %} checked {% endif %}></td>
+              <td class="text-center">{{ user.username }}</td>
+              <td class="text-center">{{ user.email }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Модальное окно для выбора компаний -->
+<div class="modal fade" id="selectCompaniesModal" tabindex="-1" aria-labelledby="selectCompaniesModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="selectCompaniesModalLabel">Выберите компании</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <table id="companiesTable" class="display">
+          <thead>
+            <tr>
+              <th class="text-center">Выбор</th>
+              <th class="text-center">Название компании</th>
+              <th class="text-center">Адрес</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for company in companies %}
+            <tr class="align-middle">
+              <td class="text-center"><input class="form-check-input company-checkbox" type="checkbox" name="companies" value="{{ company.id }}" data-name="{{ company.name }}" data-address="{{ company.address }}" {% if company.id in selected_company_ids %} checked {% endif %}></td>
+              <td class="text-center">{{ company.name }}</td>
+              <td class="text-center">{{ company.address }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Инициализация DataTables
+    $('#usersTable').DataTable({
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Russian.json"
+        }
+    });
+
+    $('#companiesTable').DataTable({
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Russian.json"
+        }
+    });
+
+    function updateSelectedList(selector, listId, itemNameAttr, hiddenFieldId) {
+        const selectedItems = document.querySelectorAll(selector + ':checked');
+        const selectedList = document.getElementById(listId);
+        const hiddenField = document.getElementById(hiddenFieldId);
+        selectedList.innerHTML = '';
+        let selectedValues = '';
+        selectedItems.forEach(item => {
+            const itemName = item.getAttribute(itemNameAttr);
+            const itemId = item.value;
+            const listItem = document.createElement('div');
+            listItem.classList.add('selected-item', 'mb-2');
+            listItem.innerHTML = `<span>${itemName}</span> <button type="button" class="btn btn-danger btn-sm ml-2 remove-item" data-id="${itemId}" data-type="${selector.substring(1)}">&times;</button>`;
+            selectedList.appendChild(listItem);
+            selectedValues += itemId + ' ';
+        });
+        hiddenField.value = selectedValues.trim();
+    }
+
+    document.querySelectorAll('.user-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            updateSelectedList('.user-checkbox', 'selectedUsersList', 'data-username', 'selectedUsers');
+        });
+    });
+
+    document.querySelectorAll('.company-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            updateSelectedList('.company-checkbox', 'selectedCompaniesList', 'data-name', 'selectedCompanies');
+        });
+    });
+
+    document.getElementById('selectedUsersList').addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-item')) {
+            const id = e.target.getAttribute('data-id');
+            document.querySelector(`.user-checkbox[value="${id}"]`).checked = false;
+            updateSelectedList('.user-checkbox', 'selectedUsersList', 'data-username', 'selectedUsers');
+        }
+    });
+
+    document.getElementById('selectedCompaniesList').addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-item')) {
+            const id = e.target.getAttribute('data-id');
+            document.querySelector(`.company-checkbox[value="${id}"]`).checked = false;
+            updateSelectedList('.company-checkbox', 'selectedCompaniesList', 'data-name', 'selectedCompanies');
+        }
+    });
+
+    // Инициализация списков при загрузке страницы
+    const selectedUsers = document.getElementById('selectedUsers').value.split(' ');
+    selectedUsers.forEach(id => {
+        if (id) {
+            document.querySelector(`.user-checkbox[value="${id}"]`).checked = true;
+        }
+    });
+    updateSelectedList('.user-checkbox', 'selectedUsersList', 'data-username', 'selectedUsers');
+
+    const selectedCompanies = document.getElementById('selectedCompanies').value.split(' ');
+    selectedCompanies.forEach(id => {
+        if (id) {
+            document.querySelector(`.company-checkbox[value="${id}"]`).checked = true;
+        }
+    });
+    updateSelectedList('.company-checkbox', 'selectedCompaniesList', 'data-name', 'selectedCompanies');
+});
+</script>
+
 {% endblock %}

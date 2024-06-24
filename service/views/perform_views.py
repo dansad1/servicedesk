@@ -2,7 +2,6 @@ from service.forms.Performer_forms import *
 from service.models import PerformerGroup, Company, CustomUser
 from django.shortcuts import render, redirect, get_object_or_404
 
-# TODO разобраться что это и расписать комментарии
 
 
 def performer_group_list(request):
@@ -16,56 +15,52 @@ def performer_group_create(request):
         form = PerformerGroupForm(request.POST)
         if form.is_valid():
             group = form.save(commit=False)
-            # Manually process 'members' and 'companies' fields
-            selected_members = request.POST.getlist('selected_members')  # Names of your checkboxes
-            selected_companies = request.POST.getlist('selected_companies')
             group.save()
-            group.members.set(selected_members)
-            group.companies.set(selected_companies)
+            members_ids = request.POST.get('selected_users', '').split()
+            companies_ids = request.POST.get('selected_companies', '').split()
+            group.members.set(members_ids)
+            group.companies.set(companies_ids)
             return redirect('performer_group_list')
     else:
         form = PerformerGroupForm()
-
     custom_users = CustomUser.objects.all()
     companies = Company.objects.all()
-    context = {
+    selected_member_ids = request.POST.get('selected_users', '').split()
+    selected_company_ids = request.POST.get('selected_companies', '').split()
+    return render(request, 'performer_group/performer_group_create.html', {
         'form': form,
         'custom_users': custom_users,
-        'companies': companies
-    }
-    return render(request, 'performer_group/performer_group_create.html', context)
-
+        'companies': companies,
+        'selected_member_ids': selected_member_ids,
+        'selected_company_ids': selected_company_ids
+    })
 
 def performer_group_update(request, pk):
     group = get_object_or_404(PerformerGroup, pk=pk)
     if request.method == 'POST':
         form = PerformerGroupForm(request.POST, instance=group)
         if form.is_valid():
-            # Сохраняем изменения без коммита в базу данных
-            updated_group = form.save(commit=False)
-            updated_group.save()  # Сохраняем объект группы
-
-            # Обработка выбранных пользователей
-            selected_members = request.POST.getlist('selected_members')  # Имена ваших чекбоксов
-            selected_companies = request.POST.getlist('selected_companies')  # Имена ваших чекбоксов
-            # Устанавливаем выбранных пользователей и компании
-            updated_group.members.set(selected_members)
-            updated_group.companies.set(selected_companies)
-            # Перенаправляем на страницу со списком групп
+            group = form.save(commit=False)
+            group.save()
+            members_ids = request.POST.get('selected_users', '').split()
+            companies_ids = request.POST.get('selected_companies', '').split()
+            group.members.set(members_ids)
+            group.companies.set(companies_ids)
             return redirect('performer_group_list')
     else:
         form = PerformerGroupForm(instance=group)
-
     custom_users = CustomUser.objects.all()
     companies = Company.objects.all()
-    context = {
+    selected_member_ids = request.POST.get('selected_users', '') or group.members.values_list('id', flat=True)
+    selected_company_ids = request.POST.get('selected_companies', '') or group.companies.values_list('id', flat=True)
+    return render(request, 'performer_group/performer_group_update.html', {
         'form': form,
         'group': group,
         'custom_users': custom_users,
-        'companies': companies
-    }
-    return render(request, 'performer_group/performer_group_update.html', context)
-
+        'companies': companies,
+        'selected_member_ids': selected_member_ids,
+        'selected_company_ids': selected_company_ids
+    })
 
 def performer_group_delete(request, pk):
     group = get_object_or_404(PerformerGroup, pk=pk)

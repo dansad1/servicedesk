@@ -18,12 +18,8 @@ class GroupForm(forms.ModelForm):
         model = Group
         fields = ['name']
         widgets = {
-            'name': TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Введите название роли'
-            })
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите название роли'})
         }
-
 
 class GroupPermissionForm(forms.ModelForm):
     custompermission = forms.ModelMultipleChoiceField(
@@ -39,15 +35,13 @@ class GroupPermissionForm(forms.ModelForm):
             field_name = f'access_level_{permission.id}'
             self.fields[field_name] = forms.ChoiceField(
                 choices=GroupPermission.ACCESS_LEVEL_CHOICES,
-                initial='personal',  # Установите здесь значение по умолчанию
+                initial='personal',
                 widget=forms.RadioSelect,
                 label=f"Уровень доступа для {permission.code_name}"
             )
 
         requests_2_permissions = self.fields['custompermission'].queryset.filter(code_name="requests_2")
-        # Получить значения id для каждого custompermission с code_name "requests_2"
         requests_2_permission_ids = list(requests_2_permissions.values_list('id', flat=True))
-        # Установить эти id в качестве значений по умолчанию для поля custompermission
         self.initial['custompermission'] = requests_2_permission_ids
 
     class Meta:
