@@ -11,12 +11,4 @@ class MessageForm(forms.ModelForm):
         }
 
 
-class DocumentUploadForm(forms.ModelForm):
-    class Meta:
-        model = Doc
-        fields = ('title', 'doc_file',)
-        
-        widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите заголовок документа'}),
-            'doc_file': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
-        }
+

@@ -1,49 +1,62 @@
-{% extends "base.html" %}
+{{% extends "base.html" %}
 
 {% block content %}
 <h2 class="m-auto max-w-4xl text-center text-4xl p-10">Список активов</h2>
-<table class="table">
-  <thead>
-    <tr>
-      <th class="text-center">Имя актива</th>
-      <th class="text-center">Тип актива</th>
-      <th class="text-center">Родительский актив</th>
-      <th class="text-center">Действия</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for asset in assets %}
-    <tr class="align-middle">
-      <td class="text-center">{{ asset.name }}</td>
-      <td class="text-center">
-        <a href="{% url 'asset_type_edit' asset.asset_type.id %}"> <span class="badge text-bg-success px-8 py-2 hover:scale-110">{{ asset.asset_type.name }} </span></a>
-      </td>
-      <td class="text-center">{{ asset.parent_asset.name|default:"N/A" }}</td>
-      <td class="flex justify-evenly ">
-        <button onclick="window.location.href='{% url 'edit_asset' asset.id %}'" type="button" class="btn btn-primary" href="{% url 'edit_asset' asset.id %}" >Редактировать</button>
-        <form id="delete-form-{{ asset.id }}" action="{% url 'delete_asset' asset.id %}" method="post" class="mb-0" style="display: inline;">
-          {% csrf_token %}
-          <button type="button" class="btn btn-danger" onclick="confirmDelete({{ asset.id }})">Удалить</button>
-      </form>
-      </td>
-    </tr>
-    {% empty %}
-    <tr>
-      <td colspan="4">Активы не найдены.</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<form id="delete-form" method="post" action="{% url 'delete_asset' %}">
+  {% csrf_token %}
+  <table id="assetsTable" class="table">
+    <thead>
+      <tr>
+        <th class="text-center"><input type="checkbox" id="select-all"></th>
+        <th class="text-center">Имя актива</th>
+        <th class="text-center">Тип актива</th>
+        <th class="text-center">Родительский актив</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for asset in assets %}
+      <tr class="align-middle">
+        <td class="text-center"><input type="checkbox" name="selected_assets" value="{{ asset.id }}"></td>
+        <td class="text-center"><a href="{% url 'edit_asset' asset.id %}">{{ asset.name }}</a></td>
+        <td class="text-center">
+          <a href="{% url 'asset_type_edit' asset.asset_type.id %}"><span class="badge text-bg-success px-8 py-2 hover:scale-110">{{ asset.asset_type.name }}</span></a>
+        </td>
+        <td class="text-center">{{ asset.parent_asset.name|default:"N/A" }}</td>
+        <td class="flex justify-evenly">
+
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5">Активы не найдены.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <button type="submit" class="btn btn-danger mb-3">Удалить выбранные активы</button>
+</form>
 <button onclick="window.location.href='{% url 'create_asset' %}'" type="button" class="btn btn-success">Добавить новый актив</button>
 <button onclick="window.location.href='{% url 'asset_type_list' %}'" type="button" class="btn btn-secondary">Посмотреть типы активов</button>
 
 <script>
-  function confirmDelete(assetId) {
-      const isConfirmed = confirm('Вы уверены?');
-      if (isConfirmed) {
-          document.getElementById('delete-form-' + assetId).submit();
-      }
-  }
-  </script>
+  // Select all checkboxes
+  document.getElementById('select-all').addEventListener('click', function(event) {
+    var isChecked = event.target.checked;
+    var checkboxes = document.querySelectorAll('input[name="selected_assets"]');
+    checkboxes.forEach(function(checkbox) {
+      checkbox.checked = isChecked;
+    });
+  });
+</script>
+
+<!-- Подключение DataTables -->
+<link href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    $('#assetsTable').DataTable();
+});
+</script>
 
 {% endblock %}

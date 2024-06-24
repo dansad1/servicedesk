@@ -3,6 +3,8 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse
 from service.forms.Asset_Forms import AssetForm
 from service.models import AssetAttribute, Attribute, Asset, AssetTypeAttribute
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 
 # Создание актива
@@ -62,16 +64,22 @@ def edit_asset(request, pk):
     else:
         form = AssetForm(instance=asset)
 
-    return render(request, 'assets/edit_asset.html', {
+    return render(request, 'assets/asset_edit.html', {
         'form': form,
         'asset': asset
     })
 
 # Функция удаления актива
-def delete_asset(request, pk):
-    asset = get_object_or_404(Asset, pk=pk)
-    asset.delete()
-    return redirect("assets_list")
+@login_required
+def delete_asset(request):
+    if request.method == 'POST':
+        asset_ids = request.POST.getlist('selected_assets')
+        if asset_ids:
+            Asset.objects.filter(id__in=asset_ids).delete()
+            messages.success(request, 'Выбранные активы были удалены.')
+        else:
+            messages.warning(request, 'Пожалуйста, выберите хотя бы один актив для удаления.')
+    return redirect('asset_list')
 
 # Функция вывода списка активов
 def asset_list(request):

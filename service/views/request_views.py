@@ -216,17 +216,16 @@ def request_list(request):
     })
     
     
-def request_delete(request, pk):
-    request_instance = get_object_or_404(Request, pk=pk)
-
+@login_required
+def request_delete(request):
     if request.method == 'POST':
-        request_instance.delete()
-        messages.success(request, "Заявка успешно удалена.")
-        return redirect('request_list')
-
-    # Нет необходимости в отдельном шаблоне для подтверждения удаления
+        request_ids = request.POST.getlist('selected_requests')
+        if request_ids:
+            Request.objects.filter(id__in=request_ids).delete()
+            messages.success(request, 'Выбранные заявки были удалены.')
+        else:
+            messages.warning(request, 'Пожалуйста, выберите хотя бы одну заявку для удаления.')
     return redirect('request_list')
-
 
 pdfmetrics.registerFont(
     TTFont('Arial', 'staticfiles/fonts/ArialRegular.ttf'))  # Убедитесь, что файл шрифта находится в указанной директории

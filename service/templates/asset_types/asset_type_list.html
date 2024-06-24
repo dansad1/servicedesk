@@ -1,30 +1,48 @@
-{% extends "base.html" %}
+{{% extends "base.html" %}
 
 {% block content %}
 <h2 class="text-center max-w-2xl text-4xl p-10 m-auto">Список типов активов</h2>
-<table class="table">
-    <thead>
-        <tr>
-            <th class="text-center">Имя</th>
-            <th class="text-center">Действия</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for asset_type in asset_types %}
-        <tr class="align-middle">
-            <td class="text-center">{{ asset_type.name }}</td>
-            <td class="flex justify-evenly">
-                <a onclick="window.location.href='{% url 'asset_type_edit' pk=asset_type.pk %}'" type="button" class="btn btn-primary">Редактировать</a>
-                <form action="{% url 'asset_type_delete' pk=asset_type.pk %}" class='mb-0' method="post" onsubmit="return confirm('Are you sure?');">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">Удалить</button>
-                </form>
-                <!-- Ссылка для создания атрибута для каждого типа актива -->
-                <button onclick="window.location.href='{% url 'attribute_create' asset_type_id=asset_type.id %}'" type="button" class="btn btn-secondary">Создать атрибут</button>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<form id="delete-form" method="post" action="{% url 'asset_type_delete' %}">
+    {% csrf_token %}
+    <table id="assetTypesTable" class="table">
+        <thead>
+            <tr>
+                <th class="text-center"><input type="checkbox" id="select-all"></th>
+                <th class="text-center">Имя</th>
+                <th class="text-center">Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for asset_type in asset_types %}
+            <tr class="align-middle">
+                <td class="text-center"><input type="checkbox" name="selected_asset_types" value="{{ asset_type.pk }}"></td>
+                <td class="text-center"><a href="{% url 'asset_type_edit' pk=asset_type.pk %}">{{ asset_type.name }}</a></td>
+                <td class="flex justify-evenly">
+                    <button onclick="window.location.href='{% url 'attribute_create' asset_type_id=asset_type.pk %}'" type="button" class="btn btn-secondary">Создать атрибут</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-danger mb-3">Удалить выбранные типы</button>
+</form>
 <button onclick="window.location.href='{% url 'asset_type_create' %}'" type="button" class="btn btn-success">Добавить новый тип</button>
+
+<!-- Подключение DataTables -->
+<link href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    $('#assetTypesTable').DataTable();
+
+    // Select all checkboxes
+    $('#select-all').click(function() {
+        var isChecked = $(this).is(':checked');
+        $('input[name="selected_asset_types"]').prop('checked', isChecked);
+    });
+});
+</script>
+
 {% endblock %}

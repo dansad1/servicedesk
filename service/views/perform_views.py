@@ -1,6 +1,8 @@
 from service.forms.Performer_forms import *
 from service.models import PerformerGroup, Company, CustomUser
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 
 
@@ -62,7 +64,13 @@ def performer_group_update(request, pk):
         'selected_company_ids': selected_company_ids
     })
 
-def performer_group_delete(request, pk):
-    group = get_object_or_404(PerformerGroup, pk=pk)
-    group.delete()
-    return redirect('performer_group/performer_group_list')
+@login_required
+def performer_group_delete(request):
+    if request.method == 'POST':
+        group_ids = request.POST.getlist('selected_groups')
+        if group_ids:
+            PerformerGroup.objects.filter(id__in=group_ids).delete()
+            messages.success(request, 'Выбранные группы были удалены.')
+        else:
+            messages.warning(request, 'Пожалуйста, выберите хотя бы одну группу для удаления.')
+    return redirect('performer_group_list')

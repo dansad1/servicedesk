@@ -53,12 +53,16 @@ def company_list(request):
     companies = Company.objects.all()
     return render(request, 'company/company_list.html', {'companies': companies})
 @require_http_methods(["POST"])
+@login_required
 def company_delete(request, pk):
-    company = get_object_or_404(Company, pk=pk)
-    company.delete()
-    messages.success(request, "Компания успешно удалена.")
+    if request.method == 'POST':
+        company_ids = request.POST.getlist('selected_companies')
+        if company_ids:
+            Company.objects.filter(id__in=company_ids).delete()
+            messages.success(request, 'Выбранные компании были удалены.')
+        else:
+            messages.warning(request, 'Пожалуйста, выберите хотя бы одну компанию для удаления.')
     return redirect('company_list')
-
 @login_required
 def department_create(request, company_pk):
     company = get_object_or_404(Company, pk=company_pk)

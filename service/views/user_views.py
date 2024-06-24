@@ -33,15 +33,16 @@ def user_list(request):
         return redirect('profile')
     
 
-# Удаление пользователя
 @login_required
-@require_POST  # Убедитесь, что запрос на удаление выполняется через POST
-def user_delete(request, pk):
-    user = get_object_or_404(User, pk=pk)
-    user.delete()
-    messages.success(request, "Пользователь успешно удален.")
+def user_delete(request):
+    if request.method == 'POST':
+        user_ids = request.POST.getlist('selected_users')
+        if user_ids:
+            CustomUser.objects.filter(id__in=user_ids).delete()
+            messages.success(request, 'Выбранные пользователи были удалены.')
+        else:
+            messages.warning(request, 'Пожалуйста, выберите хотя бы одного пользователя для удаления.')
     return redirect('user_list')
-
 
 
 class CustomLoginView(auth_views.LoginView):

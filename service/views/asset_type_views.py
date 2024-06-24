@@ -3,6 +3,8 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 from service.models import AssetType, Attribute, AssetTypeAttribute
 from service.forms.Asset_Forms import AssetTypeForm
@@ -43,7 +45,13 @@ def asset_type_edit(request, pk):
     return render(request, 'asset_types/asset_type_edit.html', context)
 
 
-def asset_type_delete(request, pk):
-    asset_type = get_object_or_404(AssetType, pk=pk)
-    asset_type.delete()
+@login_required
+def asset_type_delete(request):
+    if request.method == 'POST':
+        asset_type_ids = request.POST.getlist('selected_asset_types')
+        if asset_type_ids:
+            AssetType.objects.filter(id__in=asset_type_ids).delete()
+            messages.success(request, 'Выбранные типы активов были удалены.')
+        else:
+            messages.warning(request, 'Пожалуйста, выберите хотя бы один тип актива для удаления.')
     return redirect('asset_type_list')
