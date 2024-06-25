@@ -117,13 +117,13 @@ class GroupPermission(models.Model):
     custompermission = models.ForeignKey(CustomPermission, on_delete=models.CASCADE)
     access_level = models.CharField(
         max_length=50,
-        choices=ACCESS_LEVEL_CHOICES,
+        choices=[('global', 'Global'), ('company', 'Company'), ('department', 'Department'), ('personal', 'Personal')],
         blank=True,
         null=True
     )
 
     def __str__(self):
-        return f"{self.group.name} - {self.custompermission.name} - {self.access_level}"
+        return f"{self.group.name} - {self.custompermission.name}"
 class Status(models.Model):
     name = models.CharField(max_length=50, unique=True)
     color = models.CharField(max_length=20, blank=True, null=True)
@@ -151,6 +151,85 @@ class PriorityDuration(models.Model):
 
     def __str__(self):
         return f"{self.priority.name} for {self.request_type.name} : {self.duration_in_hours} hours"
+
+class FieldAccess(models.Model):
+    role = models.ForeignKey(Group, on_delete=models.CASCADE)
+    field_meta = models.ForeignKey('FieldMeta', on_delete=models.CASCADE)
+    can_read = models.BooleanField(default=True)
+    can_update = models.BooleanField(default=False)
+
+class FieldMeta(models.Model):
+    FIELD_TYPES = [
+        ('text', 'Text'),
+        ('textarea', 'Textarea'),
+        ('select', 'Select'),
+        ('number', 'Number'),
+        ('date', 'Date'),
+        ('boolean', 'Boolean'),
+        ('email', 'Email'),
+        ('url', 'URL'),
+        ('json', 'JSON'),
+        ('status', 'Status'),
+        ('company', 'Company'),
+        ('priority', 'Priority'),
+        ('requester', 'Requester'),
+        ('assignee', 'Assignee'),
+        ('request_type', 'Request Type'),
+    ]
+
+    name = models.CharField(max_length=255)
+    field_type = models.CharField(max_length=50, choices=FIELD_TYPES)
+    is_required = models.BooleanField(default=False)
+    show_name = models.BooleanField(default=True)
+    default_value = models.CharField(max_length=255, blank=True, null=True)
+    unit = models.CharField(max_length=50, blank=True, null=True)
+    hint = models.CharField(max_length=255, blank=True, null=True)
+    request_type = models.ForeignKey(RequestType, on_delete=models.CASCADE, related_name='fields', default=1)
+
+    def __str__(self):
+        return self.name
+
+class FieldValue(models.Model):
+    field_meta = models.ForeignKey(FieldMeta, on_delete=models.CASCADE)
+    request = models.ForeignKey('Request', on_delete=models.CASCADE, related_name='field_values')
+    value_text = models.TextField(blank=True, null=True)
+    value_number = models.FloatField(blank=True, null=True)
+    value_date = models.DateField(blank=True, null=True)
+    value_boolean = models.BooleanField(null=True, blank=True)
+    value_email = models.EmailField(null=True, blank=True)
+    value_url = models.URLField(null=True, blank=True)
+    value_json = models.JSONField(null=True, blank=True)
+    value_status = models.ForeignKey(Status, on_delete=models.SET_NULL, null=True, blank=True)
+    value_company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True)
+    value_priority = models.ForeignKey(Priority, on_delete=models.SET_NULL, null=True, blank=True)
+    value_requester = models.ForeignKey(CustomUser, related_name='value_requester', on_delete=models.SET_NULL, null=True, blank=True)
+    value_assignee = models.ForeignKey(CustomUser, related_name='value_assignee', on_delete=models.SET_NULL, null=True, blank=True)
+    value_request_type = models.ForeignKey(RequestType, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.field_meta.name}: {self.get_value()}"
+
+    def get_value(self):
+        type_map = {
+            'text': self.value_text,
+            'textarea': self.value_text,
+            'select': self.value_text,
+            'number': self.value_number,
+            'date': self.value_date,
+            'boolean': self.value_boolean,
+            'email': self.value_email,
+            'url': self.value_url,
+            'json': self.value_json,
+            'status': self.value_status.name if self.value_status else None,
+            'company': self.value_company.name if self.value_company else None,
+            'priority': self.value_priority.name if self.value_priority else None,
+            'requester': self.value_requester.username if self.value_requester else None,
+            'assignee': self.value_assignee.username if self.value_assignee else None,
+            'request_type': self.value_request_type.name if self.value_request_type else None,
+        }
+        return type_map.get(self.field_meta.field_type)
+
+
 class Request(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
@@ -242,6 +321,7 @@ class EmailSettings(models.Model):
     @property
     def use_ssl(self):
         return self.connection_type == 'ssl'
+from django.db import models
 
 class Event(models.Model):
     EVENT_CHOICES = [

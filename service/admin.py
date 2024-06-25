@@ -33,13 +33,7 @@ class StatusTransitionAdmin(admin.ModelAdmin):
     get_allowed_groups.short_description = 'Allowed Groups'
 
 # Model Registrations
-admin.site.register(Company)
-admin.site.register(Request, RequestAdmin)
-admin.site.register(Status)
-admin.site.register(RequestType)
-admin.site.register(Priority)
-admin.site.register(PriorityDuration, PriorityDurationAdmin)
-admin.site.register(StatusTransition, StatusTransitionAdmin)
+
 
 # Кастомный админ-класс для CustomUser
 class CustomUserAdmin(admin.ModelAdmin):
@@ -58,7 +52,7 @@ class CustomPermissionAdmin(admin.ModelAdmin):
     list_display = ['name', 'code_name']
 
 class GroupPermissionAdmin(admin.ModelAdmin):
-    list_display = ['group', 'get_custom_permission_display', 'access_level']
+    list_display = ['group', 'get_custom_permission_display']
 
     def get_custom_permission_display(self, obj):
         return str(obj.custompermission)
