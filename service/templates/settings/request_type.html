@@ -3,27 +3,69 @@
 {% block settings_content %}
 <h1 class="m-auto max-w-4xl text-4xl p-10 text-center">
     {% if request_type %}
-        Редактировать {{request_type}}
+        Редактировать {{ request_type.name }}
     {% else %}
         Создать новый тип заявки
-    {% endif %} 
+    {% endif %}
 </h1>
+<div class="button_group p-10">
+    <button id="button_main" type="button" class="btn active" onclick="showBlock('main', this)">Основная информация</button>
+    <button id="button_fields" type="button" class="btn" onclick="showBlock('fields', this)">Поля типа заявки</button>
+</div>
 <div class="m-auto max-w-2xl rounded-xl bg-slate-200 p-10">
-
-
     <form method="post" class="request-type-form">
         {% csrf_token %}
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                Название типа заявки:
+        <div id="main" class="form_style active">
+            <div class="form-group">
+                <label for="id_name">Название типа заявки:</label>
                 {{ form.name }}
-                {{ form.name.errors }}
+                {% if form.name.errors %}
+                    <div class="alert alert-danger">
+                        {{ form.name.errors }}
+                    </div>
+                {% endif %}
             </div>
-            <div class="form-group col-md-6">
-                Описание типа заявки:
+            <div class="form-group">
+                <label for="id_description">Описание типа заявки:</label>
                 {{ form.description }}
-                {{ form.description.errors }}
+                {% if form.description.errors %}
+                    <div class="alert alert-danger">
+                        {{ form.description.errors }}
+                    </div>
+                {% endif %}
             </div>
+        </div>
+        <div id="fields" class="form_style">
+            <h3>Поля типа заявки:</h3>
+            {% if request_type %}
+                <div class="form-group">
+                    <a href="{% url 'request_field_create' request_type.id %}" class="btn btn-secondary mb-3">Создать новое поле</a>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th>Тип</th>
+                            <th>Обязательное</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for field in request_type.field_set.fields.all %}
+                            <tr>
+                                <td>{{ field.name }}</td>
+                                <td>{{ field.get_field_type_display }}</td>
+                                <td>{{ field.is_required }}</td>
+                                <td>
+                                    <a href="{% url 'request_field_edit' request_type.id field.id %}" class="btn btn-primary btn-sm">Редактировать</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Сначала создайте тип заявки, чтобы добавить поля.</p>
+            {% endif %}
         </div>
         <div class="form-group">
             <button type="submit" class="btn btn-primary mt-3">
@@ -37,6 +79,8 @@
         </div>
     </form>
 </div>
+
+
 
 <style>
     .settings-content {
@@ -105,4 +149,20 @@
         }
     }
 </style>
+<script>
+    function showBlock(id, button) {
+        var blocks = document.getElementsByClassName('form_style');
+        for (var i = 0; i < blocks.length; i++) {
+            blocks[i].classList.remove('active');
+        }
+        document.getElementById(id).classList.add('active');
+
+        var buttons = document.getElementsByClassName('btn');
+        for (var i = 0; i < buttons.length; i++) {
+            buttons[i].classList.remove('active');
+        }
+        button.classList.add('active');
+    }
+</script>
+
 {% endblock %}

@@ -1,15 +1,18 @@
 from django import forms
-from service.models import Status, Priority, RequestType, PriorityDuration, StatusTransition
+from service.models import Status, Priority, RequestType, PriorityDuration, StatusTransition, FieldMeta
 from colorfield.fields import ColorField, ColorWidget
 
 class RequestTypeForm(forms.ModelForm):
+    fields = forms.ModelMultipleChoiceField(
+        queryset=FieldMeta.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        label='Поля'
+    )
+
     class Meta:
         model = RequestType
-        fields = ['name', 'description']
-        widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'description': forms.Textarea(attrs={'class': 'form-control'}),
-        }
+        fields = ['name', 'description', 'fields']
 
 
 class PriorityForm(forms.ModelForm):

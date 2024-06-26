@@ -188,3 +188,90 @@ class FieldAccessForm(forms.ModelForm):
 
 
 FieldAccessFormSet = forms.inlineformset_factory(FieldMeta, FieldAccess, form=FieldAccessForm, extra=1, can_delete=True)
+
+
+class RequestForm(forms.ModelForm):
+    class Meta:
+        model = Request
+        fields = ['request_type']  # Добавьте другие статические поля, если необходимо
+
+    def __init__(self, *args, **kwargs):
+        request_type = kwargs.pop('request_type', None)
+        super(RequestForm, self).__init__(*args, **kwargs)
+
+        if request_type:
+            for field_meta in request_type.field_set.fields.all():
+                self.add_custom_field(field_meta)
+
+    def add_custom_field(self, field_meta):
+        field_name = f'custom_field_{field_meta.id}'
+        if field_meta.field_type == 'text':
+            self.fields[field_name] = forms.CharField(
+                label=field_meta.name,
+                required=field_meta.is_required,
+                initial=field_meta.default_value,
+                widget=forms.TextInput(attrs={'class': 'form-control'})
+            )
+        elif field_meta.field_type == 'textarea':
+            self.fields[field_name] = forms.CharField(
+                label=field_meta.name,
+                required=field_meta.is_required,
+                initial=field_meta.default_value,
+                widget=forms.Textarea(attrs={'class': 'form-control'})
+            )
+        elif field_meta.field_type == 'date':
+            self.fields[field_name] = forms.DateField(
+                label=field_meta.name,
+                required=field_meta.is_required,
+                initial=field_meta.default_value,
+                widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
+            )
+        elif field_meta.field_type == 'file':
+            self.fields[field_name] = forms.FileField(
+                label=field_meta.name,
+                required=field_meta.is_required,
+                widget=forms.ClearableFileInput(attrs={'class': 'form-control'})
+            )
+        elif field_meta.field_type == 'number':
+            self.fields[field_name] = forms.FloatField(
+                label=field_meta.name,
+                required=field_meta.is_required,
+                initial=field_meta.default_value,
+                widget=forms.NumberInput(attrs={'class': 'form-control'})
+            )
+        elif field_meta.field_type == 'boolean':
+            self.fields[field_name] = forms.BooleanField(
+                label=field_meta.name,
+                required=field_meta.is_required,
+                initial=field_meta.default_value,
+                widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+            )
+        elif field_meta.field_type == 'email':
+            self.fields[field_name] = forms.EmailField(
+                label=field_meta.name,
+                required=field_meta.is_required,
+                initial=field_meta.default_value,
+                widget=forms.EmailInput(attrs={'class': 'form-control'})
+            )
+        elif field_meta.field_type == 'url':
+            self.fields[field_name] = forms.URLField(
+                label=field_meta.name,
+                required=field_meta.is_required,
+                initial=field_meta.default_value,
+                widget=forms.URLInput(attrs={'class': 'form-control'})
+            )
+        elif field_meta.field_type == 'json':
+            self.fields[field_name] = forms.JSONField(
+                label=field_meta.name,
+                required=field_meta.is_required,
+                initial=field_meta.default_value,
+                widget=forms.Textarea(attrs={'class': 'form-control'})
+            )
+        elif field_meta.field_type == 'select':
+            # Пример, если у вас есть предопределенные варианты
+            self.fields[field_name] = forms.ChoiceField(
+                label=field_meta.name,
+                required=field_meta.is_required,
+                choices=[('option1', 'Option 1'), ('option2', 'Option 2')],
+                widget=forms.Select(attrs={'class': 'form-control'})
+            )
