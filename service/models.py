@@ -141,6 +141,7 @@ class FieldMeta(models.Model):
         ('requester', 'Requester'),
         ('assignee', 'Assignee'),
         ('request_type', 'Request Type'),
+        ('file', 'File'),
     ]
 
     name = models.CharField(max_length=255)
@@ -150,10 +151,75 @@ class FieldMeta(models.Model):
     default_value = models.CharField(max_length=255, blank=True, null=True)
     unit = models.CharField(max_length=50, blank=True, null=True)
     hint = models.CharField(max_length=255, blank=True, null=True)
-    request_type = models.ForeignKey(RequestType, on_delete=models.CASCADE, related_name='fields', default=1)
 
     def __str__(self):
         return self.name
+
+class FieldSet(models.Model):
+    name = models.CharField(max_length=100)
+    fields = models.ManyToManyField(FieldMeta, blank=True, related_name='field_sets')
+
+    def __str__(self):
+        return self.name
+
+    def add_default_fields(self):
+        default_fields = [
+            {"name": "Title", "field_type": "text", "is_required": True, "show_name": True, "default_value": "", "unit": "", "hint": ""},
+            {"name": "Description", "field_type": "textarea", "is_required": True, "show_name": True, "default_value": "", "unit": "", "hint": ""},
+            {"name": "Due Date", "field_type": "date", "is_required": False, "show_name": True, "default_value": "", "unit": "", "hint": ""},
+            {"name": "Attachment", "field_type": "file", "is_required": False, "show_name": True, "default_value": "", "unit": "", "hint": ""},
+            {"name": "Requester", "field_type": "requester", "is_required": True, "show_name": True, "default_value": "", "unit": "", "hint": ""},
+            {"name": "Assignee", "field_type": "assignee", "is_required": False, "show_name": True, "default_value": "", "unit": "", "hint": ""},
+            {"name": "Company", "field_type": "company", "is_required": True, "show_name": True, "default_value": "", "unit": "", "hint": ""},
+            {"name": "Status", "field_type": "status", "is_required": True, "show_name": True, "default_value": "", "unit": "", "hint": ""},
+            {"name": "Priority", "field_type": "priority", "is_required": False, "show_name": True, "default_value": "", "unit": "", "hint": ""},
+        ]
+        for field in default_fields:
+            field_meta, created = FieldMeta.objects.get_or_create(
+                name=field["name"],
+                field_type=field["field_type"],
+                defaults={
+                    "is_required": field["is_required"],
+                    "show_name": field["show_name"],
+                    "default_value": field["default_value"],
+                    "unit": field["unit"],
+                    "hint": field["hint"]
+                }
+            )
+            self.fields.add(field_meta)
+
+
+class RequestType(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    description = models.TextField(blank=True, null=True)
+    field_set = models.ForeignKey(FieldSet, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.field_set:
+            default_field_set = FieldSet.objects.create(name=f"Default for {self.name}")
+            default_field_set.add_default_fields()
+            self.field_set = default_field_set
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+
+class PriorityDuration(models.Model):
+    request_type = models.ForeignKey(RequestType, on_delete=models.CASCADE)
+    priority = models.ForeignKey(Priority, on_delete=models.CASCADE)
+    duration_in_hours = models.IntegerField(default=0)
+
+    class Meta:
+        unique_together = ('priority', 'request_type')
+
+    def __str__(self):
+        return f"{self.priority.name} for {self.request_type.name} : {self.duration_in_hours} hours"
+
+class FieldAccess(models.Model):
+    role = models.ForeignKey(Group, on_delete=models.CASCADE)
+    field_meta = models.ForeignKey('FieldMeta', on_delete=models.CASCADE)
+    can_read = models.BooleanField(default=True)
+    can_update = models.BooleanField(default=False)
 
 class FieldValue(models.Model):
     field_meta = models.ForeignKey(FieldMeta, on_delete=models.CASCADE)
@@ -165,12 +231,13 @@ class FieldValue(models.Model):
     value_email = models.EmailField(null=True, blank=True)
     value_url = models.URLField(null=True, blank=True)
     value_json = models.JSONField(null=True, blank=True)
-    value_status = models.ForeignKey(Status, on_delete=models.SET_NULL, null=True, blank=True)
-    value_company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True)
-    value_priority = models.ForeignKey(Priority, on_delete=models.SET_NULL, null=True, blank=True)
+    value_status = models.ForeignKey('Status', on_delete=models.SET_NULL, null=True, blank=True)
+    value_company = models.ForeignKey('Company', on_delete=models.SET_NULL, null=True, blank=True)
+    value_priority = models.ForeignKey('Priority', on_delete=models.SET_NULL, null=True, blank=True)
     value_requester = models.ForeignKey(CustomUser, related_name='value_requester', on_delete=models.SET_NULL, null=True, blank=True)
     value_assignee = models.ForeignKey(CustomUser, related_name='value_assignee', on_delete=models.SET_NULL, null=True, blank=True)
-    value_request_type = models.ForeignKey(RequestType, on_delete=models.SET_NULL, null=True, blank=True)
+    value_request_type = models.ForeignKey('RequestType', on_delete=models.SET_NULL, null=True, blank=True)
+    value_file = models.FileField(upload_to='field_files/', null=True, blank=True)
 
     def __str__(self):
         return f"{self.field_meta.name}: {self.get_value()}"
@@ -192,6 +259,7 @@ class FieldValue(models.Model):
             'requester': self.value_requester.username if self.value_requester else None,
             'assignee': self.value_assignee.username if self.value_assignee else None,
             'request_type': self.value_request_type.name if self.value_request_type else None,
+            'file': self.value_file.name if self.value_file else None,
         }
         return type_map.get(self.field_meta.field_type)
 class Request(models.Model):
@@ -207,10 +275,7 @@ class Comment(models.Model):
     text = RichTextUploadingField()
     attachment = models.FileField(upload_to='comments/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    content = RichTextUploadingField()  # Use RichTextUploadingField for rich text content
 
-    def __str__(self):
-        return f'Comment by {self.author.username} on {self.request.title}'
 class StatusTransition(models.Model):
     from_status = models.ForeignKey(Status, related_name='from_transitions', on_delete=models.CASCADE)
     to_status = models.ForeignKey(Status, related_name='to_transitions', on_delete=models.CASCADE)
