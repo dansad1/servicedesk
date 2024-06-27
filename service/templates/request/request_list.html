@@ -47,7 +47,7 @@
     {% if not requests_with_action %}
       <p class="text-center text-xl p-4 max-w-4xl m-auto">Нет доступных заявок</p>
     {% else %}
-      <form id="delete-form" method="post" action="{% url 'bulk_delete_requests' %}">
+      <form id="delete-form" method="post" action="{% url 'request_delete' %}">
         {% csrf_token %}
         <table id="requestsTable" class="table">
           <thead>
