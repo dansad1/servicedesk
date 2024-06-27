@@ -159,73 +159,6 @@ class SavedFilterForm(forms.ModelForm):
         }
 
 
-class FieldMetaForm(forms.ModelForm):
-    class Meta:
-        model = FieldMeta
-        fields = ['name', 'field_type', 'is_required', 'show_name', 'unit', 'hint']
-        widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'field_type': forms.Select(attrs={'class': 'form-control'}),
-            'is_required': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'show_name': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'unit': forms.TextInput(attrs={'class': 'form-control'}),
-            'hint': forms.TextInput(attrs={'class': 'form-control'}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super(FieldMetaForm, self).__init__(*args, **kwargs)
-        field_type = self.initial.get('field_type', self.instance.field_type if self.instance else None)
-        self.fields['default_value'] = self.get_default_value_field(field_type)
-        self.fields['default_value'].widget.attrs.update({'class': 'form-control'})
-
-    def get_default_value_field(self, field_type):
-        if field_type == 'text':
-            return forms.CharField(label="Значение по умолчанию", required=False, widget=forms.TextInput())
-        elif field_type == 'textarea':
-            return forms.CharField(label="Значение по умолчанию", required=False, widget=forms.Textarea())
-        elif field_type == 'date':
-            return forms.DateField(label="Значение по умолчанию", required=False, widget=forms.DateInput(attrs={'type': 'date'}))
-        elif field_type == 'file':
-            return forms.FileField(label="Значение по умолчанию", required=False, widget=forms.ClearableFileInput())
-        elif field_type == 'number':
-            return forms.FloatField(label="Значение по умолчанию", required=False, widget=forms.NumberInput())
-        elif field_type == 'boolean':
-            return forms.BooleanField(label="Значение по умолчанию", required=False, widget=forms.CheckboxInput())
-        elif field_type == 'email':
-            return forms.EmailField(label="Значение по умолчанию", required=False, widget=forms.EmailInput())
-        elif field_type == 'url':
-            return forms.URLField(label="Значение по умолчанию", required=False, widget=forms.URLInput())
-        elif field_type == 'json':
-            return forms.JSONField(label="Значение по умолчанию", required=False, widget=forms.Textarea())
-        elif field_type == 'status':
-            return forms.ModelChoiceField(label="Значение по умолчанию", required=False, queryset=Status.objects.all(), widget=forms.Select())
-        elif field_type == 'company':
-            return forms.ModelChoiceField(label="Значение по умолчанию", required=False, queryset=Company.objects.all(), widget=forms.Select())
-        elif field_type == 'priority':
-            return forms.ModelChoiceField(label="Значение по умолчанию", required=False, queryset=Priority.objects.all(), widget=forms.Select())
-        elif field_type == 'requester':
-            return forms.ModelChoiceField(label="Значение по умолчанию", required=False, queryset=User.objects.all(), widget=forms.Select())
-        elif field_type == 'assignee':
-            return forms.ModelChoiceField(label="Значение по умолчанию", required=False, queryset=User.objects.all(), widget=forms.Select())
-        else:
-            return forms.CharField(label="Значение по умолчанию", required=False, widget=forms.TextInput())
-
-class FieldAccessForm(forms.ModelForm):
-    role = forms.ModelChoiceField(queryset=Group.objects.all(), required=True,
-                                  widget=forms.Select(attrs={'class': 'form-control'}))
-
-    class Meta:
-        model = FieldAccess
-        fields = ['role', 'field_meta', 'can_read', 'can_update']
-        widgets = {
-            'can_read': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'can_update': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-        }
-
-
-FieldAccessFormSet = forms.inlineformset_factory(FieldMeta, FieldAccess, form=FieldAccessForm, extra=0, can_delete=True)
-
-
 class RequestForm(forms.ModelForm):
     class Meta:
         model = Request
@@ -237,77 +170,62 @@ class RequestForm(forms.ModelForm):
 
         if request_type:
             for field_meta in request_type.field_set.fields.all():
-                self.add_custom_field(field_meta)
+                self.fields[f'custom_field_{field_meta.id}'] = self.get_form_field(field_meta)
 
-    def add_custom_field(self, field_meta):
-        field_name = f'custom_field_{field_meta.id}'
-        if field_meta.field_type == 'text':
-            self.fields[field_name] = forms.CharField(
+    def get_form_field(self, field_meta):
+        field_class = {
+            'text': forms.CharField,
+            'textarea': forms.CharField,
+            'date': forms.DateField,
+            'file': forms.FileField,
+            'number': forms.FloatField,
+            'boolean': forms.BooleanField,
+            'email': forms.EmailField,
+            'url': forms.URLField,
+            'json': forms.JSONField,
+            'status': forms.ModelChoiceField,
+            'company': forms.ModelChoiceField,
+            'priority': forms.ModelChoiceField,
+            'requester': forms.ModelChoiceField,
+            'assignee': forms.ModelChoiceField,
+        }.get(field_meta.field_type, forms.CharField)
+
+        if field_meta.field_type in ['status', 'company', 'priority', 'requester', 'assignee']:
+            queryset = self.get_queryset(field_meta.field_type)
+            return field_class(label=field_meta.name, required=field_meta.is_required, queryset=queryset)
+        else:
+            return field_class(
                 label=field_meta.name,
                 required=field_meta.is_required,
                 initial=field_meta.default_value,
-                widget=forms.TextInput(attrs={'class': 'form-control'})
+                widget=self.get_widget(field_meta)
             )
-        elif field_meta.field_type == 'textarea':
-            self.fields[field_name] = forms.CharField(
-                label=field_meta.name,
-                required=field_meta.is_required,
-                initial=field_meta.default_value,
-                widget=forms.Textarea(attrs={'class': 'form-control'})
-            )
-        elif field_meta.field_type == 'date':
-            self.fields[field_name] = forms.DateField(
-                label=field_meta.name,
-                required=field_meta.is_required,
-                initial=field_meta.default_value,
-                widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
-            )
-        elif field_meta.field_type == 'file':
-            self.fields[field_name] = forms.FileField(
-                label=field_meta.name,
-                required=field_meta.is_required,
-                widget=forms.ClearableFileInput(attrs={'class': 'form-control'})
-            )
-        elif field_meta.field_type == 'number':
-            self.fields[field_name] = forms.FloatField(
-                label=field_meta.name,
-                required=field_meta.is_required,
-                initial=field_meta.default_value,
-                widget=forms.NumberInput(attrs={'class': 'form-control'})
-            )
-        elif field_meta.field_type == 'boolean':
-            self.fields[field_name] = forms.BooleanField(
-                label=field_meta.name,
-                required=field_meta.is_required,
-                initial=field_meta.default_value,
-                widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
-            )
-        elif field_meta.field_type == 'email':
-            self.fields[field_name] = forms.EmailField(
-                label=field_meta.name,
-                required=field_meta.is_required,
-                initial=field_meta.default_value,
-                widget=forms.EmailInput(attrs={'class': 'form-control'})
-            )
-        elif field_meta.field_type == 'url':
-            self.fields[field_name] = forms.URLField(
-                label=field_meta.name,
-                required=field_meta.is_required,
-                initial=field_meta.default_value,
-                widget=forms.URLInput(attrs={'class': 'form-control'})
-            )
-        elif field_meta.field_type == 'json':
-            self.fields[field_name] = forms.JSONField(
-                label=field_meta.name,
-                required=field_meta.is_required,
-                initial=field_meta.default_value,
-                widget=forms.Textarea(attrs={'class': 'form-control'})
-            )
-        elif field_meta.field_type == 'select':
-            # Пример, если у вас есть предопределенные варианты
-            self.fields[field_name] = forms.ChoiceField(
-                label=field_meta.name,
-                required=field_meta.is_required,
-                choices=[('option1', 'Option 1'), ('option2', 'Option 2')],
-                widget=forms.Select(attrs={'class': 'form-control'})
-            )
+
+    def get_widget(self, field_meta):
+        widgets = {
+            'text': forms.TextInput(attrs={'class': 'form-control'}),
+            'textarea': forms.Textarea(attrs={'class': 'form-control'}),
+            'date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'file': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'number': forms.NumberInput(attrs={'class': 'form-control'}),
+            'boolean': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'url': forms.URLInput(attrs={'class': 'form-control'}),
+            'json': forms.Textarea(attrs={'class': 'form-control'}),
+            'status': forms.Select(attrs={'class': 'form-control'}),
+            'company': forms.Select(attrs={'class': 'form-control'}),
+            'priority': forms.Select(attrs={'class': 'form-control'}),
+            'requester': forms.Select(attrs={'class': 'form-control'}),
+            'assignee': forms.Select(attrs={'class': 'form-control'}),
+        }
+        return widgets.get(field_meta.field_type, forms.TextInput(attrs={'class': 'form-control'}))
+
+    def get_queryset(self, field_type):
+        querysets = {
+            'status': Status.objects.all(),
+            'company': Company.objects.all(),
+            'priority': Priority.objects.all(),
+            'requester': User.objects.all(),
+            'assignee': User.objects.all(),
+        }
+        return querysets.get(field_type, User.objects.none())

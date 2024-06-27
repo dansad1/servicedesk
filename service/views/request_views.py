@@ -80,48 +80,44 @@ def select_request_type(request):
     return render(request, 'request/select_request_type.html', {'types': types})
 
 @login_required
-def request_create(request, type_id):
-    request_type = get_object_or_404(RequestType, pk=type_id)
-    form = RequestForm(request.POST or None, request.FILES or None)
-    comment_form = CommentForm(request.POST or None, request.FILES or None)
-
+def request_create(request, request_type_id):
+    request_type = get_object_or_404(RequestType, id=request_type_id)
     if request.method == 'POST':
-        comment_data = {"attachment": request.POST['attachment'], "text": request.POST['text']}
-        print(comment_data)
-        comment_form = CommentForm(comment_data, request.FILES or None)
-        print(comment_form.is_valid())
-        if form.is_valid() and comment_form.is_valid():
+        form = RequestForm(request.POST, request.FILES, request_type=request_type)
+        if form.is_valid():
             new_request = form.save(commit=False)
-            new_request.requester = request.user
             new_request.request_type = request_type
-
-            priority = form.cleaned_data.get('priority')
-            duration_obj = PriorityDuration.objects.filter(priority=priority, request_type=request_type).first()
-            if duration_obj:
-                new_request.due_date = timezone.now() + timedelta(hours=duration_obj.duration_in_hours)
-
             new_request.save()
-            form.save_m2m()
+            for field_meta in request_type.field_set.fields.all():
+                field_value = FieldValue(
+                    request=new_request,
+                    field_meta=field_meta,
+                    value_text=form.cleaned_data.get(f'custom_field_{field_meta.id}')
+                )
+                field_value.save()
+            return redirect('request_list')
+    else:
+        form = RequestForm(request_type=request_type)
+    return render(request, 'request/request_create.html', {'form': form, 'request_type': request_type})
 
-            new_comment = comment_form.save(commit=False)
-            new_comment.request = new_request
-            new_comment.author = request.user
-            new_comment.save()
-
-            if 'save_and_close' in request.POST.get('action', ''):
-                messages.success(request, "Заявка успешно создана.")
-                return redirect('request_list')
-            else:
-                messages.success(request, "Заявка создана. Вы можете продолжить редактирование.")
-                return redirect('edit_request', pk=new_request.pk)
-
-    # Этот контекст должен быть доступен вне условных блоков, чтобы всегда возвращать страницу, даже если POST не произошел.
-    context = {
-        'form': form,
-        'comment_form': comment_form,
-        'request_type': request_type
-    }
-    return render(request, 'request/request_create.html', context)
+def edit_request(request, request_id):
+    req = get_object_or_404(Request, id=request_id)
+    request_type = req.request_type
+    if request.method == 'POST':
+        form = RequestForm(request.POST, request.FILES, instance=req, request_type=request_type)
+        if form.is_valid():
+            req = form.save()
+            # Update FieldValues
+            for field_meta in request_type.field_set.fields.all():
+                field_value, created = FieldValue.objects.get_or_create(
+                    request=req, field_meta=field_meta
+                )
+                field_value.value_text = form.cleaned_data.get(f'custom_field_{field_meta.id}')
+                field_value.save()
+            return redirect('request_list')
+    else:
+        form = RequestForm(instance=req, request_type=request_type)
+    return render(request, 'request/request_edit.html', {'form': form, 'request': req})
 
 
 @login_required

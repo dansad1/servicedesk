@@ -1,55 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
-{% load static %}
-<script type="text/javascript" src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
-<script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
 <div class="container mt-5">
   <h2 class="text-center mb-4 text-4xl">Создать новую заявку</h2>
   <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
-      
-      <div class="form-group">
-          <label for="requestType">Тип заявки:</label>
-          <input type="text" id="requestType" class="form-control" value="{{ request_type.name }}" readonly>
-      </div>
-
-      <div class="row">
-          <div class="col-md-6">
-              {% for field in form.visible_fields %}
-                  {% if field.name != "due_date" and field.name != "status" and field.name != "request_type" %}
-                      <div class="form-group">
-                          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                          {{ field }}
-                      </div>
-                  {% endif %}
-              {% endfor %}
-          </div>
-
-          <div class="col-md-6">
-              <div class="form-group">
-                  <label for="{{ form.due_date.id_for_label }}">До какого заявка:</label>
-                  {{ form.due_date }}
-              </div>
-              <div class="form-group">
-                  <label for="{{ form.status.id_for_label }}">Статус заявки:</label>
-                  {{ form.status }}
-              </div>
-          </div>
-      </div>
-
-      {% if comment_form %}
-          <h3 class="text-center mt-5 mb-4">Добавить комментарий к заявке</h3>
-          <div class="form-group">
-              {{ comment_form.as_p }}
-          </div>
-      {% endif %}
-
+      {{ form.as_p }}
       <div class="form-group text-center">
           <button type="submit" name="action" value="save" class="btn btn-primary">Сохранить</button>
           <button type="submit" name="action" value="save_and_close" class="btn btn-secondary">Сохранить и закрыть</button>
       </div>
   </form>
-
   <div class="form-group text-center mt-4">
       <a href="{% url 'request_list' %}" class="btn btn-secondary">Вернуться к списку заявок</a>
   </div>
