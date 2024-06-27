@@ -2,6 +2,14 @@ from django.shortcuts import render, get_object_or_404, redirect
 from service.models import FieldMeta, FieldAccess, RequestType
 from service.forms.Request_forms import FieldMetaForm, FieldAccessFormSet
 from django.contrib.auth.models import Group
+from django.http import JsonResponse
+
+def get_default_value_widget(request):
+    field_type = request.GET.get('field_type')
+    form = FieldMetaForm()
+    widget = form.get_default_value_field(field_type)
+    widget_html = widget.widget.render('default_value', None, attrs={'class': 'form-control'})
+    return JsonResponse({'widget': widget_html})
 
 def request_field_create(request, request_type_id):
     request_type = get_object_or_404(RequestType, pk=request_type_id)
