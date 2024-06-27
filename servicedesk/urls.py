@@ -9,6 +9,7 @@ from service.views.asset_type_views import *
 from service.views.asset_views import create_asset, edit_asset, delete_asset, asset_list, get_attributes_by_asset_type
 from service.views.attribute_views import attribute_create,  attribute_edit
 from service.views.file_views import file_view
+from service.views.request_field_views import request_field_edit, request_field_create
 from service.views.request_views import *
 from service.views.company_views import company_create,company_edit,company_list,company_delete,department_create,department_delete,department_edit,subdepartment_create
 from service.views.profile_views import *
@@ -148,6 +149,10 @@ urlpatterns = [
     path('templates/', notification_template_list, name='template_list'),  # URL для списка шаблонов уведомлений
  path('templates/create/', notification_template_create, name='template_create'),
     path('templates/<int:pk>/delete/', notification_template_delete, name='template_delete'),
+
+    #Поля заявок
+    path('request_field/create/<int:request_type_id>/', request_field_create, name='request_field_create'),
+    path('request_field/edit/<int:request_type_id>/<int:pk>/', request_field_edit, name='request_field_edit'),
 ]
 
 

@@ -98,6 +98,8 @@ class Department(models.Model):
     class Meta:
         verbose_name = "Подразделение"
         verbose_name_plural = "Подразделения"
+
+
 class CustomPermission(models.Model):
     code_name = models.CharField(max_length=100, unique=True)
     name = models.CharField(max_length=255)
@@ -106,21 +108,8 @@ class CustomPermission(models.Model):
         return self.name
 
 class GroupPermission(models.Model):
-    ACCESS_LEVEL_CHOICES = [
-        ('global', 'Global'),
-        ('company', 'Company'),
-        ('department', 'Department'),
-        ('personal', 'Personal')
-    ]
-
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     custompermission = models.ForeignKey(CustomPermission, on_delete=models.CASCADE)
-    access_level = models.CharField(
-        max_length=50,
-        choices=[('global', 'Global'), ('company', 'Company'), ('department', 'Department'), ('personal', 'Personal')],
-        blank=True,
-        null=True
-    )
 
     def __str__(self):
         return f"{self.group.name} - {self.custompermission.name}"
@@ -135,29 +124,6 @@ class Priority(models.Model):
     name = models.CharField(max_length=50, unique=True)
     def __str__(self):
         return self.name
-
-class RequestType(models.Model):
-    name = models.CharField(max_length=50, unique=True)
-    description = models.TextField(blank=True, null=True)
-    def __str__(self):
-        return self.name
-class PriorityDuration(models.Model):
-    request_type = models.ForeignKey(RequestType, on_delete=models.CASCADE)
-    priority = models.ForeignKey(Priority, on_delete=models.CASCADE)
-    duration_in_hours = models.IntegerField(default=0)
-
-    class Meta:
-        unique_together = ('priority', 'request_type')
-
-    def __str__(self):
-        return f"{self.priority.name} for {self.request_type.name} : {self.duration_in_hours} hours"
-
-class FieldAccess(models.Model):
-    role = models.ForeignKey(Group, on_delete=models.CASCADE)
-    field_meta = models.ForeignKey('FieldMeta', on_delete=models.CASCADE)
-    can_read = models.BooleanField(default=True)
-    can_update = models.BooleanField(default=False)
-
 class FieldMeta(models.Model):
     FIELD_TYPES = [
         ('text', 'Text'),
@@ -228,42 +194,13 @@ class FieldValue(models.Model):
             'request_type': self.value_request_type.name if self.value_request_type else None,
         }
         return type_map.get(self.field_meta.field_type)
-
-
 class Request(models.Model):
-    title = models.CharField(max_length=100)
-    description = models.TextField()
-    requester = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='requests')
-    assignee = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_requests')
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True)
-    status = models.ForeignKey(Status, on_delete=models.SET_NULL, null=True, default=None)
+    request_type = models.ForeignKey(RequestType, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
-    priority = models.ForeignKey(Priority, on_delete=models.SET_NULL, null=True, blank=True)
-    request_type = models.ForeignKey(RequestType, on_delete=models.SET_NULL, null=True, blank=True)
-    due_date = models.DateTimeField(null=True, blank=True)
-    attachment = models.FileField(upload_to='attachments/', null=True, blank=True)
-    tracker = FieldTracker(fields=['assignee', 'status'])
 
-    def set_due_date(self):
-        duration = PriorityDuration.objects.filter(
-            priority=self.priority,
-            request_type=self.request_type).first()
-
-        if duration:
-            self.due_date = timezone.now() + timezone.timedelta(hours=duration.duration_in_hours)
-
-    def save(self, *args, **kwargs):
-        if not self.id:  # только при первом сохранении
-            self.set_due_date()
-
-            # Установить статус "Открыта" по умолчанию
-            open_status = Status.objects.get_or_create(name='Открыта')[0]
-            self.status = open_status
-
-        super(Request, self).save(*args, **kwargs)
     def __str__(self):
-        return self.title
+        return f"Request {self.id}"
 class Comment(models.Model):
     request = models.ForeignKey(Request, on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -321,7 +258,6 @@ class EmailSettings(models.Model):
     @property
     def use_ssl(self):
         return self.connection_type == 'ssl'
-from django.db import models
 
 class Event(models.Model):
     EVENT_CHOICES = [
