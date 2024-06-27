@@ -187,7 +187,7 @@ class FieldAccessForm(forms.ModelForm):
         }
 
 
-FieldAccessFormSet = forms.inlineformset_factory(FieldMeta, FieldAccess, form=FieldAccessForm, extra=1, can_delete=True)
+FieldAccessFormSet = forms.inlineformset_factory(FieldMeta, FieldAccess, form=FieldAccessForm, extra=0, can_delete=True)
 
 
 class RequestForm(forms.ModelForm):
