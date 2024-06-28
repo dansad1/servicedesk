@@ -58,6 +58,10 @@
                                 <td>{{ field.is_required }}</td>
                                 <td>
                                     <a href="{% url 'request_field_edit' request_type.id field.id %}" class="btn btn-primary btn-sm">Редактировать</a>
+                                     <form method="post" action="{% url 'request_field_delete' request_type.id field.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Удалить</button>
+                        </form>
                                 </td>
                             </tr>
                         {% endfor %}

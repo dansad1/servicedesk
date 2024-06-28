@@ -80,45 +80,32 @@ def select_request_type(request):
     return render(request, 'request/select_request_type.html', {'types': types})
 
 @login_required
+@login_required
 def request_create(request, request_type_id):
     request_type = get_object_or_404(RequestType, id=request_type_id)
     if request.method == 'POST':
-        form = RequestForm(request.POST, request.FILES, request_type=request_type)
+        form = RequestForm(request.POST, request.FILES, user=request.user, request_type=request_type)
         if form.is_valid():
             new_request = form.save(commit=False)
             new_request.request_type = request_type
             new_request.save()
-            for field_meta in request_type.field_set.fields.all():
-                field_value = FieldValue(
-                    request=new_request,
-                    field_meta=field_meta,
-                    value_text=form.cleaned_data.get(f'custom_field_{field_meta.id}')
-                )
-                field_value.save()
+            new_request.set_default_values(request.user)  # Устанавливаем значения по умолчанию
             return redirect('request_list')
     else:
-        form = RequestForm(request_type=request_type)
+        form = RequestForm(user=request.user, request_type=request_type)
     return render(request, 'request/request_create.html', {'form': form, 'request_type': request_type})
 
-def edit_request(request, request_id):
+def request_edit(request, request_id):
     req = get_object_or_404(Request, id=request_id)
     request_type = req.request_type
     if request.method == 'POST':
-        form = RequestForm(request.POST, request.FILES, instance=req, request_type=request_type)
+        form = RequestForm(request.POST, request.FILES, instance=req, user=request.user, request_type=request_type)
         if form.is_valid():
             req = form.save()
-            # Update FieldValues
-            for field_meta in request_type.field_set.fields.all():
-                field_value, created = FieldValue.objects.get_or_create(
-                    request=req, field_meta=field_meta
-                )
-                field_value.value_text = form.cleaned_data.get(f'custom_field_{field_meta.id}')
-                field_value.save()
             return redirect('request_list')
     else:
-        form = RequestForm(instance=req, request_type=request_type)
+        form = RequestForm(instance=req, user=request.user, request_type=request_type)
     return render(request, 'request/request_edit.html', {'form': form, 'request': req})
-
 
 @login_required
 def add_comment(request, pk):
@@ -149,40 +136,7 @@ def add_comment(request, pk):
 
 
 
-@login_required
-def request_edit(request, pk):
-    request_instance = get_object_or_404(Request, pk=pk)
-    comment_instances = Comment.objects.filter(request_id=pk)
-    is_editable = request.user.has_perm('service.action_edit_request', request_instance)
 
-    if request.method == 'POST' and 'submit_update' in request.POST and is_editable:
-        form = RequestForm(request.POST, instance=request_instance)
-        if form.is_valid():
-            form.save()
-            return redirect('request_list')  # или другой URL, куда вы хотите перенаправить пользователя
-    elif request.method == "POST" and "add_comment" in request.POST:
-        comment_form = CommentForm(request.POST, request.FILES)
-        if comment_form.is_valid():
-            new_comment = comment_form.save(commit=False)
-            new_comment.request = request_instance
-            new_comment.author = request.user
-            new_comment.save()
-        comment_instances = Comment.objects.filter(request_id=pk)
-        form = RequestForm(instance=request_instance)
-
-    else:
-        form = RequestForm(instance=request_instance)
-        comment_form = CommentForm(instance=request_instance)
-        print(request.POST)
-
-    return render(request, 'request/request_edit.html', {
-        'form': form,
-        'is_editable': is_editable,
-        'comments': comment_instances,
-        "comment_form": comment_form,
-        'request_instance': request_instance,
-        'due_date': request_instance.due_date
-    })
 
 
 @login_required

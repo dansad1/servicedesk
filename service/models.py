@@ -269,6 +269,41 @@ class Request(models.Model):
 
     def __str__(self):
         return f"Request {self.id}"
+
+    def set_default_values(self, user):
+        # Устанавливаем значения по умолчанию для полей заявки
+        if not self.request_type:
+            raise ValueError("Request type must be set before setting default values.")
+
+        default_fields = self.request_type.field_set.fields.all()
+        for field_meta in default_fields:
+            if not FieldValue.objects.filter(request=self, field_meta=field_meta).exists():
+                FieldValue.objects.create(
+                    request=self,
+                    field_meta=field_meta,
+                    value_text=self.get_default_value(field_meta, user)
+                )
+
+    def get_default_value(self, field_meta, user):
+        type_map = {
+            'text': '',
+            'textarea': '',
+            'select': None,
+            'number': 0,
+            'date': timezone.now().date() if field_meta.name.lower() == 'due date' else None,
+            'boolean': False,
+            'email': user.email if field_meta.field_type == 'email' else '',
+            'url': '',
+            'json': {},
+            'status': 'Открыта' if field_meta.field_type == 'status' else None,
+            'company': user.company if field_meta.field_type == 'company' else None,
+            'priority': None,
+            'requester': user if field_meta.field_type == 'requester' else None,
+            'assignee': None,
+            'request_type': self.request_type if field_meta.field_type == 'request_type' else None,
+            'file': None,
+        }
+        return type_map.get(field_meta.field_type, '')
 class Comment(models.Model):
     request = models.ForeignKey(Request, on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)

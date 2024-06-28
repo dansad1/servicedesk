@@ -1,3 +1,6 @@
+from datetime import timezone
+from django.utils import timezone
+
 from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.contrib.auth import get_user_model
@@ -165,14 +168,15 @@ class RequestForm(forms.ModelForm):
         fields = ['request_type']  # Добавьте другие статические поля, если необходимо
 
     def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
         request_type = kwargs.pop('request_type', None)
         super(RequestForm, self).__init__(*args, **kwargs)
 
         if request_type:
             for field_meta in request_type.field_set.fields.all():
-                self.fields[f'custom_field_{field_meta.id}'] = self.get_form_field(field_meta)
+                self.fields[f'custom_field_{field_meta.id}'] = self.get_form_field(field_meta, user)
 
-    def get_form_field(self, field_meta):
+    def get_form_field(self, field_meta, user):
         field_class = {
             'text': forms.CharField,
             'textarea': forms.CharField,
@@ -192,12 +196,14 @@ class RequestForm(forms.ModelForm):
 
         if field_meta.field_type in ['status', 'company', 'priority', 'requester', 'assignee']:
             queryset = self.get_queryset(field_meta.field_type)
-            return field_class(label=field_meta.name, required=field_meta.is_required, queryset=queryset)
+            initial_value = self.get_initial_value(field_meta, user)
+            return field_class(label=field_meta.name, required=field_meta.is_required, queryset=queryset, initial=initial_value)
         else:
+            initial_value = self.get_initial_value(field_meta, user)
             return field_class(
                 label=field_meta.name,
                 required=field_meta.is_required,
-                initial=field_meta.default_value,
+                initial=initial_value,
                 widget=self.get_widget(field_meta)
             )
 
@@ -229,3 +235,24 @@ class RequestForm(forms.ModelForm):
             'assignee': User.objects.all(),
         }
         return querysets.get(field_type, User.objects.none())
+
+    def get_initial_value(self, field_meta, user):
+        type_map = {
+            'text': '',
+            'textarea': '',
+            'select': None,
+            'number': 0,
+            'date': timezone.now().date() if field_meta.name.lower() == 'due date' else None,
+            'boolean': False,
+            'email': user.email if field_meta.field_type == 'email' else '',
+            'url': '',
+            'json': {},
+            'status': 'Открыта' if field_meta.field_type == 'status' else None,
+            'company': user.company if field_meta.field_type == 'company' else None,
+            'priority': None,
+            'requester': user if field_meta.field_type == 'requester' else None,
+            'assignee': None,
+            'request_type': self.instance.request_type if field_meta.field_type == 'request_type' else None,
+            'file': None,
+        }
+        return type_map.get(field_meta.field_type, '')
