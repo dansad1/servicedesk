@@ -1,17 +1,74 @@
 {% extends "base.html" %}
+
 {% block content %}
 <div class="container mt-5">
-  <h2 class="text-center mb-4 text-4xl">Создать новую заявку</h2>
-  <form method="post" enctype="multipart/form-data">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <div class="form-group text-center">
-          <button type="submit" name="action" value="save" class="btn btn-primary">Сохранить</button>
-          <button type="submit" name="action" value="save_and_close" class="btn btn-secondary">Сохранить и закрыть</button>
-      </div>
-  </form>
-  <div class="form-group text-center mt-4">
-      <a href="{% url 'request_list' %}" class="btn btn-secondary">Вернуться к списку заявок</a>
+  <h2 class="text-center mb-4">Создать новую заявку</h2>
+  <div class="form-container">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <div class="form-group">
+            <label for="{{ form.request_type.id_for_label }}" class="form-label">Тип заявки:</label>
+            {{ form.request_type }}
+        </div>
+
+        {% if form.title %}
+        <div class="form-group">
+            <label for="{{ form.title.id_for_label }}" class="form-label">Title:</label>
+            {{ form.title }}
+        </div>
+        {% endif %}
+
+        {% if form.description %}
+        <div class="form-group">
+            <label for="{{ form.description.id_for_label }}" class="form-label">Description:</label>
+            {{ form.description }}
+        </div>
+        {% endif %}
+
+        {% if form.attachment %}
+        <div class="form-group">
+            <label for="{{ form.attachment.id_for_label }}" class="form-label">Attachment:</label>
+            {{ form.attachment }}
+        </div>
+        {% endif %}
+
+        <div class="row">
+            <div class="col-md-6">
+                {% for field in form %}
+                    {% if not field.is_hidden and field.name not in ['title', 'description', 'attachment', 'request_type'] and forloop.counter0|divisibleby:2 %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                            {{ field.errors }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div class="col-md-6">
+                {% for field in form %}
+                    {% if not field.is_hidden and field.name not in ['title', 'description', 'attachment', 'request_type'] and not forloop.counter0|divisibleby:2 %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                            {{ field.errors }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="form-group text-center">
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+        </div>
+    </form>
   </div>
 </div>
 {% endblock %}

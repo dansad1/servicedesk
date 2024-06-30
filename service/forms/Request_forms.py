@@ -22,7 +22,7 @@ User = get_user_model()
      #   widget=forms.HiddenInput(),
       #  required=False
     #)
-    
+
     #class Meta:
      #   model = Request
         # Исключаем 'request_type' из списка отображаемых полей
@@ -39,7 +39,7 @@ User = get_user_model()
         #self.fields['status'].widget = Select(attrs={'class': 'form-control'})
         #self.fields['due_date'].widget = DateInput(attrs={'class': 'form-control datetimepicker-input', 'type': 'date'})
         #self.fields['priority'].widget.attrs.update({'class': 'form-control'})
-        
+
         #self.fields['title'].label = "Название заявки:"
         #self.fields['description'].label = "Описание заявки:"
         #self.fields['assignee'].label = "Исполнитель:"
@@ -53,8 +53,8 @@ User = get_user_model()
 
         # Adjust status field based on current_status
      #   self.adjust_status_field(current_status)
-    
-    
+
+
     #def adjust_status_field(self, current_status):
         #if current_status:
             # Limit status choices to valid next statuses
@@ -165,16 +165,22 @@ class SavedFilterForm(forms.ModelForm):
 class RequestForm(forms.ModelForm):
     class Meta:
         model = Request
-        fields = ['request_type']  # Добавьте другие статические поля, если необходимо
+        fields = ['request_type']  # Статическое поле типа заявки
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         request_type = kwargs.pop('request_type', None)
         super(RequestForm, self).__init__(*args, **kwargs)
 
+        # Добавим стили для виджета типа заявки
+        self.fields['request_type'].widget.attrs.update({'class': 'form-select'})
+
         if request_type:
             for field_meta in request_type.field_set.fields.all():
-                self.fields[f'custom_field_{field_meta.id}'] = self.get_form_field(field_meta, user)
+                field_name = f'custom_field_{field_meta.id}'
+                field = self.get_form_field(field_meta, user)
+                field.widget.attrs['widget_class'] = field.widget.__class__.__name__
+                self.fields[field_name] = field
 
     def get_form_field(self, field_meta, user):
         field_class = {
@@ -197,32 +203,39 @@ class RequestForm(forms.ModelForm):
         if field_meta.field_type in ['status', 'company', 'priority', 'requester', 'assignee']:
             queryset = self.get_queryset(field_meta.field_type)
             initial_value = self.get_initial_value(field_meta, user)
-            return field_class(label=field_meta.name, required=field_meta.is_required, queryset=queryset, initial=initial_value)
+            return field_class(
+                label=field_meta.name,
+                required=field_meta.is_required,
+                queryset=queryset,
+                initial=initial_value,
+                widget=forms.Select(attrs={'class': 'form-select'})
+            )
         else:
             initial_value = self.get_initial_value(field_meta, user)
+            widget = self.get_widget(field_meta)
             return field_class(
                 label=field_meta.name,
                 required=field_meta.is_required,
                 initial=initial_value,
-                widget=self.get_widget(field_meta)
+                widget=widget
             )
 
     def get_widget(self, field_meta):
         widgets = {
             'text': forms.TextInput(attrs={'class': 'form-control'}),
-            'textarea': forms.Textarea(attrs={'class': 'form-control'}),
+            'textarea': forms.Textarea(attrs={'class': 'form-textarea'}),
             'date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'file': forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'number': forms.NumberInput(attrs={'class': 'form-control'}),
             'boolean': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'url': forms.URLInput(attrs={'class': 'form-control'}),
-            'json': forms.Textarea(attrs={'class': 'form-control'}),
-            'status': forms.Select(attrs={'class': 'form-control'}),
-            'company': forms.Select(attrs={'class': 'form-control'}),
-            'priority': forms.Select(attrs={'class': 'form-control'}),
-            'requester': forms.Select(attrs={'class': 'form-control'}),
-            'assignee': forms.Select(attrs={'class': 'form-control'}),
+            'json': forms.Textarea(attrs={'class': 'form-textarea'}),
+            'status': forms.Select(attrs={'class': 'form-select'}),
+            'company': forms.Select(attrs={'class': 'form-select'}),
+            'priority': forms.Select(attrs={'class': 'form-select'}),
+            'requester': forms.Select(attrs={'class': 'form-select'}),
+            'assignee': forms.Select(attrs={'class': 'form-select'}),
         }
         return widgets.get(field_meta.field_type, forms.TextInput(attrs={'class': 'form-control'}))
 

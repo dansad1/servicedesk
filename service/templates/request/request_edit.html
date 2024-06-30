@@ -1,77 +1,63 @@
 {% extends "base.html" %}
-{% load static %}
-{% block content %}
-<script type="text/javascript" src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
-<script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
-  {{ form.media }}
-  {{ comment_form.media }}
 
+{% block content %}
 <div class="container mt-4">
     <h1 class="mb-4">Обновление заявки</h1>
 
-    <form method="post" {% if not is_editable %}class="read-only"{% endif %}>
-    <form method="post" {% if not is_editable %}class="read-only"{% endif %}>
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
+        {{ form.non_field_errors }}
 
-        {% for field in form %}
-        {% if field.name != "duration_in_hours" and field.name != "due_date" %}
-            <div class="form-group">
-                <label>{{ field.label }}</label>
-                {% if is_editable %}
-                    {{ field }}
-                {% else %}
-                    <p>{{ field.value }}</p>
-                {% endif %}
-            </div>
+        <div class="form-group">
+            <label for="{{ form.request_type.id_for_label }}">Тип заявки:</label>
+            {{ form.request_type }}
+        </div>
+
+        {% if form.fields.title %}
+        <div class="form-group">
+            <label for="{{ form.title.id_for_label }}" class="form-label">Название:</label>
+            {{ form.title }}
+        </div>
         {% endif %}
-    {% endfor %}
 
-
-    <div class="form-group">
-        <label>Срок выполнения:</label>
-        {% if due_date %}
-            <span>{{ due_date|date:"d M Y H:i" }}</span>
-        {% else %}
-            <span>Не установлен</span>
+        {% if form.fields.description %}
+        <div class="form-group">
+            <label for="{{ form.description.id_for_label }}" class="form-label">Описание:</label>
+            {{ form.description }}
+        </div>
         {% endif %}
-    </div>
 
-    {% if is_editable %}
-        <button type="submit" name="submit_update" class="btn btn-primary">Сохранить изменения</button>
-    {% endif %}
-</form>
-</div>
+        {% if form.fields.attachment %}
+        <div class="form-group">
+            <label for="{{ form.attachment.id_for_label }}" class="form-label">Вложение:</label>
+            {{ form.attachment }}
+        </div>
+        {% endif %}
 
-    <h2 class="mb-3">Комментарии</h2>
-    <div class="comments">
-        {% for comment in comments %}
-            <div class="comment mb-3">
-                <strong>{{comment.label}}</strong>
-                
-                <p><strong>{{ comment.author.username }}</strong></p>
-                
-                <p><em>{{ comment.created_at|date:"N d, Y H:i" }}</em></p>
-                <p>{{ comment.text|safe }}</p>
-                {% if comment.attachment and comment.attachment.url %}
-                <p>Attachment: <a href="{% url 'file_view' comment.attachment.url %}" target="_blank">{{ comment.attachment.name }}</a></p>
-                {% endif %}
-            </div>
-        {% empty %}
-            <p>Комментариев пока нет.</p>
-        {% endfor %}
-    </div>
+        <div class="row">
+            {% with excluded_fields="title description attachment request_type" %}
+                {% for field in form %}
+                    {% if not field.is_hidden and field.name not in excluded_fields %}
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                                {% endif %}
+                                {{ field.errors }}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endwith %}
+        </div>
 
-    <!-- Форма добавления комментария -->
-    <div class="form-custom mt-4">
-        <h3 class="mb-3">Добавить комментарий</h3>
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ comment_form.as_p }}
-            <button type="submit" name="add_comment" value="add_comment" class="btn btn-success">Добавить комментарий</button>
-        </form>
-    </div>
+        <div class="form-group text-center">
+            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+        </div>
+    </form>
 
-
-<a href="{% url 'request_list' %}" class="btn btn-secondary">Вернуться к списку заявок</a>
+    <a href="{% url 'request_list' %}" class="btn btn-secondary">Вернуться к списку заявок</a>
 </div>
 {% endblock %}

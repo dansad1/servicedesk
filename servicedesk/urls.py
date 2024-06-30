@@ -45,7 +45,7 @@ urlpatterns = [
     path('select_request_type/', select_request_type, name='select_request_type'),
     path('select_request_type/', select_request_type, name='select_request_type'),
     path('request/create/<int:request_type_id>/', request_create, name='request_create'),
-    path('request/update/<int:pk>/', request_edit, name='request_edit'),
+    path('request/update/<int:request_id>/', request_edit, name='request_edit'),
     path('requests/delete/', request_delete, name='request_delete'),
     path('request/<int:pk>/comment/', add_comment, name='add_comment'),
     path('ckeditor/', include('ckeditor_uploader.urls')),
