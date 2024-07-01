@@ -35,22 +35,34 @@
         {% endif %}
 
         <div class="row">
-            {% with excluded_fields="title description attachment request_type" %}
+            <div class="col-md-6">
                 {% for field in form %}
-                    {% if not field.is_hidden and field.name not in excluded_fields %}
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                                {{ field }}
-                                {% if field.help_text %}
-                                    <small class="form-text text-muted">{{ field.help_text }}</small>
-                                {% endif %}
-                                {{ field.errors }}
-                            </div>
+                    {% if not field.is_hidden and field.name != 'title' and field.name != 'description' and field.name != 'attachment' and field.name != 'request_type' and forloop.counter0|divisibleby:2 %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                            {{ field.errors }}
                         </div>
                     {% endif %}
                 {% endfor %}
-            {% endwith %}
+            </div>
+            <div class="col-md-6">
+                {% for field in form %}
+                    {% if not field.is_hidden and field.name != 'title' and field.name != 'description' and field.name != 'attachment' and field.name != 'request_type' and not forloop.counter0|divisibleby:2 %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                            {{ field.errors }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
         </div>
 
         <div class="form-group text-center">

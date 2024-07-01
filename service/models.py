@@ -154,6 +154,14 @@ class FieldMeta(models.Model):
 
     def __str__(self):
         return self.name
+def get_default_value(self):
+        if self.field_type == 'status' and self.default_value:
+            try:
+                return Status.objects.get(id=self.default_value)
+            except Status.DoesNotExist:
+                return None
+        # Другие типы полей могут быть добавлены аналогично
+        return self.default_value
 
 class FieldSet(models.Model):
     name = models.CharField(max_length=100)
@@ -246,22 +254,50 @@ class FieldValue(models.Model):
         type_map = {
             'text': self.value_text,
             'textarea': self.value_text,
-            'select': self.value_text,
             'number': self.value_number,
             'date': self.value_date,
             'boolean': self.value_boolean,
             'email': self.value_email,
             'url': self.value_url,
             'json': self.value_json,
-            'status': self.value_status.name if self.value_status else None,
-            'company': self.value_company.name if self.value_company else None,
-            'priority': self.value_priority.name if self.value_priority else None,
-            'requester': self.value_requester.username if self.value_requester else None,
-            'assignee': self.value_assignee.username if self.value_assignee else None,
-            'request_type': self.value_request_type.name if self.value_request_type else None,
+            'status': self.value_status.id if self.value_status else None,
+            'company': self.value_company.id if self.value_company else None,
+            'priority': self.value_priority.id if self.value_priority else None,
+            'requester': self.value_requester.id if self.value_requester else None,
+            'assignee': self.value_assignee.id if self.value_assignee else None,
+            'request_type': self.value_request_type.id if self.value_request_type else None,
             'file': self.value_file.name if self.value_file else None,
         }
         return type_map.get(self.field_meta.field_type)
+
+    def set_value(self, value):
+        if self.field_meta.field_type == 'status':
+            self.value_status_id = value if value else None
+        elif self.field_meta.field_type == 'company':
+            self.value_company_id = value if value else None
+        elif self.field_meta.field_type == 'priority':
+            self.value_priority_id = value if value else None
+        elif self.field_meta.field_type == 'requester':
+            self.value_requester_id = value if value else None
+        elif self.field_meta.field_type == 'assignee':
+            self.value_assignee_id = value if value else None
+        elif self.field_meta.field_type == 'request_type':
+            self.value_request_type_id = value if value else None
+        elif self.field_meta.field_type == 'file':
+            self.value_file = value
+        else:
+            field_name = {
+                'text': 'value_text',
+                'textarea': 'value_text',
+                'number': 'value_number',
+                'date': 'value_date',
+                'boolean': 'value_boolean',
+                'email': 'value_email',
+                'url': 'value_url',
+                'json': 'value_json',
+            }.get(self.field_meta.field_type)
+            if field_name:
+                setattr(self, field_name, value)
 class Request(models.Model):
     request_type = models.ForeignKey(RequestType, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
@@ -271,39 +307,41 @@ class Request(models.Model):
         return f"Request {self.id}"
 
     def set_default_values(self, user):
-        # Устанавливаем значения по умолчанию для полей заявки
         if not self.request_type:
             raise ValueError("Request type must be set before setting default values.")
 
         default_fields = self.request_type.field_set.fields.all()
         for field_meta in default_fields:
             if not FieldValue.objects.filter(request=self, field_meta=field_meta).exists():
+                default_value = self.get_default_value(field_meta, user)
                 FieldValue.objects.create(
                     request=self,
                     field_meta=field_meta,
-                    value_text=self.get_default_value(field_meta, user)
+                    **default_value
                 )
 
     def get_default_value(self, field_meta, user):
         type_map = {
-            'text': '',
-            'textarea': '',
-            'select': None,
-            'number': 0,
-            'date': timezone.now().date() if field_meta.name.lower() == 'due date' else None,
-            'boolean': False,
-            'email': user.email if field_meta.field_type == 'email' else '',
-            'url': '',
-            'json': {},
-            'status': 'Открыта' if field_meta.field_type == 'status' else None,
-            'company': user.company if field_meta.field_type == 'company' else None,
-            'priority': None,
-            'requester': user if field_meta.field_type == 'requester' else None,
-            'assignee': None,
-            'request_type': self.request_type if field_meta.field_type == 'request_type' else None,
-            'file': None,
+            'text': {'value_text': ''},
+            'textarea': {'value_text': ''},
+            'select': {'value_text': None},
+            'number': {'value_number': 0},
+            'date': {'value_date': timezone.now().date() if field_meta.name.lower() == 'due date' else None},
+            'boolean': {'value_boolean': False},
+            'email': {'value_email': user.email if field_meta.field_type == 'email' else ''},
+            'url': {'value_url': ''},
+            'json': {'value_json': {}},
+            'status': {
+                'value_status': Status.objects.get(id=field_meta.default_value) if field_meta.default_value else None},
+            'company': {'value_company': user.company if field_meta.field_type == 'company' else None},
+            'priority': {'value_priority': None},
+            'requester': {'value_requester': user if field_meta.field_type == 'requester' else None},
+            'assignee': {'value_assignee': None},
+            'request_type': {
+                'value_request_type': self.request_type if field_meta.field_type == 'request_type' else None},
+            'file': {'value_file': None},
         }
-        return type_map.get(field_meta.field_type, '')
+        return type_map.get(field_meta.field_type, {})
 class Comment(models.Model):
     request = models.ForeignKey(Request, on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)

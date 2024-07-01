@@ -80,7 +80,6 @@ def select_request_type(request):
     return render(request, 'request/select_request_type.html', {'types': types})
 
 @login_required
-
 def request_create(request, request_type_id):
     request_type = get_object_or_404(RequestType, id=request_type_id)
     if request.method == 'POST':
@@ -89,19 +88,22 @@ def request_create(request, request_type_id):
             new_request = form.save(commit=False)
             new_request.request_type = request_type
             new_request.save()
-            # Сохранение динамических полей
             for field_name, field_value in form.cleaned_data.items():
                 if field_name.startswith('custom_field_'):
-                    # Логика сохранения динамических полей
                     field_id = int(field_name.split('_')[-1])
-                    # Пример сохранения: custom_field = CustomField.objects.create(request=new_request, field_id=field_id, value=field_value)
-                    pass
+                    field_meta = get_object_or_404(FieldMeta, id=field_id)
+                    field_value_obj, created = FieldValue.objects.get_or_create(
+                        request=new_request,
+                        field_meta=field_meta
+                    )
+                    field_value_obj.set_value(field_value)
+                    field_value_obj.save()
             return redirect('request_list')
     else:
         form = RequestForm(user=request.user, request_type=request_type)
-    return render(request, 'request/request_create.html', {'form': form, 'request_type': request_type})
+    excluded_fields = ['title', 'description', 'attachment', 'request_type']
+    return render(request, 'request/request_create.html', {'form': form, 'request_type': request_type, 'excluded_fields': excluded_fields})
 
-@login_required
 def request_edit(request, request_id):
     req = get_object_or_404(Request, id=request_id)
     request_type = req.request_type
@@ -109,13 +111,16 @@ def request_edit(request, request_id):
         form = RequestForm(request.POST, request.FILES, instance=req, user=request.user, request_type=request_type)
         if form.is_valid():
             req = form.save()
-            # Сохранение динамических полей
             for field_name, field_value in form.cleaned_data.items():
                 if field_name.startswith('custom_field_'):
-                    # Логика сохранения динамических полей
                     field_id = int(field_name.split('_')[-1])
-                    # Пример обновления: custom_field = CustomField.objects.update_or_create(request=req, field_id=field_id, defaults={'value': field_value})
-                    pass
+                    field_meta = get_object_or_404(FieldMeta, id=field_id)
+                    field_value_obj, created = FieldValue.objects.get_or_create(
+                        request=req,
+                        field_meta=field_meta
+                    )
+                    field_value_obj.set_value(field_value)
+                    field_value_obj.save()
             return redirect('request_list')
     else:
         form = RequestForm(instance=req, user=request.user, request_type=request_type)

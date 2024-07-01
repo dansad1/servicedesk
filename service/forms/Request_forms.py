@@ -5,7 +5,8 @@ from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.contrib.auth import get_user_model
 from django.forms import SelectMultiple, DateInput
-from service.models import StatusTransition, Status, Comment, Request, Company, Priority, RequestType, SavedFilter,FieldAccess, FieldMeta
+from service.models import StatusTransition, Status, Comment, Request, Company, Priority, RequestType, SavedFilter, \
+    FieldAccess, FieldMeta, FieldValue, CustomUser
 from django.forms.widgets import Select
 from django.contrib.auth.models import Group
 
@@ -165,24 +166,32 @@ class SavedFilterForm(forms.ModelForm):
 class RequestForm(forms.ModelForm):
     class Meta:
         model = Request
-        fields = ['request_type']  # Статическое поле типа заявки
+        fields = ['request_type']
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         request_type = kwargs.pop('request_type', None)
         super(RequestForm, self).__init__(*args, **kwargs)
 
-        # Добавим стили для виджета типа заявки
         self.fields['request_type'].widget.attrs.update({'class': 'form-select'})
 
         if request_type:
             for field_meta in request_type.field_set.fields.all():
                 field_name = f'custom_field_{field_meta.id}'
-                field = self.get_form_field(field_meta, user)
+                initial_value = None
+                if self.instance.pk:
+                    try:
+                        field_value = FieldValue.objects.get(request=self.instance, field_meta=field_meta)
+                        initial_value = field_value.get_value()
+                    except FieldValue.DoesNotExist:
+                        pass
+                else:
+                    initial_value = self.get_initial_value(field_meta, user)
+                field = self.get_form_field(field_meta, initial_value)
                 field.widget.attrs['widget_class'] = field.widget.__class__.__name__
                 self.fields[field_name] = field
 
-    def get_form_field(self, field_meta, user):
+    def get_form_field(self, field_meta, initial_value):
         field_class = {
             'text': forms.CharField,
             'textarea': forms.CharField,
@@ -202,16 +211,15 @@ class RequestForm(forms.ModelForm):
 
         if field_meta.field_type in ['status', 'company', 'priority', 'requester', 'assignee']:
             queryset = self.get_queryset(field_meta.field_type)
-            initial_value = self.get_initial_value(field_meta, user)
+            initial = field_meta.default_value if field_meta.field_type == 'status' and field_meta.default_value else initial_value
             return field_class(
                 label=field_meta.name,
                 required=field_meta.is_required,
                 queryset=queryset,
-                initial=initial_value,
+                initial=initial,
                 widget=forms.Select(attrs={'class': 'form-select'})
             )
         else:
-            initial_value = self.get_initial_value(field_meta, user)
             widget = self.get_widget(field_meta)
             return field_class(
                 label=field_meta.name,
@@ -244,28 +252,51 @@ class RequestForm(forms.ModelForm):
             'status': Status.objects.all(),
             'company': Company.objects.all(),
             'priority': Priority.objects.all(),
-            'requester': User.objects.all(),
-            'assignee': User.objects.all(),
+            'requester': CustomUser.objects.all(),
+            'assignee': CustomUser.objects.all(),
         }
-        return querysets.get(field_type, User.objects.none())
+        return querysets.get(field_type, CustomUser.objects.none())
 
     def get_initial_value(self, field_meta, user):
-        type_map = {
-            'text': '',
-            'textarea': '',
-            'select': None,
-            'number': 0,
-            'date': timezone.now().date() if field_meta.name.lower() == 'due date' else None,
-            'boolean': False,
-            'email': user.email if field_meta.field_type == 'email' else '',
-            'url': '',
-            'json': {},
-            'status': 'Открыта' if field_meta.field_type == 'status' else None,
-            'company': user.company if field_meta.field_type == 'company' else None,
-            'priority': None,
-            'requester': user if field_meta.field_type == 'requester' else None,
-            'assignee': None,
-            'request_type': self.instance.request_type if field_meta.field_type == 'request_type' else None,
-            'file': None,
-        }
-        return type_map.get(field_meta.field_type, '')
+        if self.instance.pk:
+            try:
+                field_value = FieldValue.objects.get(request=self.instance, field_meta=field_meta)
+                return field_value.get_value()
+            except FieldValue.DoesNotExist:
+                return None
+        else:
+            type_map = {
+                'text': '',
+                'textarea': '',
+                'select': None,
+                'number': 0,
+                'date': timezone.now().date() if field_meta.name.lower() == 'due date' else None,
+                'boolean': False,
+                'email': user.email if field_meta.field_type == 'email' else '',
+                'url': '',
+                'json': {},
+                'status': Status.objects.get(id=field_meta.default_value) if field_meta.default_value else None,
+                'company': user.company if hasattr(user, 'company') else None,
+                'priority': None,
+                'requester': user if field_meta.field_type == 'requester' else None,
+                'assignee': None,
+                'request_type': None,
+                'file': None,
+            }
+            return type_map.get(field_meta.field_type, '')
+
+    def save(self, commit=True):
+        instance = super(RequestForm, self).save(commit=False)
+        if commit:
+            instance.save()
+            for field_name, field_value in self.cleaned_data.items():
+                if field_name.startswith('custom_field_'):
+                    field_id = int(field_name.split('_')[-1])
+                    field_meta = FieldMeta.objects.get(id=field_id)
+                    field_value_obj, created = FieldValue.objects.get_or_create(
+                        request=instance,
+                        field_meta=field_meta
+                    )
+                    field_value_obj.set_value(field_value)
+                    field_value_obj.save()
+        return instance

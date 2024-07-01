@@ -1,5 +1,5 @@
 from service.forms.Request_forms import User
-from service.models import FieldMeta, FieldAccess, Priority, Status, Company
+from service.models import FieldMeta, FieldAccess, Priority, Status, Company, CustomUser
 from django import forms
 from django.contrib.auth.models import Group
 
@@ -49,9 +49,9 @@ class FieldMetaForm(forms.ModelForm):
         elif field_type == 'priority':
             return forms.ModelChoiceField(label="Значение по умолчанию", required=False, queryset=Priority.objects.all(), widget=forms.Select())
         elif field_type == 'requester':
-            return forms.ModelChoiceField(label="Значение по умолчанию", required=False, queryset=User.objects.all(), widget=forms.Select())
+            return forms.ModelChoiceField(label="Значение по умолчанию", required=False, queryset=CustomUser.objects.all(), widget=forms.Select())
         elif field_type == 'assignee':
-            return forms.ModelChoiceField(label="Значение по умолчанию", required=False, queryset=User.objects.all(), widget=forms.Select())
+            return forms.ModelChoiceField(label="Значение по умолчанию", required=False, queryset=CustomUser.objects.all(), widget=forms.Select())
         else:
             return forms.CharField(label="Значение по умолчанию", required=False, widget=forms.TextInput())
 
