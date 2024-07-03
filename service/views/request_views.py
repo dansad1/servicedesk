@@ -153,27 +153,19 @@ def add_comment(request, pk):
 
 @login_required
 def request_list(request):
-    filter_form = RequestFilterForm(request.GET)
     initial_requests = Request.objects.all()
+    filtered_requests, filter_form = handle_filters(request, initial_requests)
 
-    if filter_form.is_valid():
-        filters = filter_form.cleaned_data
-        filtered_requests = apply_filters(initial_requests, filters)
-    else:
-        filtered_requests = initial_requests
-
-    requests_with_action = []
-
-    for req in filtered_requests:
-        # Определение действия на основе прав доступа
-        action_url = 'view_request'  # URL страницы просмотра по умолчанию
-        if can_edit_request(request.user, req):
-            action_url = 'edit_request'  # URL страницы редактирования, если есть право на редактирование
-
-        requests_with_action.append({'request': req, 'action_url': action_url})
+    requests_with_field_values = [
+        {
+            'request': req,
+            'field_values': req.get_field_values()
+        }
+        for req in filtered_requests
+    ]
 
     return render(request, 'request/request_list.html', {
-        'requests_with_action': requests_with_action,
+        'requests_with_field_values': requests_with_field_values,
         'filter_form': filter_form
     })
     

@@ -14,63 +14,8 @@ from django.contrib.auth.models import Group
 User = get_user_model()
 
 
-#class RequestForm(forms.ModelForm):
- #   description = forms.CharField(widget=CKEditorWidget())
-  #  duration_in_hours = forms.IntegerField(required=False, widget=forms.HiddenInput())
-   # attachment = forms.FileField(required=False)
-    #request_type = forms.ModelChoiceField(
-    #    queryset=RequestType.objects.all(),
-     #   widget=forms.HiddenInput(),
-      #  required=False
-    #)
-
-    #class Meta:
-     #   model = Request
-        # Исключаем 'request_type' из списка отображаемых полей
-        #fields = ['title', 'description', 'assignee', 'status', 'due_date', 'priority']
-
-   # def __init__(self, *args, **kwargs):
-    #    current_status = kwargs.pop('current_status', None)
-        #super(RequestForm, self).__init__(*args, **kwargs)
-
-        # Styling for fields
-     #   self.fields['title'].widget.attrs.update({'class': 'form-control'})
-      #  self.fields['description'].widget.attrs.update({'class': 'form-control'})
-       # self.fields['assignee'].widget.attrs.update({'class': 'form-control'})
-        #self.fields['status'].widget = Select(attrs={'class': 'form-control'})
-        #self.fields['due_date'].widget = DateInput(attrs={'class': 'form-control datetimepicker-input', 'type': 'date'})
-        #self.fields['priority'].widget.attrs.update({'class': 'form-control'})
-
-        #self.fields['title'].label = "Название заявки:"
-        #self.fields['description'].label = "Описание заявки:"
-        #self.fields['assignee'].label = "Исполнитель:"
-        #self.fields['status'].label = "Статус:"
-        #self.fields['due_date'].label = "Срок выполнения:"
-        #self.fields['priority'].label = "Приоритет:"
-
-        # Make status field optional and set initial values
-      #  self.fields['status'].required = False
-       # self.fields['status'].empty_label = "No change"
-
-        # Adjust status field based on current_status
-     #   self.adjust_status_field(current_status)
 
 
-    #def adjust_status_field(self, current_status):
-        #if current_status:
-            # Limit status choices to valid next statuses
-            #valid_next_statuses = StatusTransition.objects.filter(
-             #   from_status=current_status
-            #).values_list('to_status', flat=True)
-           # self.fields['status'].queryset = Status.objects.filter(
-          #      id__in=valid_next_statuses
-         #   ).union(Status.objects.filter(pk=current_status.pk))
-        #    self.fields['status'].initial = current_status
-       # else:
-            # Set a default status for new requests
-           # default_status, _ = Status.objects.get_or_create(name="Открыта")
-          #  self.fields['status'].queryset = Status.objects.filter(pk=default_status.pk)
-         #   self.fields['status'].initial = default_status
 
 class CommentForm(forms.ModelForm):
     class Meta:

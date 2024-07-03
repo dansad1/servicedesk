@@ -342,6 +342,43 @@ class Request(models.Model):
             'file': {'value_file': None},
         }
         return type_map.get(field_meta.field_type, {})
+
+    def get_field_values(self):
+        values = {}
+        for field_value in self.field_values.all():
+            field_type = field_value.field_meta.field_type
+            if field_type == 'text' or field_type == 'textarea':
+                values[field_value.field_meta.name] = field_value.value_text
+            elif field_type == 'number':
+                values[field_value.field_meta.name] = field_value.value_number
+            elif field_type == 'date':
+                values[field_value.field_meta.name] = field_value.value_date
+            elif field_type == 'boolean':
+                values[field_value.field_meta.name] = field_value.value_boolean
+            elif field_type == 'email':
+                values[field_value.field_meta.name] = field_value.value_email
+            elif field_type == 'url':
+                values[field_value.field_meta.name] = field_value.value_url
+            elif field_type == 'json':
+                values[field_value.field_meta.name] = field_value.value_json
+            elif field_type == 'status':
+                values[
+                    field_value.field_meta.name] = field_value.value_status.name if field_value.value_status else None
+            elif field_type == 'company':
+                values[
+                    field_value.field_meta.name] = field_value.value_company.name if field_value.value_company else None
+            elif field_type == 'priority':
+                values[
+                    field_value.field_meta.name] = field_value.value_priority.name if field_value.value_priority else None
+            elif field_type == 'requester' or field_type == 'assignee':
+                user = field_value.value_requester if field_type == 'requester' else field_value.value_assignee
+                values[field_value.field_meta.name] = user.username if user else None
+            elif field_type == 'request_type':
+                values[
+                    field_value.field_meta.name] = field_value.value_request_type.name if field_value.value_request_type else None
+            elif field_type == 'file':
+                values[field_value.field_meta.name] = field_value.value_file.url if field_value.value_file else None
+        return values
 class Comment(models.Model):
     request = models.ForeignKey(Request, on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)

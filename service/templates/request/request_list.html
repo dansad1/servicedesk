@@ -42,9 +42,10 @@
   </div>
 </div>
 
+
 <div class="requests-list">
     <h3 class="text-center text-4xl p-10 max-w-4xl m-auto">Список заявок</h3>
-    {% if not requests_with_action %}
+    {% if not requests_with_field_values %}
       <p class="text-center text-xl p-4 max-w-4xl m-auto">Нет доступных заявок</p>
     {% else %}
       <form id="delete-form" method="post" action="{% url 'request_delete' %}">
@@ -65,18 +66,17 @@
             </tr>
           </thead>
           <tbody>
-            {% for item in requests_with_action %}
+            {% for item in requests_with_field_values %}
             <tr class="align-middle">
                 <td class="text-center"><input type="checkbox" name="selected_requests" value="{{ item.request.pk }}"></td>
-                <td class="text-center">{{ item.request.title }}</td>
-                <td class="text-center">{{ item.request.request_type }}</td>
-                <td class="text-center">{{ item.request.priority }}</td>
-                <td class="text-center">{{ item.request.assignee }}</td>
-                <td class="text-center">{{ item.request.requester }}</td>
-                <td class="text-center">{{ item.request.status }}</td>
-                <td class="text-center">{% if item.request.due_date %}{{ item.request.due_date|date:"d.m.Y" }}{% else %}Не указано{% endif %}</td>
+                <td class="text-center">{{ item.field_values.Title }}</td>
+                <td class="text-center">{{ item.field_values.Request_Type }}</td>
+                <td class="text-center">{{ item.field_values.Priority }}</td>
+                <td class="text-center">{{ item.field_values.Assignee }}</td>
+                <td class="text-center">{{ item.field_values.Requester }}</td>
+                <td class="text-center">{{ item.field_values.Status }}</td>
+                <td class="text-center">{% if item.field_values.Due_Date %}{{ item.field_values.Due_Date|date:"d.m.Y" }}{% else %}Не указано{% endif %}</td>
                 <td class="text-center">{% if item.request.updated_at %}{{ item.request.updated_at|date:"d.m.Y H:i" }}{% else %}Не указано{% endif %}</td>
-                <!-- Кнопка удаления теперь в своей ячейке -->
                 <td class="flex gap-2 justify-evenly">
                     <button onclick="window.location.href='{% url 'request_edit' item.request.pk %}'" type="button" class="btn btn-primary">Редактировать</button>
                 </td>
@@ -91,7 +91,6 @@
     <button class="btn btn-primary" id="openFilters">Открыть фильтры</button>
     <button class="btn btn-secondary" id="exportPdf">Экспорт в PDF</button>
 </div>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const openFiltersButton = document.getElementById('openFilters');
