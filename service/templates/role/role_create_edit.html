@@ -1,6 +1,10 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %}
+
+{% block content %}
 <div class="role">
-    <h1 class='m-auto max-w-4xl p-10 text-4xl text-center'>Полномичия для роли {{group.name}}</h1>
+    <h1 class='m-auto max-w-4xl p-10 text-4xl text-center'>
+        {% if group %}Полномочия для роли {{ group.name }}{% else %}Создание роли{% endif %}
+    </h1>
     <div class="button_group p-10">
         <button id="button_requests" type='button' class="btn active" onclick="showBlock('requests', this)">По заявкам</button>
         <button class="btn" type="button" onclick="showBlock('users', this)">По пользователям/ группам пользователей</button>
@@ -14,144 +18,151 @@
     <form method="post">
         {% csrf_token %}
 
-        <div class="form-group m-auto max-w-5xl mb-5 ">
+        <div class="form-group m-auto max-w-5xl mb-5">
             <label class="mb-2" for="id_name">Название роли:</label>
             {{ group_form.name }}
         </div>
 
-        <div id="requests" class="form_style active max-w-5xl  m-auto p-10 bg-slate-200">
+        <div id="requests" class="form_style active max-w-5xl m-auto p-10 bg-slate-200">
             <h2 class="text-2xl">Полномочия по заявкам</h2>
             <div class="service_authority gap-4 text-xl">
-                    {% for permission in  permission_form.fields.custompermission.queryset %}
-                        {% if 'requests_1' in permission.code_name %}
-                            <div>
+                {% for permission in permission_form.fields.custompermission.queryset %}
+                    {% if 'requests_1' in permission.code_name %}
+                        <div>
+                            <label>
+                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}"
+                                {% if permission.id in current_permissions %}checked{% endif %}>
+                                {{ permission.name }}
+                            </label>
+                        </div>
+                    {% endif %}
+
+                    {% if 'requests_2' in permission.code_name %}
+                        <div>
+                            <h1 class="text-2xl">{{ permission.name }}</h1>
+                            <input class="hidden" type="checkbox" name="permissions[]" value="{{ permission.id }}" checked>
+                            {% for choice in access_levels_choices %}
                                 <label>
-                                    <input type="checkbox" name="permissions[]" value="{{ permission.id }}">
-                                    {{ permission.name }}
+                                    <input type="radio" name="access_level_{{ permission.id }}" value="{{ choice.0 }}"
+                                    {% if current_permissions|default_if_none:None|get_item:permission.id == choice.0 %}checked{% elif not permission.id in current_permissions and forloop.first %}checked{% endif %}>
+                                    {{ choice.1 }}
                                 </label>
-                            </div>
-                        {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
 
-                        {% if 'requests_2' in permission.code_name %}
-                            <div>
-                                <h1 class="text-2xl">{{ permission.name }}</h1>
-                                <input class="hidden" type="checkbox" name="permissions[]" value="{{permission.id}}" checked>
-                                {% for choice in access_levels_choices %}
-                                    <label>
-                                        <input type="radio" name="access_level_{{ permission.id }}" value="{{ choice.0 }}"
-                                        {% if forloop.first %}checked{% endif %}>
-                                            {{ choice.1 }}
-                                    </label>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-
-                        {% if 'requests_can_add_executors' in permission.code_name %}
-                            <div>
-                                <h1 class="text-2xl">Карточка заявки. Исполнение заявок</h1>
-                                <label>
-                                    <input type="checkbox" name="permissions[]" value="{{ permission.id }}">
-                                    {{ permission.name }}
-                                </label>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-            </div>
-        </div>
-
-
-
-        <div id="profile" class="form_style max-w-5xl  m-auto p-10 bg-slate-200">
-            <h2 class="text-2xl" >Профиль</h2>
-            <div class="service_authority gap-4 text-xl">
-                {% for permission in  permission_form.fields.custompermission.queryset %}
-
-                    {% if 'profile' in permission.code_name %}
-                    <div>
-                        <label>
-                            <input type="checkbox" name="permissions[]" value="{{ permission.id }}">
-                            {{ permission.name }}
-                        </label>
-                    </div>
+                    {% if 'requests_can_add_executors' in permission.code_name %}
+                        <div>
+                            <h1 class="text-2xl">Карточка заявки. Исполнение заявок</h1>
+                            <label>
+                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}"
+                                {% if permission.id in current_permissions %}checked{% endif %}>
+                                {{ permission.name }}
+                            </label>
+                        </div>
                     {% endif %}
                 {% endfor %}
             </div>
         </div>
 
-        <div id="settings" class="form_style max-w-5xl  m-auto p-10 bg-slate-200">
+        <div id="profile" class="form_style max-w-5xl m-auto p-10 bg-slate-200">
+            <h2 class="text-2xl">Профиль</h2>
+            <div class="service_authority gap-4 text-xl">
+                {% for permission in permission_form.fields.custompermission.queryset %}
+                    {% if 'profile' in permission.code_name %}
+                        <div>
+                            <label>
+                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}"
+                                {% if permission.id in current_permissions %}checked{% endif %}>
+                                {{ permission.name }}
+                            </label>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="settings" class="form_style max-w-5xl m-auto p-10 bg-slate-200">
             <h2 class="text-2xl">Настройки типов заявок</h2>
             <div class="service_authority text-xl">
-                {% for permission in  permission_form.fields.custompermission.queryset %}
+                {% for permission in permission_form.fields.custompermission.queryset %}
                     {% if 'requests_types' in permission.code_name %}
                         <div>
                             <label>
-                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}">
+                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}"
+                                {% if permission.id in current_permissions %}checked{% endif %}>
                                 {{ permission.name }}
                             </label>
                         </div>
                     {% endif %}
                 {% endfor %}
                 <h2 class="text-2xl">Настройки приоритетов заявок</h2>
-                {% for permission in  permission_form.fields.custompermission.queryset %}
+                {% for permission in permission_form.fields.custompermission.queryset %}
                     {% if 'requests_priority' in permission.code_name %}
                         <div>
                             <label>
-                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}">
+                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}"
+                                {% if permission.id in current_permissions %}checked{% endif %}>
                                 {{ permission.name }}
                             </label>
                         </div>
                     {% endif %}
                 {% endfor %}
                 <h2 class="text-2xl">Настройки списков статусов</h2>
-                {% for permission in  permission_form.fields.custompermission.queryset %}
+                {% for permission in permission_form.fields.custompermission.queryset %}
                     {% if 'status_list' in permission.code_name %}
                         <div>
                             <label>
-                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}">
+                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}"
+                                {% if permission.id in current_permissions %}checked{% endif %}>
                                 {{ permission.name }}
                             </label>
                         </div>
                     {% endif %}
                 {% endfor %}
                 <h2 class="text-2xl">Настройки переходов статусов</h2>
-                {% for permission in  permission_form.fields.custompermission.queryset %}
+                {% for permission in permission_form.fields.custompermission.queryset %}
                     {% if 'status_trans' in permission.code_name %}
                         <div>
                             <label>
-                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}">
+                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}"
+                                {% if permission.id in current_permissions %}checked{% endif %}>
                                 {{ permission.name }}
                             </label>
                         </div>
                     {% endif %}
                 {% endfor %}
                 <h2 class="text-2xl">Настройки SMTP</h2>
-                {% for permission in  permission_form.fields.custompermission.queryset %}
+                {% for permission in permission_form.fields.custompermission.queryset %}
                     {% if 'smtp' in permission.code_name %}
                         <div>
                             <label>
-                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}">
+                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}"
+                                {% if permission.id in current_permissions %}checked{% endif %}>
                                 {{ permission.name }}
                             </label>
                         </div>
                     {% endif %}
                 {% endfor %}
                 <h2 class="text-2xl">Настройки списка документов</h2>
-                {% for permission in  permission_form.fields.custompermission.queryset %}
+                {% for permission in permission_form.fields.custompermission.queryset %}
                     {% if 'docs' in permission.code_name %}
                         <div>
                             <label>
-                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}">
+                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}"
+                                {% if permission.id in current_permissions %}checked{% endif %}>
                                 {{ permission.name }}
                             </label>
                         </div>
                     {% endif %}
                 {% endfor %}
                 <h2 class="text-2xl">Настройки обзора уведомлений</h2>
-                {% for permission in  permission_form.fields.custompermission.queryset %}
+                {% for permission in permission_form.fields.custompermission.queryset %}
                     {% if 'notifications' in permission.code_name %}
                         <div>
                             <label>
-                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}">
+                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}"
+                                {% if permission.id in current_permissions %}checked{% endif %}>
                                 {{ permission.name }}
                             </label>
                         </div>
@@ -160,14 +171,15 @@
             </div>
         </div>
 
-        <div id="users" class="form_style max-w-5xl  m-auto p-10 bg-slate-200">
+        <div id="users" class="form_style max-w-5xl m-auto p-10 bg-slate-200">
             <h2 class="text-2xl">Полномочия по пользователям/группам пользователей</h2>
             <div class="service_authority gap-4 text-xl mt-2">
-                {% for permission in  permission_form.fields.custompermission.queryset %}
+                {% for permission in permission_form.fields.custompermission.queryset %}
                     {% if 'users_can' in permission.code_name %}
                         <div>
                             <label>
-                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}">
+                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}"
+                                {% if permission.id in current_permissions %}checked{% endif %}>
                                 {{ permission.name }}
                             </label>
                         </div>
@@ -176,14 +188,15 @@
             </div>
         </div>
 
-        <div id="companies" class="form_style max-w-5xl  m-auto p-10 bg-slate-200">
+        <div id="companies" class="form_style max-w-5xl m-auto p-10 bg-slate-200">
             <h2 class="text-2xl">Полномочия по компаниям</h2>
             <div class="service_authority gap-2 text-xl">
-                {% for permission in  permission_form.fields.custompermission.queryset %}
+                {% for permission in permission_form.fields.custompermission.queryset %}
                     {% if 'companies_can' in permission.code_name %}
                         <div>
                             <label>
-                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}">
+                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}"
+                                {% if permission.id in current_permissions %}checked{% endif %}>
                                 {{ permission.name }}
                             </label>
                         </div>
@@ -191,11 +204,12 @@
                 {% endfor %}
 
                 <h2 class="text-2xl">Полномочия по отделам</h2>
-                {% for permission in  permission_form.fields.custompermission.queryset %}
+                {% for permission in permission_form.fields.custompermission.queryset %}
                     {% if 'departments' in permission.code_name %}
                         <div>
                             <label>
-                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}">
+                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}"
+                                {% if permission.id in current_permissions %}checked{% endif %}>
                                 {{ permission.name }}
                             </label>
                         </div>
@@ -204,14 +218,15 @@
             </div>
         </div>
 
-        <div id="roles" class="form_style max-w-5xl  m-auto p-10 bg-slate-200">
+        <div id="roles" class="form_style max-w-5xl m-auto p-10 bg-slate-200">
             <h2 class="text-2xl">Полномочия по ролям</h2>
             <div class="service_authority gap-2 text-xl">
-                {% for permission in  permission_form.fields.custompermission.queryset %}
+                {% for permission in permission_form.fields.custompermission.queryset %}
                     {% if 'roles_can' in permission.code_name %}
                         <div>
                             <label>
-                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}">
+                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}"
+                                {% if permission.id in current_permissions %}checked{% endif %}>
                                 {{ permission.name }}
                             </label>
                         </div>
@@ -220,36 +235,39 @@
             </div>
         </div>
 
-        <div id="assets" class="form_style max-w-5xl  m-auto p-10 bg-slate-200">
+        <div id="assets" class="form_style max-w-5xl m-auto p-10 bg-slate-200">
             <h2 class="text-2xl">Полномочия по активам</h2>
             <div class="service_authority text-xl">
-                {% for permission in  permission_form.fields.custompermission.queryset %}
+                {% for permission in permission_form.fields.custompermission.queryset %}
                     {% if 'assets_can' in permission.code_name %}
                         <div>
                             <label>
-                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}">
+                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}"
+                                {% if permission.id in current_permissions %}checked{% endif %}>
                                 {{ permission.name }}
                             </label>
                         </div>
                     {% endif %}
                 {% endfor %}
                 <h2 class="text-2xl">Полномочия по типам активов</h2>
-                {% for permission in  permission_form.fields.custompermission.queryset %}
+                {% for permission in permission_form.fields.custompermission.queryset %}
                     {% if 'assets_types_can' in permission.code_name %}
                         <div>
                             <label>
-                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}">
+                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}"
+                                {% if permission.id in current_permissions %}checked{% endif %}>
                                 {{ permission.name }}
                             </label>
                         </div>
                     {% endif %}
                 {% endfor %}
                 <h2 class="text-2xl">Полномочия по атрибутам типов активов</h2>
-                    {% for permission in  permission_form.fields.custompermission.queryset %}
+                    {% for permission in permission_form.fields.custompermission.queryset %}
                         {% if 'assets_types_attr' in permission.code_name %}
                             <div>
                                 <label>
-                                    <input type="checkbox" name="permissions[]" value="{{ permission.id }}">
+                                    <input type="checkbox" name="permissions[]" value="{{ permission.id }}"
+                                    {% if permission.id in current_permissions %}checked{% endif %}>
                                     {{ permission.name }}
                                 </label>
                             </div>
@@ -258,14 +276,15 @@
             </div>
         </div>
 
-        <div id="interface" class="form_style max-w-5xl  m-auto p-10 bg-slate-200">
+        <div id="interface" class="form_style max-w-5xl m-auto p-10 bg-slate-200">
             <h2 class="text-2xl">Интерфейс</h2>
             <div class="service_authority text-xl">
-                {% for permission in  permission_form.fields.custompermission.queryset %}
+                {% for permission in permission_form.fields.custompermission.queryset %}
                     {% if 'interface' in permission.code_name %}
                         <div>
                             <label>
-                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}">
+                                <input type="checkbox" name="permissions[]" value="{{ permission.id }}"
+                                {% if permission.id in current_permissions %}checked{% endif %}>
                                 {{ permission.name }}
                             </label>
                         </div>
@@ -275,7 +294,7 @@
         </div>
 
         <div class="max-w-5xl m-auto mt-4">
-            <button class="btn btn-success" type="submit" >Сохранить</button>
+            <button class="btn btn-success" type="submit">Сохранить</button>
         </div>
 
     </form>
@@ -292,17 +311,8 @@
             btn.classList.remove('active');
         });
 
-        // Добавить активный класс к нажатой кнопке
         button.classList.add('active');
     }
-
 </script>
 
-{% comment %}
-<h2>{{ group.id|default:"Создание" }} Роли</h2>
-<form method="post">
-  {% csrf_token %} {{ form.as_p }}
-
-  <button type="submit">Сохранить</button>
-</form>
-{% endcomment %} {% endblock %}
+{% endblock %}

@@ -39,10 +39,13 @@ class GroupPermissionForm(forms.ModelForm):
                 widget=forms.RadioSelect,
                 label=f"Уровень доступа для {permission.code_name}"
             )
-
-        requests_2_permissions = self.fields['custompermission'].queryset.filter(code_name="requests_2")
-        requests_2_permission_ids = list(requests_2_permissions.values_list('id', flat=True))
-        self.initial['custompermission'] = requests_2_permission_ids
+        # Initialize the permissions
+        if self.instance.pk:
+            group_permissions = GroupPermission.objects.filter(group=self.instance)
+            self.initial['custompermission'] = group_permissions.values_list('custompermission', flat=True)
+            for permission in group_permissions:
+                field_name = f'access_level_{permission.custompermission.id}'
+                self.initial[field_name] = permission.access_level
 
     class Meta:
         model = GroupPermission
