@@ -3,6 +3,7 @@ from django import forms
 from service.models import NotificationSetting, NotificationTemplate
 
 
+
 class NotificationSettingForm(forms.ModelForm):
     class Meta:
         model = NotificationSetting
@@ -10,6 +11,7 @@ class NotificationSettingForm(forms.ModelForm):
         widgets = {
             'email_template': forms.Textarea(attrs={'cols': 40, 'rows': 4})
         }
+
 class NotificationTemplateForm(forms.ModelForm):
     body = forms.CharField(widget=CKEditorWidget(config_name='custom'))
 

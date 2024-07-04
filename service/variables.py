@@ -1,3 +1,4 @@
+
 AVAILABLE_VARIABLES = {
     'Request': {
         'title': 'Заголовок заявки',

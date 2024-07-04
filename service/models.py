@@ -9,6 +9,8 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.translation import gettext_lazy as _
 from model_utils import FieldTracker
+
+from service.views.email_notification_views import EVENT_CHOICES
 from servicedesk import settings
 
 
@@ -434,27 +436,7 @@ class EmailSettings(models.Model):
     def use_ssl(self):
         return self.connection_type == 'ssl'
 
-class Event(models.Model):
-    EVENT_CHOICES = [
-        ('create_request', 'Создание заявки'),
-        ('update_request', 'Изменение полей заявки'),
-        ('add_comment', 'Добавление комментария'),
-        ('deadline_expiration', 'Истечение срока заявки'),
-        ('status_change', 'Смена статуса заявки'),
-    ]
-    name = models.CharField(max_length=255, choices=EVENT_CHOICES, unique=True)
-    description = models.TextField()
 
-    def __str__(self):
-        return self.get_name_display()
-
-class NotificationSetting(models.Model):
-    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='notification_settings')
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    email_template = models.TextField(blank=True, null=True)  # Пустой шаблон означает неактивное уведомление
-
-    def __str__(self):
-        return f"{self.group.name} - {self.event.name}"
 class NotificationTemplate(models.Model):
     type = models.CharField(max_length=100, choices=[('email', 'Email'), ('sms', 'SMS'), ('push', 'Push Notification')])
     name = models.CharField(max_length=255)
@@ -463,6 +445,17 @@ class NotificationTemplate(models.Model):
 
     def __str__(self):
         return self.name
+class NotificationSetting(models.Model):
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    event = models.CharField(max_length=50)
+    template = models.ForeignKey(NotificationTemplate, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.group.name} - {self.get_event_display()}'
+
+    def get_event_display(self):
+        event_dict = dict(EVENT_CHOICES)
+        return event_dict.get(self.event, self.event)
 class PerformerGroup(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)

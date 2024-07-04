@@ -1,27 +1,84 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block content %}
-<h2>Обзор уведомлений</h2>
-<a href="{% url 'template_list' %}">Управление шаблонами уведомлений</a> <!-- Добавляем ссылку на страницу шаблонов -->
+<link href="https://cdn.jsdelivr.net/npm/select2/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2/dist/js/select2.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
 
-<table>
-    <thead>
-        <tr>
-            <th>Роль</th>
-            {% for event in events %}
-            <th>{{ event.name }}</th>
+<div class="notifications-list">
+    <h3 class="text-center text-4xl p-10 max-w-4xl m-auto">Настройки уведомлений</h3>
+    <table id="notificationsTable" class="table">
+        <thead>
+            <tr>
+                <th>Роль</th>
+                {% for event_key, event_name in events %}
+                <th>{{ event_name }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for group, group_data in settings_list %}
+            <tr>
+                <td>{{ group.name }}</td>
+                {% for event_key, event_name in events %}
+                <td>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-{{ group.id }}-{{ event_key }}">
+                        Редактировать
+                    </button>
+                </td>
+                {% endfor %}
+            </tr>
             {% endfor %}
-        </tr>
-    </thead>
-    <tbody>
-        {% for group, group_settings in settings_list %}
-        <tr>
-<td><a href="{% url 'notification_detail' group_id=group.id %}">{{ group.name }}</a></td>
-            {% for status in group_settings %}
-            <td>{{ status }}</td>
-            {% endfor %}
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</div>
+
+{% for group, group_data in settings_list %}
+    {% for event_key, event_name in events %}
+    <div class="modal fade" id="modal-{{ group.id }}-{{ event_key }}" tabindex="-1" role="dialog" aria-labelledby="modalLabel-{{ group.id }}-{{ event_key }}" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel-{{ group.id }}-{{ event_key }}">Редактировать уведомления для роли: {{ group.name }} - {{ event_name }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="{% url 'notification_detail' group_id=group.id %}">
+                        {% csrf_token %}
+                        {% for form_event_key, form in group_data.forms %}
+                            {% if form_event_key == event_key %}
+                                {{ form.as_p }}
+                            {% endif %}
+                        {% endfor %}
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Сохранить</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% endfor %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    $('.select2').select2({
+        width: '100%'
+    });
+
+    // Инициализация DataTables
+    $('#notificationsTable').DataTable({
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Russian.json"
+        }
+    });
+});
+</script>
+
 {% endblock %}
