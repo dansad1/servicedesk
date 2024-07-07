@@ -6,20 +6,13 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_http_methods
-
 from servicedesk import settings
 from service.forms.Email_forms import *
-from ..forms.Notification_forms import NotificationSettingForm, NotificationTemplateForm
+from ..forms.Notification_forms import NotificationTemplateForm, NotificationSettingForm
 from ..models import EmailSettings,  NotificationSetting, NotificationTemplate
-from ..variables import AVAILABLE_VARIABLES
+from ..variables import AVAILABLE_VARIABLES, EVENT_CHOICES
 
-EVENT_CHOICES = [
-    ('create_request', 'Создание заявки'),
-    ('update_request', 'Изменение полей заявки'),
-    ('add_comment', 'Добавление комментария'),
-    ('deadline_expiration', 'Истечение срока заявки'),
-    ('status_change', 'Смена статуса заявки'),
-]
+
 def email_settings_view(request):
     if request.method == 'POST':
         form = EmailSettingsForm(request.POST)
@@ -95,15 +88,21 @@ def notification_table_overview(request):
     settings_list = []
 
     for group in groups:
-        group_settings = ['Да' if NotificationSetting.objects.filter(group=group, event=event_key).exists() else 'Нет' for event_key, _ in EVENT_CHOICES]
-        event_forms = [(event_key, NotificationSettingForm(instance=NotificationSetting.objects.get_or_create(group=group, event=event_key)[0], prefix=f"{group.id}-{event_key}")) for event_key, _ in EVENT_CHOICES]
-        settings_list.append((group, {'group_settings': group_settings, 'forms': event_forms}))
+        event_settings = [
+            {
+                'event_key': event_key,
+                'has_template': 'Да' if NotificationSetting.objects.filter(group=group, event=event_key).exists() else 'Нет'
+            }
+            for event_key, _ in EVENT_CHOICES
+        ]
+        settings_list.append((group, event_settings))
 
     return render(request, 'notifications/overview.html', {
         'groups': groups,
         'events': EVENT_CHOICES,
         'settings_list': settings_list,
     })
+
 def notification_table_detail(request, group_id):
     group = get_object_or_404(Group, id=group_id)
     if request.method == 'POST':
@@ -112,20 +111,15 @@ def notification_table_detail(request, group_id):
             setting_instance = NotificationSetting.objects.get_or_create(group=group, event=event_key)[0]
             form = NotificationSettingForm(request.POST, instance=setting_instance, prefix=prefix)
             if form.is_valid():
-                form_instance = form.save(commit=False)
-                if form_instance.email_template:  # Проверяем, что шаблон не пуст
-                    form_instance.save()
-                else:
-                    setting_instance.delete()  # Удаляем настройку, если шаблон пуст
+                form.save()
         return redirect('notification_overview')
 
     forms = {event_key: NotificationSettingForm(instance=NotificationSetting.objects.get_or_create(group=group, event=event_key)[0], prefix=f"{group_id}-{event_key}") for event_key, _ in EVENT_CHOICES}
-    return render(request, 'notifications/overview.html', {
+    return render(request, 'notifications/detail.html', {
         'group': group,
         'events': EVENT_CHOICES,
         'forms': forms
     })
-
 def notification_template_list(request):
     templates = NotificationTemplate.objects.all()
     return render(request, 'notifications/notification_template_list.html', {'templates': templates})

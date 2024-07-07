@@ -22,3 +22,10 @@ AVAILABLE_VARIABLES = {
         'content': 'Содержание комментария',
     }
 }
+EVENT_CHOICES = [
+    ('create_request', 'Создание заявки'),
+    ('update_request', 'Изменение полей заявки'),
+    ('add_comment', 'Добавление комментария'),
+    ('deadline_expiration', 'Истечение срока заявки'),
+    ('status_change', 'Смена статуса заявки'),
+]

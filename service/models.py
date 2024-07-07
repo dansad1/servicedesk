@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.translation import gettext_lazy as _
 from model_utils import FieldTracker
 
-from service.views.email_notification_views import EVENT_CHOICES
+from service.variables import EVENT_CHOICES
 from servicedesk import settings
 
 
@@ -445,10 +445,11 @@ class NotificationTemplate(models.Model):
 
     def __str__(self):
         return self.name
+
 class NotificationSetting(models.Model):
-    group = models.ForeignKey(Group, on_delete=models.CASCADE)
-    event = models.CharField(max_length=50)
-    template = models.ForeignKey(NotificationTemplate, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)  # Используйте импортированную модель Group
+    event = models.CharField(max_length=50, choices=EVENT_CHOICES)
+    template = models.ForeignKey(NotificationTemplate, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return f'{self.group.name} - {self.get_event_display()}'

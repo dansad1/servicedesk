@@ -7,10 +7,15 @@ from service.models import NotificationSetting, NotificationTemplate
 class NotificationSettingForm(forms.ModelForm):
     class Meta:
         model = NotificationSetting
-        fields = ['email_template']
+        fields = ['template']
         widgets = {
-            'email_template': forms.Textarea(attrs={'cols': 40, 'rows': 4})
+            'template': forms.Select()
         }
+
+    def __init__(self, *args, **kwargs):
+        super(NotificationSettingForm, self).__init__(*args, **kwargs)
+        self.fields['template'].queryset = NotificationTemplate.objects.all()
+        self.fields['template'].required = False
 
 class NotificationTemplateForm(forms.ModelForm):
     body = forms.CharField(widget=CKEditorWidget(config_name='custom'))
