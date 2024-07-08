@@ -145,7 +145,7 @@ urlpatterns = [
 
 #уведомления
     path('notifications/', notification_table_overview, name='notification_overview'),
-    path('notifications/detail/<int:group_id>/', notification_table_detail, name='notification_detail'),
+    path('notifications/update/', update_notifications, name='update_notifications'),
     path('templates/<int:pk>/edit/', notification_template_edit, name='template_edit'),
     path('templates/', notification_template_list, name='template_list'),  # URL для списка шаблонов уведомлений
  path('templates/create/', notification_template_create, name='template_create'),

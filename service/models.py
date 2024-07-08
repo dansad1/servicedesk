@@ -447,9 +447,13 @@ class NotificationTemplate(models.Model):
         return self.name
 
 class NotificationSetting(models.Model):
-    group = models.ForeignKey(Group, on_delete=models.CASCADE)  # Используйте импортированную модель Group
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
     event = models.CharField(max_length=50, choices=EVENT_CHOICES)
-    template = models.ForeignKey(NotificationTemplate, on_delete=models.CASCADE, null=True, blank=True)
+    email_template = models.ForeignKey(NotificationTemplate, on_delete=models.CASCADE, null=True, blank=True, related_name='email_settings')
+    sms_template = models.ForeignKey(NotificationTemplate, on_delete=models.CASCADE, null=True, blank=True, related_name='sms_settings')
+    push_template = models.ForeignKey(NotificationTemplate, on_delete=models.CASCADE, null=True, blank=True, related_name='push_settings')
+    telegram_template = models.ForeignKey(NotificationTemplate, on_delete=models.CASCADE, null=True, blank=True, related_name='telegram_settings')
+    whatsapp_template = models.ForeignKey(NotificationTemplate, on_delete=models.CASCADE, null=True, blank=True, related_name='whatsapp_settings')
 
     def __str__(self):
         return f'{self.group.name} - {self.get_event_display()}'

@@ -5,18 +5,15 @@ from service.models import NotificationSetting, NotificationTemplate
 
 
 class NotificationSettingForm(forms.ModelForm):
+    email_template = forms.ModelChoiceField(queryset=NotificationTemplate.objects.filter(type='email'), required=False, widget=forms.Select())
+    sms_template = forms.ModelChoiceField(queryset=NotificationTemplate.objects.filter(type='sms'), required=False, widget=forms.Select())
+    push_template = forms.ModelChoiceField(queryset=NotificationTemplate.objects.filter(type='push'), required=False, widget=forms.Select())
+    telegram_template = forms.ModelChoiceField(queryset=NotificationTemplate.objects.filter(type='telegram'), required=False, widget=forms.Select())
+    whatsapp_template = forms.ModelChoiceField(queryset=NotificationTemplate.objects.filter(type='whatsapp'), required=False, widget=forms.Select())
+
     class Meta:
         model = NotificationSetting
-        fields = ['template']
-        widgets = {
-            'template': forms.Select()
-        }
-
-    def __init__(self, *args, **kwargs):
-        super(NotificationSettingForm, self).__init__(*args, **kwargs)
-        self.fields['template'].queryset = NotificationTemplate.objects.all()
-        self.fields['template'].required = False
-
+        fields = ['email_template', 'sms_template', 'push_template', 'telegram_template', 'whatsapp_template']
 class NotificationTemplateForm(forms.ModelForm):
     body = forms.CharField(widget=CKEditorWidget(config_name='custom'))
 

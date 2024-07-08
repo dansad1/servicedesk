@@ -83,43 +83,54 @@ def send_test_email(request):
 
     except Exception as e:  # Это поймает любые исключения, включая BadHeaderError
         return JsonResponse({'success': False, 'error': f'Ошибка отправки письма: {e}'})
+
+
 def notification_table_overview(request):
     groups = Group.objects.all().order_by('id')
-    settings_list = []
+    templates = NotificationTemplate.objects.all()
+    settings = []
 
+    forms = []
     for group in groups:
-        event_settings = [
-            {
+        for event_key, event_name in EVENT_CHOICES:
+            setting = NotificationSetting.objects.filter(group=group, event=event_key).first()
+            form = NotificationSettingForm(instance=setting, prefix=f"{group.id}_{event_key}")
+            forms.append((group.id, event_key, form))
+            settings.append({
+                'group_id': group.id,
+                'group_name': group.name,
                 'event_key': event_key,
-                'has_template': 'Да' if NotificationSetting.objects.filter(group=group, event=event_key).exists() else 'Нет'
-            }
-            for event_key, _ in EVENT_CHOICES
-        ]
-        settings_list.append((group, event_settings))
+                'event_name': event_name,
+                'email_template': setting.email_template.id if setting and setting.email_template else None,
+                'push_template': setting.push_template.id if setting and setting.push_template else None,
+                'sms_template': setting.sms_template.id if setting and setting.sms_template else None,
+                'telegram_template': setting.telegram_template.id if setting and setting.telegram_template else None,
+                'whatsapp_template': setting.whatsapp_template.id if setting and setting.whatsapp_template else None
+            })
 
     return render(request, 'notifications/overview.html', {
         'groups': groups,
         'events': EVENT_CHOICES,
-        'settings_list': settings_list,
+        'templates': templates,
+        'settings': settings,
+        'forms': forms,
     })
 
-def notification_table_detail(request, group_id):
-    group = get_object_or_404(Group, id=group_id)
+def update_notifications(request):
     if request.method == 'POST':
+        group_id = request.POST.get('group_id')
+        group = get_object_or_404(Group, id=group_id)
         for event_key, _ in EVENT_CHOICES:
-            prefix = f"{group_id}-{event_key}"
-            setting_instance = NotificationSetting.objects.get_or_create(group=group, event=event_key)[0]
-            form = NotificationSettingForm(request.POST, instance=setting_instance, prefix=prefix)
+            form = NotificationSettingForm(request.POST, prefix=f"{group_id}_{event_key}")
             if form.is_valid():
-                form.save()
+                setting, created = NotificationSetting.objects.get_or_create(group=group, event=event_key)
+                setting.email_template = form.cleaned_data['email_template']
+                setting.push_template = form.cleaned_data['push_template']
+                setting.sms_template = form.cleaned_data['sms_template']
+                setting.telegram_template = form.cleaned_data['telegram_template']
+                setting.whatsapp_template = form.cleaned_data['whatsapp_template']
+                setting.save()
         return redirect('notification_overview')
-
-    forms = {event_key: NotificationSettingForm(instance=NotificationSetting.objects.get_or_create(group=group, event=event_key)[0], prefix=f"{group_id}-{event_key}") for event_key, _ in EVENT_CHOICES}
-    return render(request, 'notifications/detail.html', {
-        'group': group,
-        'events': EVENT_CHOICES,
-        'forms': forms
-    })
 def notification_template_list(request):
     templates = NotificationTemplate.objects.all()
     return render(request, 'notifications/notification_template_list.html', {'templates': templates})

@@ -21,15 +21,25 @@
             </tr>
         </thead>
         <tbody>
-            {% for group, event_settings in settings_list %}
+            {% for group in groups %}
             <tr>
                 <td>
                     <button type="button" class="btn btn-link" data-toggle="modal" data-target="#modal-{{ group.id }}">
                         {{ group.name }}
                     </button>
                 </td>
-                {% for event in event_settings %}
-                <td>{{ event.has_template }}</td>
+                {% for event_key, _ in events %}
+                <td>
+                    {% for setting in settings %}
+                        {% if setting.group_id == group.id and setting.event_key == event_key %}
+                            {% if setting.email_template %}
+                                Да
+                            {% else %}
+                                Нет
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </td>
                 {% endfor %}
             </tr>
             {% endfor %}
@@ -37,7 +47,7 @@
     </table>
 </div>
 
-{% for group, event_settings in settings_list %}
+{% for group in groups %}
 <div class="modal fade" id="modal-{{ group.id }}" tabindex="-1" role="dialog" aria-labelledby="modalLabel-{{ group.id }}" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -48,26 +58,43 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form method="post" action="{% url 'notification_detail' group_id=group.id %}">
+                <form method="post" action="{% url 'update_notifications' %}">
                     {% csrf_token %}
+                    <input type="hidden" name="group_id" value="{{ group.id }}">
                     <table class="table">
                         <thead>
                             <tr>
                                 <th>Событие</th>
-                                <th>Шаблон уведомлений</th>
+                                <th>Email</th>
+                                <th>Push (web/mobile)</th>
+                                <th>SMS</th>
+                                <th>Telegram</th>
+                                <th>Whatsapp</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for event_key, event_name in events %}
                             <tr>
                                 <td>{{ event_name }}</td>
-                                <td>
-                                    {% for form_event_key, form in forms.items %}
-                                        {% if form_event_key == event_key %}
-                                            {{ form.template }}
-                                        {% endif %}
-                                    {% endfor %}
-                                </td>
+                                {% for form_group_id, form_event_key, form in forms %}
+                                    {% if form_group_id == group.id and form_event_key == event_key %}
+                                        <td>
+                                            {{ form.email_template }}
+                                        </td>
+                                        <td>
+                                            {{ form.push_template }}
+                                        </td>
+                                        <td>
+                                            {{ form.sms_template }}
+                                        </td>
+                                        <td>
+                                            {{ form.telegram_template }}
+                                        </td>
+                                        <td>
+                                            {{ form.whatsapp_template }}
+                                        </td>
+                                    {% endif %}
+                                {% endfor %}
                             </tr>
                             {% endfor %}
                         </tbody>
