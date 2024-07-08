@@ -8,8 +8,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_http_methods
 from servicedesk import settings
 from service.forms.Email_forms import *
-from ..forms.Notification_forms import NotificationTemplateForm, NotificationSettingForm
-from ..models import EmailSettings,  NotificationSetting, NotificationTemplate
+from ..forms.Notification_forms import NotificationTemplateForm, NotificationSettingForm, StatusNotificationSettingForm
+from ..models import EmailSettings, NotificationSetting, NotificationTemplate, Status
 from ..variables import AVAILABLE_VARIABLES, EVENT_CHOICES
 
 
@@ -85,17 +85,22 @@ def send_test_email(request):
         return JsonResponse({'success': False, 'error': f'Ошибка отправки письма: {e}'})
 
 
+
 def notification_table_overview(request):
     groups = Group.objects.all().order_by('id')
     templates = NotificationTemplate.objects.all()
+    statuses = Status.objects.all()
     settings = []
 
-    forms = []
+    event_forms = []
+    status_forms = []
+
     for group in groups:
+        # Подготовка форм для событий
         for event_key, event_name in EVENT_CHOICES:
             setting = NotificationSetting.objects.filter(group=group, event=event_key).first()
             form = NotificationSettingForm(instance=setting, prefix=f"{group.id}_{event_key}")
-            forms.append((group.id, event_key, form))
+            event_forms.append((group.id, event_key, form))
             settings.append({
                 'group_id': group.id,
                 'group_name': group.name,
@@ -108,12 +113,20 @@ def notification_table_overview(request):
                 'whatsapp_template': setting.whatsapp_template.id if setting and setting.whatsapp_template else None
             })
 
+        # Подготовка форм для статусов
+        for status in statuses:
+            setting = NotificationSetting.objects.filter(group=group, status=status).first()
+            form = StatusNotificationSettingForm(instance=setting, prefix=f"{group.id}_status_{status.id}")
+            status_forms.append((group.id, status.id, form))
+
     return render(request, 'notifications/overview.html', {
         'groups': groups,
         'events': EVENT_CHOICES,
         'templates': templates,
         'settings': settings,
-        'forms': forms,
+        'event_forms': event_forms,
+        'statuses': statuses,
+        'status_forms': status_forms,
     })
 
 def update_notifications(request):
@@ -130,6 +143,18 @@ def update_notifications(request):
                 setting.telegram_template = form.cleaned_data['telegram_template']
                 setting.whatsapp_template = form.cleaned_data['whatsapp_template']
                 setting.save()
+
+        for status in Status.objects.all():
+            form = StatusNotificationSettingForm(request.POST, prefix=f"{group_id}_status_{status.id}")
+            if form.is_valid():
+                setting, created = NotificationSetting.objects.get_or_create(group=group, status=status)
+                setting.email_template = form.cleaned_data['email_template']
+                setting.push_template = form.cleaned_data['push_template']
+                setting.sms_template = form.cleaned_data['sms_template']
+                setting.telegram_template = form.cleaned_data['telegram_template']
+                setting.whatsapp_template = form.cleaned_data['whatsapp_template']
+                setting.save()
+
         return redirect('notification_overview')
 def notification_template_list(request):
     templates = NotificationTemplate.objects.all()

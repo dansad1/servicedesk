@@ -27,5 +27,4 @@ EVENT_CHOICES = [
     ('update_request', 'Изменение полей заявки'),
     ('add_comment', 'Добавление комментария'),
     ('deadline_expiration', 'Истечение срока заявки'),
-    ('status_change', 'Смена статуса заявки'),
 ]

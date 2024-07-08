@@ -18,6 +18,9 @@
                 {% for event_key, event_name in events %}
                 <th>{{ event_name }}</th>
                 {% endfor %}
+                {% for status in statuses %}
+                <th>{{ status.name }}</th>
+                {% endfor %}
             </tr>
         </thead>
         <tbody>
@@ -32,6 +35,19 @@
                 <td>
                     {% for setting in settings %}
                         {% if setting.group_id == group.id and setting.event_key == event_key %}
+                            {% if setting.email_template %}
+                                Да
+                            {% else %}
+                                Нет
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                {% endfor %}
+                {% for status in statuses %}
+                <td>
+                    {% for setting in settings %}
+                        {% if setting.group_id == group.id and setting.status_id == status.id %}
                             {% if setting.email_template %}
                                 Да
                             {% else %}
@@ -61,6 +77,7 @@
                 <form method="post" action="{% url 'update_notifications' %}">
                     {% csrf_token %}
                     <input type="hidden" name="group_id" value="{{ group.id }}">
+                    <h4>События</h4>
                     <table class="table">
                         <thead>
                             <tr>
@@ -76,23 +93,42 @@
                             {% for event_key, event_name in events %}
                             <tr>
                                 <td>{{ event_name }}</td>
-                                {% for form_group_id, form_event_key, form in forms %}
+                                {% for form_group_id, form_event_key, form in event_forms %}
                                     {% if form_group_id == group.id and form_event_key == event_key %}
-                                        <td>
-                                            {{ form.email_template }}
-                                        </td>
-                                        <td>
-                                            {{ form.push_template }}
-                                        </td>
-                                        <td>
-                                            {{ form.sms_template }}
-                                        </td>
-                                        <td>
-                                            {{ form.telegram_template }}
-                                        </td>
-                                        <td>
-                                            {{ form.whatsapp_template }}
-                                        </td>
+                                        <td>{{ form.email_template }}</td>
+                                        <td>{{ form.push_template }}</td>
+                                        <td>{{ form.sms_template }}</td>
+                                        <td>{{ form.telegram_template }}</td>
+                                        <td>{{ form.whatsapp_template }}</td>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <h4>Статусы</h4>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Статус</th>
+                                <th>Email</th>
+                                <th>Push (web/mobile)</th>
+                                <th>SMS</th>
+                                <th>Telegram</th>
+                                <th>Whatsapp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for status in statuses %}
+                            <tr>
+                                <td>{{ status.name }}</td>
+                                {% for form_group_id, form_status_id, form in status_forms %}
+                                    {% if form_group_id == group.id and form_status_id == status.id %}
+                                        <td>{{ form.email_template }}</td>
+                                        <td>{{ form.push_template }}</td>
+                                        <td>{{ form.sms_template }}</td>
+                                        <td>{{ form.telegram_template }}</td>
+                                        <td>{{ form.whatsapp_template }}</td>
                                     {% endif %}
                                 {% endfor %}
                             </tr>
