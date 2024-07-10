@@ -92,17 +92,32 @@ def request_create(request, request_type_id):
                 if field_name.startswith('custom_field_'):
                     field_id = int(field_name.split('_')[-1])
                     field_meta = get_object_or_404(FieldMeta, id=field_id)
-                    field_value_obj, created = FieldValue.objects.get_or_create(
-                        request=new_request,
-                        field_meta=field_meta
-                    )
-                    field_value_obj.set_value(field_value)
-                    field_value_obj.save()
+                    if field_meta.field_type != 'comment':
+                        field_value_obj, created = FieldValue.objects.get_or_create(
+                            request=new_request,
+                            field_meta=field_meta
+                        )
+                        field_value_obj.set_value(field_value)
+                        field_value_obj.save()
+                    else:
+                        comment = Comment(
+                            request=new_request,
+                            author=request.user,
+                            text=field_value[0],
+                            attachment=field_value[1]
+                        )
+                        comment.save()
+
             return redirect('request_list')
     else:
         form = RequestForm(user=request.user, request_type=request_type)
+
     excluded_fields = ['title', 'description', 'attachment', 'request_type']
-    return render(request, 'request/request_create.html', {'form': form, 'request_type': request_type, 'excluded_fields': excluded_fields})
+    return render(request, 'request/request_create.html', {
+        'form': form,
+        'request_type': request_type,
+        'excluded_fields': excluded_fields,
+    })
 
 def request_edit(request, request_id):
     req = get_object_or_404(Request, id=request_id)
@@ -115,42 +130,31 @@ def request_edit(request, request_id):
                 if field_name.startswith('custom_field_'):
                     field_id = int(field_name.split('_')[-1])
                     field_meta = get_object_or_404(FieldMeta, id=field_id)
-                    field_value_obj, created = FieldValue.objects.get_or_create(
-                        request=req,
-                        field_meta=field_meta
-                    )
-                    field_value_obj.set_value(field_value)
-                    field_value_obj.save()
+                    if field_meta.field_type != 'comment':
+                        field_value_obj, created = FieldValue.objects.get_or_create(
+                            request=req,
+                            field_meta=field_meta
+                        )
+                        field_value_obj.set_value(field_value)
+                        field_value_obj.save()
+                    else:
+                        comment = Comment(
+                            request=req,
+                            author=request.user,
+                            text=field_value[0],
+                            attachment=field_value[1]
+                        )
+                        comment.save()
+
             return redirect('request_list')
     else:
         form = RequestForm(instance=req, user=request.user, request_type=request_type)
-    return render(request, 'request/request_edit.html', {'form': form, 'request': req})
-def add_comment(request, pk):
-    request_instance = get_object_or_404(Request, pk=pk)
-    if request.method == 'POST':
-        comment_form = CommentForm(request.POST, request.FILES)
-        print(comment_form.data)
-        print(comment_form.is_valid)
-        if comment_form.is_valid():
-            new_comment = comment_form.save(commit=False)
-            new_comment.request = request_instance
-            new_comment.author = request.user
-            new_comment.save()
-            messages.success(request, "Комментарий успешно добавлен.")
-            return HttpResponseRedirect(request.path_info)  # Остаться на текущей странице
-    else:
-        comment_form = CommentForm()
 
-    # Возвращаем форму создания заявки для отображения вместе с формой комментариев
-    form = RequestForm()
-    context = {
+    return render(request, 'request/request_edit.html', {
         'form': form,
-        'comment_form': comment_form,
-        'request_instance': request_instance,
-        'request_type': request_instance.request_type  # Или другой контекст, необходимый для шаблона
-    }
-    return render(request, 'request/request_create.html', context)
-
+        'request': req,
+        'excluded_fields': ['title', 'description', 'attachment', 'request_type']
+    })
 @login_required
 def request_list(request):
     initial_requests = Request.objects.all()

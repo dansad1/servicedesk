@@ -13,21 +13,21 @@
             {{ form.request_type }}
         </div>
 
-        {% if form.fields.title %}
+        {% if 'title' in form.fields %}
         <div class="form-group">
             <label for="{{ form.title.id_for_label }}" class="form-label">Название:</label>
             {{ form.title }}
         </div>
         {% endif %}
 
-        {% if form.fields.description %}
+        {% if 'description' in form.fields %}
         <div class="form-group">
             <label for="{{ form.description.id_for_label }}" class="form-label">Описание:</label>
             {{ form.description }}
         </div>
         {% endif %}
 
-        {% if form.fields.attachment %}
+        {% if 'attachment' in form.fields %}
         <div class="form-group">
             <label for="{{ form.attachment.id_for_label }}" class="form-label">Вложение:</label>
             {{ form.attachment }}
@@ -37,7 +37,7 @@
         <div class="row">
             <div class="col-md-6">
                 {% for field in form %}
-                    {% if not field.is_hidden and field.name != 'title' and field.name != 'description' and field.name != 'attachment' and field.name != 'request_type' and forloop.counter0|divisibleby:2 %}
+                    {% if not field.is_hidden and field.name not in excluded_fields and forloop.counter0|divisibleby:2 %}
                         <div class="form-group">
                             <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
                             {{ field }}
@@ -51,7 +51,7 @@
             </div>
             <div class="col-md-6">
                 {% for field in form %}
-                    {% if not field.is_hidden and field.name != 'title' and field.name != 'description' and field.name != 'attachment' and field.name != 'request_type' and not forloop.counter0|divisibleby:2 %}
+                    {% if not field.is_hidden and field.name not in excluded_fields and not forloop.counter0|divisibleby:2 %}
                         <div class="form-group">
                             <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
                             {{ field }}
@@ -65,11 +65,24 @@
             </div>
         </div>
 
+        <h3 class="mt-4">Комментарии</h3>
+        <div class="comments mb-3">
+            {% for comment in request.comments.all %}
+                <div class="comment">
+                    <p><strong>{{ comment.author.username }}</strong> ({{ comment.created_at }}):</p>
+                    <p>{{ comment.text|safe }}</p>
+                    {% if comment.attachment %}
+                        <p><a href="{{ comment.attachment.url }}">Скачать вложение</a></p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
         <div class="form-group text-center">
             <button type="submit" class="btn btn-primary">Сохранить изменения</button>
         </div>
     </form>
 
-    <a href="{% url 'request_list' %}" class="btn btn-secondary">Вернуться к списку заявок</a>
+    <a href="{% url 'request_list' %}" class="btn btn-secondary mt-4">Вернуться к списку заявок</a>
 </div>
 {% endblock %}

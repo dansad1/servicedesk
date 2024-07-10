@@ -144,6 +144,8 @@ class FieldMeta(models.Model):
         ('assignee', 'Assignee'),
         ('request_type', 'Request Type'),
         ('file', 'File'),
+        ('comment', 'Comment'),
+
     ]
 
     name = models.CharField(max_length=255)
@@ -183,6 +185,9 @@ class FieldSet(models.Model):
             {"name": "Company", "field_type": "company", "is_required": True, "show_name": True, "default_value": "", "unit": "", "hint": ""},
             {"name": "Status", "field_type": "status", "is_required": True, "show_name": True, "default_value": "", "unit": "", "hint": ""},
             {"name": "Priority", "field_type": "priority", "is_required": False, "show_name": True, "default_value": "", "unit": "", "hint": ""},
+            {"name": "Comments", "field_type": "comment", "is_required": False, "show_name": True, "default_value": "",
+             "unit": "", "hint": ""},
+
         ]
         for field in default_fields:
             field_meta, created = FieldMeta.objects.get_or_create(
