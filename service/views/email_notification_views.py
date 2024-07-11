@@ -115,7 +115,8 @@ def notification_table_overview(request):
 
         # Подготовка форм для статусов
         for status in statuses:
-            setting = NotificationSetting.objects.filter(group=group, status=status).first()
+            event_key = f"status_{status.id}"
+            setting = NotificationSetting.objects.filter(group=group, event=event_key).first()
             form = StatusNotificationSettingForm(instance=setting, prefix=f"{group.id}_status_{status.id}")
             status_forms.append((group.id, status.id, form))
 
@@ -145,9 +146,10 @@ def update_notifications(request):
                 setting.save()
 
         for status in Status.objects.all():
+            event_key = f"status_{status.id}"
             form = StatusNotificationSettingForm(request.POST, prefix=f"{group_id}_status_{status.id}")
             if form.is_valid():
-                setting, created = NotificationSetting.objects.get_or_create(group=group, status=status)
+                setting, created = NotificationSetting.objects.get_or_create(group=group, event=event_key)
                 setting.email_template = form.cleaned_data['email_template']
                 setting.push_template = form.cleaned_data['push_template']
                 setting.sms_template = form.cleaned_data['sms_template']
@@ -156,6 +158,7 @@ def update_notifications(request):
                 setting.save()
 
         return redirect('notification_overview')
+
 def notification_template_list(request):
     templates = NotificationTemplate.objects.all()
     return render(request, 'notifications/notification_template_list.html', {'templates': templates})
