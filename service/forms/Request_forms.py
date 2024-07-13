@@ -13,12 +13,6 @@ from django.contrib.auth.models import Group
 
 User = get_user_model()
 
-
-
-
-
-
-
 class RequestFilterForm(forms.Form):
     
     filter_name = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'class': 'form-control'}), label="Название фильтра")
@@ -99,12 +93,10 @@ class SavedFilterForm(forms.ModelForm):
                 'rows': 5,
             }),
         }
-
-
 class CommentFormWidget(forms.MultiWidget):
     def __init__(self, attrs=None):
         widgets = [
-            CKEditorWidget(attrs={'class': 'form-control', 'placeholder': 'Введите комментарий'}),
+            CKEditorWidget(attrs={'class': 'form-control', 'placeholder': 'Введите текст'}),
             forms.ClearableFileInput(attrs={'class': 'form-control'}),
         ]
         super().__init__(widgets, attrs)
@@ -137,8 +129,8 @@ class CommentMultiValueField(forms.MultiValueField):
 
     def compress(self, data_list):
         if data_list:
-            return data_list
-        return ['', '']
+            return ','.join(data_list)
+        return ''
 
 class RequestForm(forms.ModelForm):
     class Meta:
@@ -150,6 +142,7 @@ class RequestForm(forms.ModelForm):
         request_type = kwargs.pop('request_type', None)
         super(RequestForm, self).__init__(*args, **kwargs)
 
+        self.user = user
         self.fields['request_type'].widget.attrs.update({'class': 'form-select'})
 
         if request_type:
@@ -184,11 +177,12 @@ class RequestForm(forms.ModelForm):
             'priority': forms.ModelChoiceField,
             'requester': forms.ModelChoiceField,
             'assignee': forms.ModelChoiceField,
-            'comment': CommentMultiValueField,  # Добавление типа поля для комментариев
+            'comment': CommentMultiValueField,
+            'description': CommentMultiValueField,
         }.get(field_meta.field_type, forms.CharField)
 
-        if field_meta.field_type == 'comment':
-            return CommentMultiValueField(
+        if field_meta.field_type in ['comment', 'description']:
+            return field_class(
                 label=field_meta.name,
                 required=field_meta.is_required,
                 initial=initial_value,
@@ -229,7 +223,8 @@ class RequestForm(forms.ModelForm):
             'priority': forms.Select(attrs={'class': 'form-select'}),
             'requester': forms.Select(attrs={'class': 'form-select'}),
             'assignee': forms.Select(attrs={'class': 'form-select'}),
-            'comment': CommentFormWidget(),  # Виджет для комментариев
+            'comment': CommentFormWidget(),
+            'description': CommentFormWidget(),
         }
         return widgets.get(field_meta.field_type, forms.TextInput(attrs={'class': 'form-control'}))
 
@@ -279,7 +274,7 @@ class RequestForm(forms.ModelForm):
                 if field_name.startswith('custom_field_'):
                     field_id = int(field_name.split('_')[-1])
                     field_meta = FieldMeta.objects.get(id=field_id)
-                    if field_meta.field_type != 'comment':
+                    if field_meta.field_type not in ['comment', 'description']:
                         field_value_obj, created = FieldValue.objects.get_or_create(
                             request=instance,
                             field_meta=field_meta
@@ -287,11 +282,24 @@ class RequestForm(forms.ModelForm):
                         field_value_obj.set_value(field_value)
                         field_value_obj.save()
                     else:
-                        comment = Comment(
-                            request=instance,
-                            author=self.user,  # Предположим, что self.user - это текущий пользователь
-                            text=field_value[0],
-                            attachment=field_value[1]
-                        )
-                        comment.save()
+                        text, attachment = field_value.split(',')
+                        if text.strip() or attachment:
+                            if field_meta.field_type == 'comment':
+                                comment = Comment(
+                                    request=instance,
+                                    author=self.user,
+                                    text=text,
+                                    attachment=attachment
+                                )
+                                comment.save()
+                            elif field_meta.field_type == 'description':
+                                field_value_obj, created = FieldValue.objects.get_or_create(
+                                    request=instance,
+                                    field_meta=field_meta
+                                )
+                                field_value_obj.value_text = text
+                                field_value_obj.value_file = attachment
+                                field_value_obj.save()
         return instance
+
+

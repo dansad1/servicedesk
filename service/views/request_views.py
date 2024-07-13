@@ -34,7 +34,6 @@ from reportlab.lib import colors
 from reportlab.pdfbase.ttfonts import TTFont
 from django.utils.formats import date_format
 
-
 def handle_filters(request, initial_requests):
     load_filter_id = request.GET.get('load_filter')
     loaded_filters = {}
@@ -100,24 +99,20 @@ def request_create(request, request_type_id):
                         field_value_obj.set_value(field_value)
                         field_value_obj.save()
                     else:
-                        comment = Comment(
-                            request=new_request,
-                            author=request.user,
-                            text=field_value[0],
-                            attachment=field_value[1]
-                        )
-                        comment.save()
-
+                        text, attachment = field_value
+                        if text.strip() or attachment:  # Проверка на наличие текста или вложения перед созданием комментария
+                            comment = Comment(
+                                request=new_request,
+                                author=request.user,
+                                text=text,
+                                attachment=attachment
+                            )
+                            comment.save()
             return redirect('request_list')
     else:
         form = RequestForm(user=request.user, request_type=request_type)
-
     excluded_fields = ['title', 'description', 'attachment', 'request_type']
-    return render(request, 'request/request_create.html', {
-        'form': form,
-        'request_type': request_type,
-        'excluded_fields': excluded_fields,
-    })
+    return render(request, 'request/request_create.html', {'form': form, 'request_type': request_type, 'excluded_fields': excluded_fields})
 
 def request_edit(request, request_id):
     req = get_object_or_404(Request, id=request_id)
@@ -138,23 +133,19 @@ def request_edit(request, request_id):
                         field_value_obj.set_value(field_value)
                         field_value_obj.save()
                     else:
-                        comment = Comment(
-                            request=req,
-                            author=request.user,
-                            text=field_value[0],
-                            attachment=field_value[1]
-                        )
-                        comment.save()
-
+                        text, attachment = field_value
+                        if text.strip() or attachment:  # Проверка на наличие текста или вложения перед созданием комментария
+                            comment = Comment(
+                                request=req,
+                                author=request.user,
+                                text=text,
+                                attachment=attachment
+                            )
+                            comment.save()
             return redirect('request_list')
     else:
         form = RequestForm(instance=req, user=request.user, request_type=request_type)
-
-    return render(request, 'request/request_edit.html', {
-        'form': form,
-        'request': req,
-        'excluded_fields': ['title', 'description', 'attachment', 'request_type']
-    })
+    return render(request, 'request/request_edit.html', {'form': form, 'request': req, 'excluded_fields': ['title', 'description', 'attachment', 'request_type']})
 @login_required
 def request_list(request):
     initial_requests = Request.objects.all()
