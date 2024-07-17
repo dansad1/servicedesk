@@ -92,21 +92,22 @@ def request_create(request, request_type_id):
                 if field_name.startswith('custom_field_'):
                     field_id = int(field_name.split('_')[-1])
                     field_meta = get_object_or_404(FieldMeta, id=field_id)
-                    if field_meta.field_type != 'comment':
+                    if field_meta.field_type == 'comment':
+                        if field_value[0].strip() or field_value[1]:  # Проверка на наличие текста или вложения
+                            comment = Comment(
+                                request=new_request,
+                                author=request.user,
+                                text=field_value[0],
+                                attachment=field_value[1]
+                            )
+                            comment.save()
+                    else:
                         field_value_obj, created = FieldValue.objects.get_or_create(
                             request=new_request,
                             field_meta=field_meta
                         )
                         field_value_obj.set_value(field_value)
                         field_value_obj.save()
-                    else:
-                        comment = Comment(
-                            request=new_request,
-                            author=request.user,
-                            text=field_value[0],
-                            attachment=field_value[1]
-                        )
-                        comment.save()
 
             return redirect('request_list')
     else:
@@ -119,6 +120,7 @@ def request_create(request, request_type_id):
         'excluded_fields': excluded_fields,
     })
 
+@login_required
 def request_edit(request, request_id):
     req = get_object_or_404(Request, id=request_id)
     request_type = req.request_type
@@ -130,21 +132,22 @@ def request_edit(request, request_id):
                 if field_name.startswith('custom_field_'):
                     field_id = int(field_name.split('_')[-1])
                     field_meta = get_object_or_404(FieldMeta, id=field_id)
-                    if field_meta.field_type != 'comment':
+                    if field_meta.field_type == 'comment':
+                        if field_value[0].strip() or field_value[1]:  # Проверка на наличие текста или вложения
+                            comment = Comment(
+                                request=req,
+                                author=request.user,
+                                text=field_value[0],
+                                attachment=field_value[1]
+                            )
+                            comment.save()
+                    else:
                         field_value_obj, created = FieldValue.objects.get_or_create(
                             request=req,
                             field_meta=field_meta
                         )
                         field_value_obj.set_value(field_value)
                         field_value_obj.save()
-                    else:
-                        comment = Comment(
-                            request=req,
-                            author=request.user,
-                            text=field_value[0],
-                            attachment=field_value[1]
-                        )
-                        comment.save()
 
             return redirect('request_list')
     else:
@@ -155,6 +158,8 @@ def request_edit(request, request_id):
         'request': req,
         'excluded_fields': ['title', 'description', 'attachment', 'request_type']
     })
+
+
 @login_required
 def request_list(request):
     initial_requests = Request.objects.all()

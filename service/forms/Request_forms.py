@@ -146,7 +146,7 @@ class RequestForm(forms.ModelForm):
         fields = ['request_type']
 
     def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user', None)
+        self.user = kwargs.pop('user', None)
         request_type = kwargs.pop('request_type', None)
         super(RequestForm, self).__init__(*args, **kwargs)
 
@@ -163,7 +163,7 @@ class RequestForm(forms.ModelForm):
                     except FieldValue.DoesNotExist:
                         pass
                 else:
-                    initial_value = self.get_initial_value(field_meta, user)
+                    initial_value = self.get_initial_value(field_meta, self.user)
                 field = self.get_form_field(field_meta, initial_value)
                 field.widget.attrs['widget_class'] = field.widget.__class__.__name__
                 self.fields[field_name] = field
@@ -184,7 +184,7 @@ class RequestForm(forms.ModelForm):
             'priority': forms.ModelChoiceField,
             'requester': forms.ModelChoiceField,
             'assignee': forms.ModelChoiceField,
-            'comment': CommentMultiValueField,  # Добавление типа поля для комментариев
+            'comment': CommentMultiValueField,
         }.get(field_meta.field_type, forms.CharField)
 
         if field_meta.field_type == 'comment':
@@ -229,7 +229,7 @@ class RequestForm(forms.ModelForm):
             'priority': forms.Select(attrs={'class': 'form-select'}),
             'requester': forms.Select(attrs={'class': 'form-select'}),
             'assignee': forms.Select(attrs={'class': 'form-select'}),
-            'comment': CommentFormWidget(),  # Виджет для комментариев
+            'comment': CommentFormWidget(),
         }
         return widgets.get(field_meta.field_type, forms.TextInput(attrs={'class': 'form-control'}))
 
@@ -279,19 +279,20 @@ class RequestForm(forms.ModelForm):
                 if field_name.startswith('custom_field_'):
                     field_id = int(field_name.split('_')[-1])
                     field_meta = FieldMeta.objects.get(id=field_id)
-                    if field_meta.field_type != 'comment':
+                    if field_meta.field_type == 'comment':
+                        if field_value[0].strip() or field_value[1]:  # Проверка на наличие текста или вложения
+                            comment = Comment(
+                                request=instance,
+                                author=self.user,
+                                text=field_value[0],
+                                attachment=field_value[1]
+                            )
+                            comment.save()
+                    else:
                         field_value_obj, created = FieldValue.objects.get_or_create(
                             request=instance,
                             field_meta=field_meta
                         )
                         field_value_obj.set_value(field_value)
                         field_value_obj.save()
-                    else:
-                        comment = Comment(
-                            request=instance,
-                            author=self.user,  # Предположим, что self.user - это текущий пользователь
-                            text=field_value[0],
-                            attachment=field_value[1]
-                        )
-                        comment.save()
         return instance
