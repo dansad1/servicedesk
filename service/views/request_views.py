@@ -93,7 +93,7 @@ def request_create(request, request_type_id):
                     field_id = int(field_name.split('_')[-1])
                     field_meta = get_object_or_404(FieldMeta, id=field_id)
                     if field_meta.field_type == 'comment':
-                        if field_value[0].strip() or field_value[1]:  # Проверка на наличие текста или вложения
+                        if field_value[0].strip() or field_value[1]:
                             comment = Comment(
                                 request=new_request,
                                 author=request.user,
@@ -101,6 +101,14 @@ def request_create(request, request_type_id):
                                 attachment=field_value[1]
                             )
                             comment.save()
+                    elif field_meta.field_type == 'description':
+                        if field_value[0].strip() or field_value[1]:
+                            description = FieldValue(
+                                request=new_request,
+                                field_meta=field_meta
+                            )
+                            description.set_value(f"{field_value[0]},{field_value[1]}")
+                            description.save()
                     else:
                         field_value_obj, created = FieldValue.objects.get_or_create(
                             request=new_request,
@@ -119,7 +127,6 @@ def request_create(request, request_type_id):
         'request_type': request_type,
         'excluded_fields': excluded_fields,
     })
-
 @login_required
 def request_edit(request, request_id):
     req = get_object_or_404(Request, id=request_id)
@@ -127,26 +134,28 @@ def request_edit(request, request_id):
     if request.method == 'POST':
         form = RequestForm(request.POST, request.FILES, instance=req, user=request.user, request_type=request_type)
         if form.is_valid():
-            req = form.save(commit=False)
-            req.save()
+            req = form.save()
             for field_name, field_value in form.cleaned_data.items():
                 if field_name.startswith('custom_field_'):
                     field_id = int(field_name.split('_')[-1])
                     field_meta = get_object_or_404(FieldMeta, id=field_id)
                     if field_meta.field_type == 'comment':
-                        text = field_value[0].strip()
-                        attachment = field_value[1]
-                        if text or attachment:
-                            # Avoid creating duplicate comments
-                            existing_comments = Comment.objects.filter(request=req, author=request.user, text=text, attachment=attachment)
-                            if not existing_comments.exists():
-                                comment = Comment(
-                                    request=req,
-                                    author=request.user,
-                                    text=text,
-                                    attachment=attachment
-                                )
-                                comment.save()
+                        if field_value[0].strip() or field_value[1]:
+                            comment = Comment(
+                                request=req,
+                                author=request.user,
+                                text=field_value[0],
+                                attachment=field_value[1]
+                            )
+                            comment.save()
+                    elif field_meta.field_type == 'description':
+                        if field_value[0].strip() or field_value[1]:
+                            description = FieldValue(
+                                request=req,
+                                field_meta=field_meta
+                            )
+                            description.set_value(f"{field_value[0]},{field_value[1]}")
+                            description.save()
                     else:
                         field_value_obj, created = FieldValue.objects.get_or_create(
                             request=req,

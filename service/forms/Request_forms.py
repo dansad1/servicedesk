@@ -139,6 +139,43 @@ class CommentMultiValueField(forms.MultiValueField):
         if data_list:
             return data_list
         return ['', '']
+class DescriptionFormWidget(forms.MultiWidget):
+    def __init__(self, attrs=None):
+        widgets = [
+            CKEditorWidget(attrs={'class': 'form-control', 'placeholder': 'Введите описание'}),
+            forms.ClearableFileInput(attrs={'class': 'form-control'}),
+        ]
+        super().__init__(widgets, attrs)
+
+    def decompress(self, value):
+        if value:
+            return value.split(',', 1)
+        return ['', '']
+
+    def format_output(self, rendered_widgets):
+        return f"""
+            <div class="form-group">
+                <label for="id_description_text">Описание</label>
+                {rendered_widgets[0]}
+            </div>
+            <div class="form-group">
+                <label for="id_description_attachment">Прикрепить файл</label>
+                {rendered_widgets[1]}
+            </div>
+        """
+class DescriptionMultiValueField(forms.MultiValueField):
+    def __init__(self, **kwargs):
+        fields = [
+            forms.CharField(widget=CKEditorWidget(), required=False),
+            forms.FileField(required=False),
+        ]
+        super().__init__(fields, require_all_fields=False, **kwargs)
+        self.widget = DescriptionFormWidget()
+
+    def compress(self, data_list):
+        if data_list:
+            return ','.join([str(data) if data else '' for data in data_list])
+        return ''
 
 class RequestForm(forms.ModelForm):
     class Meta:
@@ -185,6 +222,8 @@ class RequestForm(forms.ModelForm):
             'requester': forms.ModelChoiceField,
             'assignee': forms.ModelChoiceField,
             'comment': CommentMultiValueField,
+            'description': DescriptionMultiValueField,
+
         }.get(field_meta.field_type, forms.CharField)
 
         if field_meta.field_type == 'comment':
@@ -193,7 +232,12 @@ class RequestForm(forms.ModelForm):
                 required=field_meta.is_required,
                 initial=initial_value,
             )
-
+        if field_meta.field_type == 'description':
+            return DescriptionMultiValueField(
+                label=field_meta.name,
+                required=field_meta.is_required,
+                initial=initial_value,
+            )
         if field_meta.field_type in ['status', 'company', 'priority', 'requester', 'assignee']:
             queryset = self.get_queryset(field_meta.field_type)
             initial = field_meta.default_value if field_meta.field_type == 'status' and field_meta.default_value else initial_value
@@ -230,6 +274,8 @@ class RequestForm(forms.ModelForm):
             'requester': forms.Select(attrs={'class': 'form-select'}),
             'assignee': forms.Select(attrs={'class': 'form-select'}),
             'comment': CommentFormWidget(),
+            'description': DescriptionFormWidget(),  # Виджет для описания
+
         }
         return widgets.get(field_meta.field_type, forms.TextInput(attrs={'class': 'form-control'}))
 
