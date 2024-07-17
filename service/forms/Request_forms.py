@@ -279,8 +279,22 @@ class RequestForm(forms.ModelForm):
                 if field_name.startswith('custom_field_'):
                     field_id = int(field_name.split('_')[-1])
                     field_meta = FieldMeta.objects.get(id=field_id)
-                    if field_meta.field_type == 'comment':
-                        if field_value[0].strip() or field_value[1]:  # Проверка на наличие текста или вложения
+                    if field_meta.field_type != 'comment':
+                        field_value_obj, created = FieldValue.objects.get_or_create(
+                            request=instance,
+                            field_meta=field_meta
+                        )
+                        field_value_obj.set_value(field_value)
+                        field_value_obj.save()
+                    else:
+                        # Avoid creating duplicate comments by checking existing ones
+                        existing_comment = Comment.objects.filter(
+                            request=instance,
+                            author=self.user,
+                            text=field_value[0],
+                            attachment=field_value[1]
+                        ).first()
+                        if not existing_comment and (field_value[0].strip() or field_value[1]):
                             comment = Comment(
                                 request=instance,
                                 author=self.user,
@@ -288,11 +302,4 @@ class RequestForm(forms.ModelForm):
                                 attachment=field_value[1]
                             )
                             comment.save()
-                    else:
-                        field_value_obj, created = FieldValue.objects.get_or_create(
-                            request=instance,
-                            field_meta=field_meta
-                        )
-                        field_value_obj.set_value(field_value)
-                        field_value_obj.save()
         return instance

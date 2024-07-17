@@ -127,20 +127,26 @@ def request_edit(request, request_id):
     if request.method == 'POST':
         form = RequestForm(request.POST, request.FILES, instance=req, user=request.user, request_type=request_type)
         if form.is_valid():
-            req = form.save()
+            req = form.save(commit=False)
+            req.save()
             for field_name, field_value in form.cleaned_data.items():
                 if field_name.startswith('custom_field_'):
                     field_id = int(field_name.split('_')[-1])
                     field_meta = get_object_or_404(FieldMeta, id=field_id)
                     if field_meta.field_type == 'comment':
-                        if field_value[0].strip() or field_value[1]:  # Проверка на наличие текста или вложения
-                            comment = Comment(
-                                request=req,
-                                author=request.user,
-                                text=field_value[0],
-                                attachment=field_value[1]
-                            )
-                            comment.save()
+                        text = field_value[0].strip()
+                        attachment = field_value[1]
+                        if text or attachment:
+                            # Avoid creating duplicate comments
+                            existing_comments = Comment.objects.filter(request=req, author=request.user, text=text, attachment=attachment)
+                            if not existing_comments.exists():
+                                comment = Comment(
+                                    request=req,
+                                    author=request.user,
+                                    text=text,
+                                    attachment=attachment
+                                )
+                                comment.save()
                     else:
                         field_value_obj, created = FieldValue.objects.get_or_create(
                             request=req,
