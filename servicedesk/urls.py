@@ -154,8 +154,7 @@ urlpatterns = [
     path('request_field/create/<int:request_type_id>/', request_field_create, name='request_field_create'),
     path('request_field/edit/<int:request_type_id>/<int:pk>/', request_field_edit, name='request_field_edit'),
     path('get_default_value_widget/', get_default_value_widget, name='get_default_value_widget'),
-    path('request_field/delete/<int:request_type_id>/<int:pk>/', request_field_delete,name='request_field_delete'),
-
+    path('request_field/delete/<int:request_type_id>/<int:pk>/', request_field_delete, name='request_field_delete'),
 ]
 
 
