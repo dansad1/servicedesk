@@ -1,61 +1,66 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Создание поля</h2>
-<form method="post" id="fieldMetaForm">
-    {% csrf_token %}
-    <div class="form-group">
-        <label for="id_name">Название поля:</label>
-        {{ form.name }}
-    </div>
-    <div class="form-group">
-        <label for="id_field_type">Тип поля:</label>
-        {{ form.field_type }}
-    </div>
-    <div class="form-group">
-        <label for="id_is_required">Обязательное:</label>
-        {{ form.is_required }}
-    </div>
-    <div class="form-group">
-        <label for="id_show_name">Показывать имя:</label>
-        {{ form.show_name }}
-    </div>
-    <div class="form-group">
-        <label for="id_default_value">Значение по умолчанию:</label>
-        <div id="default_value_container">{{ form.default_value }}</div>
-    </div>
-    <div class="form-group">
-        <label for="id_unit">Единица измерения:</label>
-        {{ form.unit }}
-    </div>
-    <div class="form-group">
-        <label for="id_hint">Подсказка:</label>
-        {{ form.hint }}
-    </div>
+<div class="container">
+    <h2>Создать новое поле для заявки</h2>
+    <form method="post" id="fieldMetaForm">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_name">Название поля:</label>
+            {{ form.name }}
+        </div>
+        <div class="form-group">
+            <label for="id_field_type">Тип поля:</label>
+            {{ form.field_type }}
+        </div>
+        <div class="form-group">
+            <label for="id_is_required">Обязательное:</label>
+            {{ form.is_required }}
+        </div>
+        <div class="form-group">
+            <label for="id_show_name">Показывать имя:</label>
+            {{ form.show_name }}
+        </div>
+        <div class="form-group">
+            <label for="id_default_value">Значение по умолчанию:</label>
+            <div id="default_value_container">{{ form.default_value }}</div>
+        </div>
+        <div class="form-group">
+            <label for="id_unit">Единица измерения:</label>
+            {{ form.unit }}
+        </div>
+        <div class="form-group">
+            <label for="id_hint">Подсказка:</label>
+            {{ form.hint }}
+        </div>
 
-    <h3>Доступ ролей к полям:</h3>
-    {{ formset.management_form }}
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Роль</th>
-                <th>Чтение</th>
-                <th>Обновление</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for formset_form in formset %}
+        <h3>Доступ групп к полям:</h3>
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>{{ formset_form.instance.role.name }}</td>
-                    <td>{{ formset_form.can_read }}</td>
-                    <td>{{ formset_form.can_update }}</td>
+                    <th>Группа</th>
+                    <th>Чтение</th>
+                    <th>Обновление</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for group in groups %}
+                    <tr>
+                        <td>{{ group.name }}</td>
+                        <td>
+                            <input type="checkbox" name="can_read_{{ group.id }}" class="form-check-input">
+                        </td>
+                        <td>
+                            <input type="checkbox" name="can_update_{{ group.id }}" class="form-check-input">
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
-    <button type="submit" class="btn btn-primary">Create</button>
-</form>
+        <button type="submit" class="btn btn-primary">Создать</button>
+    </form>
+</div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
