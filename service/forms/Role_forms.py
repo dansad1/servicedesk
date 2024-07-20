@@ -39,7 +39,6 @@ class GroupPermissionForm(forms.ModelForm):
                 widget=forms.RadioSelect,
                 label=f"Уровень доступа для {permission.code_name}"
             )
-        # Initialize the permissions
         if self.instance.pk:
             group_permissions = GroupPermission.objects.filter(group=self.instance)
             self.initial['custompermission'] = group_permissions.values_list('custompermission', flat=True)
