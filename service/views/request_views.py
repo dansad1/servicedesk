@@ -33,48 +33,60 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.pdfbase.ttfonts import TTFont
 from django.utils.formats import date_format
+import json
+from django.views.decorators.csrf import csrf_exempt
 
 
-def handle_filters(request, initial_requests):
+def handle_filters(request, initial_requests, form):
     load_filter_id = request.GET.get('load_filter')
     loaded_filters = {}
-    print(load_filter_id)
+
     if load_filter_id:
         try:
             saved_filter = SavedFilter.objects.get(id=load_filter_id, user=request.user)
-            loaded_filters = json.loads(saved_filter.filter_data)  # предполагается, что это JSON-строка
-            print(loaded_filters)
+            loaded_filters = json.loads(saved_filter.filter_data)
             loaded_filters.pop('filter_name', None)
-            print(loaded_filters)
-            initial_requests = apply_filters(initial_requests, loaded_filters)
+            initial_requests = apply_optional_filters(initial_requests, loaded_filters)
         except (SavedFilter.DoesNotExist, json.JSONDecodeError):
             pass
 
-    filter_form = RequestFilterForm(request.GET or None)
-
-    if request.method == "GET" and filter_form.is_valid():
-        filters = filter_form.cleaned_data
-        filters.pop('filter_name', None)  # Исключаем filter_name из фильтров
-        print(filters)
-        filtered_requests = apply_filters(initial_requests, filters)
+    if request.method == "GET" and form.is_valid():
+        filters = form.cleaned_data
+        filters.pop('filter_name', None)
+        filtered_requests = apply_optional_filters(initial_requests, filters)
     else:
         filtered_requests = initial_requests
 
-    return filtered_requests, filter_form
+    return filtered_requests, form
 
-
-def apply_filters(queryset, filters):
+def apply_optional_filters(queryset, filters):
     for field, value in filters.items():
-        if value:
-            if isinstance(value, list) or isinstance(value, QuerySet):
-                queryset = queryset.filter(**{f"{field}__in": value})
-            elif isinstance(value, QuerySet) and value.count() == 1:
-                queryset = queryset.filter(**{field: value.first()})
-            else:
-                queryset = queryset.filter(**{field: value})
+        if field.startswith('enable_') and value:
+            actual_field = field[len('enable_'):]
+            field_value = filters.get(actual_field)
+            if field_value:
+                if isinstance(field_value, list) or isinstance(field_value, QuerySet):
+                    queryset = queryset.filter(**{f"{actual_field}__in": field_value})
+                else:
+                    queryset = queryset.filter(**{actual_field: field_value})
     return queryset
 
+@csrf_exempt
+@login_required
+def save_filter(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        filter_name = data.get('filter_name')
+        filter_data = json.dumps(data.get('filter_data'))
 
+        saved_filter = SavedFilter.objects.create(
+            user=request.user,
+            filter_name=filter_name,
+            filter_data=filter_data
+        )
+
+        return JsonResponse({'message': 'Фильтр сохранен', 'filter_id': saved_filter.id}, status=201)
+    return JsonResponse({'error': 'Invalid request'}, status=400)
 def select_request_type(request):
     types = RequestType.objects.all()
     return render(request, 'request/select_request_type.html', {'types': types})
@@ -177,8 +189,16 @@ def request_edit(request, request_id):
 
 @login_required
 def request_list(request):
+    # Проверяем наличие FieldSet с именем "Request Filters" и создаем его, если не найден
+    fieldset, created = FieldSet.objects.get_or_create(name="Request Filters")
+    if created:
+        fieldset.add_default_fields()
+
+    RequestFilterForm = generate_dynamic_form(fieldset)
+    form = RequestFilterForm(request.GET or None)
+
     initial_requests = Request.objects.all()
-    filtered_requests, filter_form = handle_filters(request, initial_requests)
+    filtered_requests, filter_form = handle_filters(request, initial_requests, form)
 
     requests_with_field_values = [
         {
@@ -188,12 +208,15 @@ def request_list(request):
         for req in filtered_requests
     ]
 
+    saved_filters = SavedFilter.objects.filter(user=request.user)
+
     return render(request, 'request/request_list.html', {
         'requests_with_field_values': requests_with_field_values,
-        'filter_form': filter_form
+        'filter_form': filter_form,
+        'saved_filters': saved_filters
     })
-    
-    
+
+
 @login_required
 def request_delete(request):
     if request.method == 'POST':

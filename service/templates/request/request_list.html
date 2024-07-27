@@ -17,19 +17,22 @@
       <div class='mb-2 flex flex-col gap-4'>
         {{ filter_form.as_p }}
       </div>
-      <button class="btn btn-secondary"  type="submit">Применить фильтр</button>
-      <button class="btn btn-success" type="button" id="saveFilter">Сохранить фильтр</button>
-      <button class="close btn btn-danger absolute top-2 right-1 rounded-full " id="closeFilters" aria-label="Close">
+      <button class="btn btn-secondary" type="submit">Применить фильтр</button>
+      <button class="close btn btn-danger absolute top-2 right-1 rounded-full" id="closeFilters" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
     </form>
 
-    <!-- Кнопка для закрытия фильтров -->
-
+    <!-- Форма сохранения фильтра -->
+    <form method="post" id="saveFilterForm" class="max-w-4xl m-auto">
+        {% csrf_token %}
+        {{ save_filter_form.as_p }}
+        <button class="btn btn-success" type="submit" name="save_filter">Сохранить фильтр</button>
+    </form>
 
     <!-- Список сохраненных фильтров -->
-    <div id="savedFilters" class="m-auto max-w-4xl ">
-      <h3 class="text-2xl  p-10 text-center" >Сохраненные фильтры:</h3>
+    <div id="savedFilters" class="m-auto max-w-4xl">
+      <h3 class="text-2xl p-10 text-center">Сохраненные фильтры:</h3>
       <ul>
         {% for saved_filter in saved_filters %}
           <li>
@@ -41,7 +44,6 @@
     </div>
   </div>
 </div>
-
 
 <div class="requests-list">
     <h3 class="text-center text-4xl p-10 max-w-4xl m-auto">Список заявок</h3>
@@ -91,6 +93,7 @@
     <button class="btn btn-primary" id="openFilters">Открыть фильтры</button>
     <button class="btn btn-secondary" id="exportPdf">Экспорт в PDF</button>
 </div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const openFiltersButton = document.getElementById('openFilters');

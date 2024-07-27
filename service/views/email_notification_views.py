@@ -11,6 +11,7 @@ from service.forms.Email_forms import *
 from ..forms.Notification_forms import NotificationTemplateForm, NotificationSettingForm, StatusNotificationSettingForm
 from ..models import EmailSettings, NotificationSetting, NotificationTemplate, Status
 from ..variables import AVAILABLE_VARIABLES, EVENT_CHOICES
+from django.template import Template, Context
 
 
 def email_settings_view(request):
@@ -196,3 +197,48 @@ def notification_template_delete(request, pk):
     template = get_object_or_404(NotificationTemplate, pk=pk)
     template.delete()
     return redirect('template_list')
+# utils.py
+
+def render_template(template, context):
+    """
+    Заменяет переменные в шаблоне значениями из контекста.
+    """
+
+    t = Template(template)
+    c = Context(context)
+    return t.render(c)
+
+def get_request_context(request):
+    """
+    Возвращает контекст с информацией о заявке и динамических полях, включая комментарии.
+    """
+    context = {
+        'title': request.title,
+        'description': request.description,
+        'requester_username': request.requester.username if request.requester else '',
+        'assignee_username': request.assignee.username if request.assignee else '',
+        'company_name': request.company.name if request.company else '',
+        'status_name': request.status.name if request.status else '',
+        'created_at': request.created_at,
+        'updated_at': request.updated_at,
+        'priority_name': request.priority.name if request.priority else '',
+        'request_type_name': request.request_type.name if request.request_type else '',
+        'due_date': request.due_date,
+        'attachment_url': request.attachment.url if request.attachment else '',
+    }
+
+    # Добавление динамических полей
+    for field_value in request.field_values.all():
+        if field_value.field_meta.field_type == 'comment':
+            comments = context.get('comments', [])
+            comments.append({
+                'text': field_value.value_text,
+                'author_username': field_value.value_requester.username if field_value.value_requester else '',
+                'created_at': field_value.value_date,
+                'attachment_url': field_value.value_file.url if field_value.value_file else '',
+            })
+            context['comments'] = comments
+        else:
+            context[field_value.field_meta.name] = field_value.get_value()
+
+    return context

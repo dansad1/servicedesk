@@ -1,19 +1,22 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Список шаблонов уведомлений</h2>
-<a href="{% url 'template_create' %}">Создать новый шаблон</a>
-<ul>
-    {% for template in templates %}
-    <li>
-        {{ template.name }} -
-        <a href="{% url 'template_edit' template.id %}">Редактировать</a>
-        <!-- Форма удаления -->
-        <form action="{% url 'template_delete' template.id %}" method="post" style="display: inline;">
-            {% csrf_token %}
-            <button type="submit" onclick="return confirm('Вы уверены, что хотите удалить этот шаблон?');">Удалить</button>
-        </form>
-    </li>
-    {% endfor %}
-</ul>
+<div class="container mt-4">
+    <h2>Список шаблонов уведомлений</h2>
+    <a href="{% url 'template_create' %}" class="btn btn-primary mb-3">Создать новый шаблон</a>
+    <ul class="list-group">
+        {% for template in templates %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ template.name }}
+            <span>
+                <a href="{% url 'template_edit' template.id %}" class="btn btn-sm btn-warning">Редактировать</a>
+                <form action="{% url 'template_delete' template.id %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Вы уверены, что хотите удалить этот шаблон?');">Удалить</button>
+                </form>
+            </span>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
 {% endblock %}

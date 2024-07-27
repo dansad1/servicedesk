@@ -62,7 +62,8 @@
     background-color: #0056b3;
   }
 </style>
-<<h2 class="my-4 text-center text-4xl">Редактировать профиль компании</h2>
+
+<h2 class="my-4 text-center text-4xl">Редактировать профиль компании</h2>
 
 <div class="container">
   <ul class="nav nav-tabs mb-4" id="companyTabs" role="tablist">
@@ -202,13 +203,13 @@
           <tbody>
             {% for request in requests %}
               <tr>
-                <td><a href="{% url 'request_edit' request.pk %}">{{ request.title }}</a></td>
-                <td>{{ request.request_type.name|default:"Тип не указан" }}</td>
-                <td>{{ request.priority.name|default:"Приоритет не указан" }}</td>
-                <td>{{ request.assignee.get_full_name|default:"Исполнитель не назначен" }}</td>
-                <td>{{ request.requester.get_full_name }}</td>
-                <td>{{ request.status.name|default:"Статус не указан" }}</td>
-                <td>{{ request.due_date|date:"d.m.Y H:i"|default:"Не указано" }}</td>
+                <td><a href="{% url 'request_edit' request.pk %}">{{ request.get_field_values.Title }}</a></td>
+                <td>{{ request.get_field_values.Request_Type }}</td>
+                <td>{{ request.get_field_values.Priority }}</td>
+                <td>{{ request.get_field_values.Assignee }}</td>
+                <td>{{ request.get_field_values.Requester }}</td>
+                <td>{{ request.get_field_values.Status }}</td>
+                <td>{{ request.get_field_values.Due_Date|date:"d.m.Y H:i"|default:"Не указано" }}</td>
                 <td>{{ request.updated_at|date:"d.m.Y H:i" }}</td>
               </tr>
             {% empty %}
@@ -261,17 +262,16 @@
     </div>
   </div>
 </div>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      var triggerTabList = [].slice.call(document.querySelectorAll('#companyTabs a'))
-      triggerTabList.forEach(function(triggerEl) {
-        var tabTrigger = new bootstrap.Tab(triggerEl)
-        triggerEl.addEventListener('click', function(event) {
-          event.preventDefault()
-          tabTrigger.show()
-        })
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var triggerTabList = [].slice.call(document.querySelectorAll('#companyTabs a'))
+    triggerTabList.forEach(function(triggerEl) {
+      var tabTrigger = new bootstrap.Tab(triggerEl)
+      triggerEl.addEventListener('click', function(event) {
+        event.preventDefault()
+        tabTrigger.show()
       })
-    });
-  </script>
-</div>
+    })
+  });
+</script>
 {% endblock %}

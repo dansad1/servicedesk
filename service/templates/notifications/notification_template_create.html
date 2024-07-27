@@ -2,11 +2,41 @@
 {% load static %}
 
 {% block content %}
+<div class="container mt-4">
+    <h2>Создать или Редактировать Шаблон Уведомлений</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.media }}
+        {{ form.as_p }}
+
+        <div id="variable-panel" class="variable-panel">
+            <h3>Переменные</h3>
+            <input type="text" id="search-variable" placeholder="Поиск..." onkeyup="filterVariables()" class="form-control mb-2">
+            <div class="variable-list">
+                {% for category, variables in AVAILABLE_VARIABLES.items %}
+                <div class="variable-category">
+                    <h4>{{ category }}</h4>
+                    <ul class="list-group">
+                        {% for var_key, var_desc in variables.items %}
+                        <li class="list-group-item" onclick="insertVariable('{{ var_key }}')">{{ var_key }} - {{ var_desc }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Сохранить</button>
+    </form>
+</div>
+
 <style>
 .variable-panel {
     border: 1px solid #ccc;
     padding: 10px;
     margin-top: 20px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
 }
 
 .variable-list {
@@ -34,34 +64,9 @@
 }
 </style>
 
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.media }}
-    {{ form.as_p }}
-
-     <div id="variable-panel" class="variable-panel">
-        <h3>Переменные</h3>
-        <input type="text" id="search-variable" placeholder="Поиск..." onkeyup="filterVariables()">
-        <div class="variable-list">
-          {% for category, variables in AVAILABLE_VARIABLES.items %}
-<div class="variable-category">
-    <h4>{{ category }}</h4>
-    <ul>
-        {% for var_key, var_desc in variables.items %}
-        <li onclick="insertVariable('{{ var_key }}')">{{ var_key }} - {{ var_desc }}</li>
-        {% endfor %}
-    </ul>
-</div>
-{% endfor %}
-        </div>
-    </div>
-
-    <button type="submit">Сохранить</button>
-</form>
-
 <script src="{% static 'js/variable_panel.js' %}"></script>
 <script>
-    function insertVariable(variable) {
+function insertVariable(variable) {
     var editor = CKEDITOR.instances['id_body']; // Замените 'id_body' на ID вашего CKEditor
     if (editor) {
         // Вставляем переменную в формате, который сохраняет её визуальное представление
@@ -73,21 +78,20 @@
     }
 }
 
+function filterVariables() {
+    var input = document.getElementById("search-variable");
+    var filter = input.value.toUpperCase();
+    var panel = document.getElementById("variable-panel");
+    var li = panel.getElementsByTagName("li");
 
-    function filterVariables() {
-        var input = document.getElementById("search-variable");
-        var filter = input.value.toUpperCase();
-        var panel = document.getElementById("variable-panel");
-        var li = panel.getElementsByTagName("li");
-
-        for (var i = 0; i < li.length; i++) {
-            var txtValue = li[i].textContent || li[i].innerText;
-            if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                li[i].style.display = "";
-            } else {
-                li[i].style.display = "none";
-            }
+    for (var i = 0; i < li.length; i++) {
+        var txtValue = li[i].textContent || li[i].innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            li[i].style.display = "";
+        } else {
+            li[i].style.display = "none";
         }
     }
+}
 </script>
 {% endblock %}

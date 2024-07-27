@@ -13,76 +13,92 @@ from django.contrib.auth.models import Group
 
 User = get_user_model()
 
+def generate_dynamic_form(fieldset):
+    class DynamicRequestFilterForm(forms.Form):
+        filter_name = forms.CharField(
+            max_length=100,
+            required=False,
+            widget=forms.TextInput(attrs={'class': 'form-control'}),
+            label="Название фильтра"
+        )
 
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            for field in fieldset.fields.all():
+                field_name = field.name.lower().replace(' ', '_')
 
+                if field.field_type == 'text':
+                    self.fields[field_name] = forms.CharField(
+                        required=False,
+                        label=field.name,
+                        widget=forms.TextInput(attrs={'class': 'form-control'})
+                    )
+                elif field.field_type == 'textarea':
+                    self.fields[field_name] = forms.CharField(
+                        required=False,
+                        label=field.name,
+                        widget=forms.Textarea(attrs={'class': 'form-control'})
+                    )
+                elif field.field_type == 'date':
+                    self.fields[field_name] = forms.DateField(
+                        required=False,
+                        label=field.name,
+                        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
+                    )
+                elif field.field_type == 'file':
+                    self.fields[field_name] = forms.FileField(
+                        required=False,
+                        label=field.name,
+                        widget=forms.ClearableFileInput(attrs={'class': 'form-control'})
+                    )
+                elif field.field_type == 'requester':
+                    self.fields[field_name] = forms.ModelChoiceField(
+                        queryset=User.objects.all(),
+                        required=False,
+                        label=field.name,
+                        widget=forms.Select(attrs={'class': 'form-control'})
+                    )
+                elif field.field_type == 'assignee':
+                    self.fields[field_name] = forms.ModelChoiceField(
+                        queryset=User.objects.all(),
+                        required=False,
+                        label=field.name,
+                        widget=forms.Select(attrs={'class': 'form-control'})
+                    )
+                elif field.field_type == 'company':
+                    self.fields[field_name] = forms.ModelChoiceField(
+                        queryset=Company.objects.all(),
+                        required=False,
+                        label=field.name,
+                        widget=forms.Select(attrs={'class': 'form-control'})
+                    )
+                elif field.field_type == 'status':
+                    self.fields[field_name] = forms.ModelChoiceField(
+                        queryset=Status.objects.all(),
+                        required=False,
+                        label=field.name,
+                        widget=forms.Select(attrs={'class': 'form-control'})
+                    )
+                elif field.field_type == 'priority':
+                    self.fields[field_name] = forms.ModelChoiceField(
+                        queryset=Priority.objects.all(),
+                        required=False,
+                        label=field.name,
+                        widget=forms.Select(attrs={'class': 'form-control'})
+                    )
+                elif field.field_type == 'comment':
+                    self.fields[field_name] = forms.CharField(
+                        required=False,
+                        label=field.name,
+                        widget=forms.Textarea(attrs={'class': 'form-control'})
+                    )
 
+        def clean(self):
+            cleaned_data = super().clean()
+            cleaned_data.pop('filter_name', None)
+            return cleaned_data
 
-
-
-class RequestFilterForm(forms.Form):
-    
-    filter_name = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'class': 'form-control'}), label="Название фильтра")
-
-    requester = forms.ModelMultipleChoiceField(
-        label="Заявитель",
-        queryset=User.objects.all(),
-        widget=SelectMultiple(attrs={'class': 'select2 form-control'}),
-        required=False
-    )
-
-    assignee = forms.ModelMultipleChoiceField(
-        label="Исполнитель",
-        queryset=User.objects.all(),
-        widget=SelectMultiple(attrs={'class': 'select2 form-control'}),
-        required=False
-    )
-
-    company = forms.ModelMultipleChoiceField(
-        label="Компания",
-        queryset=Company.objects.all(),
-        widget=SelectMultiple(attrs={'class': 'select2 form-control'}),
-        required=False
-    )
-
-    status = forms.ModelMultipleChoiceField(
-        label="Статус",
-        queryset=Status.objects.all(),
-        widget=SelectMultiple(attrs={'class': 'select2 form-control'}),
-        required=False
-    )
-
-    created_at = forms.DateField(
-        label="Дата создания",
-        widget=DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-        required=False
-    )
-
-    updated_at = forms.DateField(
-        label="Дата обновления",
-        widget=DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-        required=False
-    )
-
-    priority = forms.ModelMultipleChoiceField(
-        label="Приоритет",
-        queryset=Priority.objects.all(),
-        widget=SelectMultiple(attrs={'class': 'select2 form-control'}),
-        required=False
-    )
-
-    request_type = forms.ModelMultipleChoiceField(
-        label="Тип заявки",
-        queryset=RequestType.objects.all(),
-        widget=SelectMultiple(attrs={'class': 'select2 form-control'}),
-        required=False
-    )
-    
-    def clean(self):
-        cleaned_data = super().clean()
-        # Remove filter_name from cleaned_data to avoid using it in filters
-        cleaned_data.pop('filter_name', None)
-        return cleaned_data
-    
+    return DynamicRequestFilterForm
 class SavedFilterForm(forms.ModelForm):
     class Meta:
         model = SavedFilter

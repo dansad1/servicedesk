@@ -24,16 +24,24 @@ def company_create(request):
     return render(request, 'company/company_create.html', {'form': form})
 
 
+@login_required
 def company_edit(request, pk):
     company = get_object_or_404(Company, pk=pk)
-    form = CompanyForm(instance=company, company_id=company.pk)
+    form = CompanyForm(instance=company)
     employees = company.customuser_set.all()
-    company_requests = Request.objects.filter(requester__in=employees).select_related('requester', 'assignee', 'status', 'priority', 'request_type')
+
+    # Получение всех заявок, связанных с компанией через динамические поля
+    employee_ids = employees.values_list('id', flat=True)
+    company_requests = Request.objects.filter(
+        field_values__field_meta__name='Requester',
+        field_values__value_requester__in=employee_ids
+    ).select_related('request_type', 'request_type__field_set')
+
     departments = company.departments.all()
     subdepartments = Department.objects.filter(parent__company=company).select_related('parent')
 
     if request.method == 'POST':
-        form = CompanyForm(request.POST, instance=company, company_id=company.pk)
+        form = CompanyForm(request.POST, instance=company)
         if form.is_valid():
             form.save()
             messages.success(request, "Информация о компании обновлена.")
@@ -77,7 +85,6 @@ def department_create(request, company_pk):
             return redirect('company_edit', pk=company.pk)
     else:
         form = DepartmentForm(initial={'company': company.id}, company_id=company.id)
-        # Проверьте, что это место кода выполняется и queryset устанавливается правильно
         form.fields['users'].queryset = CustomUser.objects.filter(company=company)
 
     context = {'form': form, 'company': company}
@@ -86,12 +93,16 @@ def department_create(request, company_pk):
 @login_required
 def department_edit(request, pk):
     department = get_object_or_404(Department, pk=pk)
-    department_requests = Request.objects.filter(requester__department=department)
+    # Исправление фильтрации по правильным полям
+    department_requests = Request.objects.filter(
+        field_values__field_meta__name='Requester',
+        field_values__value_requester__department=department
+    ).distinct()
 
     if request.method == 'POST':
         form = DepartmentForm(request.POST, instance=department, company_id=department.company_id)
         if form.is_valid():
-            department = form.save()  # Сохраняем объект модели и связанные данные многие-ко-многим
+            department = form.save()
             messages.success(request, "Отдел обновлён.")
             return redirect('company_edit', pk=department.company.pk)
     else:
@@ -105,8 +116,6 @@ def department_edit(request, pk):
     }
     return render(request, 'company/department_edit.html', context)
 
-
-
 @login_required
 @require_http_methods(["POST"])
 def department_delete(request, pk):
@@ -114,9 +123,7 @@ def department_delete(request, pk):
     company_pk = department.company.pk
     department.delete()
     messages.success(request, "Отдел удалён.")
-    # Redirect to the company edit page
     return redirect('company_edit', pk=company_pk)
-
 
 @login_required
 def subdepartment_create(request, department_id):
