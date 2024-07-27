@@ -58,35 +58,15 @@ def handle_filters(request, initial_requests, form):
         filtered_requests = initial_requests
 
     return filtered_requests, form
-
 def apply_optional_filters(queryset, filters):
     for field, value in filters.items():
-        if field.startswith('enable_') and value:
-            actual_field = field[len('enable_'):]
-            field_value = filters.get(actual_field)
-            if field_value:
-                if isinstance(field_value, list) or isinstance(field_value, QuerySet):
-                    queryset = queryset.filter(**{f"{actual_field}__in": field_value})
-                else:
-                    queryset = queryset.filter(**{actual_field: field_value})
+        if value:
+            if isinstance(value, list) or isinstance(value, QuerySet):
+                queryset = queryset.filter(**{f"field_values__field_meta__name": field, f"field_values__value_text__in": value})
+            else:
+                queryset = queryset.filter(**{f"field_values__field_meta__name": field, f"field_values__value_text": value})
     return queryset
 
-@csrf_exempt
-@login_required
-def save_filter(request):
-    if request.method == "POST":
-        data = json.loads(request.body)
-        filter_name = data.get('filter_name')
-        filter_data = json.dumps(data.get('filter_data'))
-
-        saved_filter = SavedFilter.objects.create(
-            user=request.user,
-            filter_name=filter_name,
-            filter_data=filter_data
-        )
-
-        return JsonResponse({'message': 'Фильтр сохранен', 'filter_id': saved_filter.id}, status=201)
-    return JsonResponse({'error': 'Invalid request'}, status=400)
 def select_request_type(request):
     types = RequestType.objects.all()
     return render(request, 'request/select_request_type.html', {'types': types})
@@ -189,7 +169,6 @@ def request_edit(request, request_id):
 
 @login_required
 def request_list(request):
-    # Проверяем наличие FieldSet с именем "Request Filters" и создаем его, если не найден
     fieldset, created = FieldSet.objects.get_or_create(name="Request Filters")
     if created:
         fieldset.add_default_fields()
@@ -199,6 +178,17 @@ def request_list(request):
 
     initial_requests = Request.objects.all()
     filtered_requests, filter_form = handle_filters(request, initial_requests, form)
+
+    if request.method == "POST" and 'save_filter' in request.POST:
+        save_filter_form = SavedFilterForm(request.POST)
+        if save_filter_form.is_valid():
+            saved_filter = save_filter_form.save(commit=False)
+            saved_filter.user = request.user
+            saved_filter.filter_data = json.dumps(request.GET)
+            saved_filter.save()
+            return redirect('request_list')
+    else:
+        save_filter_form = SavedFilterForm()
 
     requests_with_field_values = [
         {
@@ -213,6 +203,7 @@ def request_list(request):
     return render(request, 'request/request_list.html', {
         'requests_with_field_values': requests_with_field_values,
         'filter_form': filter_form,
+        'save_filter_form': save_filter_form,
         'saved_filters': saved_filters
     })
 
