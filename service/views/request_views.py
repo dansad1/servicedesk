@@ -193,7 +193,7 @@ def request_list(request):
     requests_with_field_values = [
         {
             'request': req,
-            'field_values': req.get_field_values()
+            'field_values': {field.name: req.get_field_values().get(field.name) for field in fieldset.fields.all()}
         }
         for req in filtered_requests
     ]
@@ -204,9 +204,9 @@ def request_list(request):
         'requests_with_field_values': requests_with_field_values,
         'filter_form': filter_form,
         'save_filter_form': save_filter_form,
-        'saved_filters': saved_filters
+        'saved_filters': saved_filters,
+        'fieldset': fieldset,
     })
-
 
 @login_required
 def request_delete(request):

@@ -7,12 +7,21 @@
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
 
-<!-- Кнопка для открытия фильтров -->
-<!-- Фоновая панель для модального окна -->
+<div id="columnModal" class="modal">
+  <div class="modal-content">
+    <span class="close" id="closeColumnModal">&times;</span>
+    <h2>Выберите столбцы для отображения</h2>
+    <form id="columnForm">
+      {% for field in fieldset.fields.all %}
+        <label><input type="checkbox" class="column-toggle" data-column="{{ field.name|lower }}" checked> {{ field.name }}</label><br>
+      {% endfor %}
+      <button type="button" id="saveColumns" class="btn btn-primary">Сохранить</button>
+    </form>
+  </div>
+</div>
+
 <div id="modalBackdrop" class="modal-backdrop relative">
-  <!-- Блок с фильтрами (изначально скрыт) -->
   <div id="filters" class="modal">
-    <!-- Форма фильтрации -->
     <form method="get" id="filterForm" class="max-w-4xl m-auto">
       <div class='mb-2 flex flex-col gap-4'>
         {{ filter_form.as_p }}
@@ -23,14 +32,12 @@
       </button>
     </form>
 
-    <!-- Форма сохранения фильтра -->
     <form method="post" id="saveFilterForm" class="max-w-4xl m-auto">
         {% csrf_token %}
         {{ save_filter_form.as_p }}
         <button class="btn btn-success" type="submit" name="save_filter">Сохранить фильтр</button>
     </form>
 
-    <!-- Список сохраненных фильтров -->
     <div id="savedFilters" class="m-auto max-w-4xl">
       <h3 class="text-2xl p-10 text-center">Сохраненные фильтры:</h3>
       <ul>
@@ -47,6 +54,10 @@
 
 <div class="requests-list">
     <h3 class="text-center text-4xl p-10 max-w-4xl m-auto">Список заявок</h3>
+
+    <!-- Кнопка для открытия модального окна выбора столбцов -->
+    <button class="btn btn-primary" id="openColumnModal">Выбрать столбцы</button>
+
     {% if not requests_with_field_values %}
       <p class="text-center text-xl p-4 max-w-4xl m-auto">Нет доступных заявок</p>
     {% else %}
@@ -56,14 +67,9 @@
           <thead>
             <tr>
               <th class="text-center"><input type="checkbox" id="select-all"></th>
-              <th class="text-center">Название заявки</th>
-              <th class="text-center">Тип</th>
-              <th class="text-center">Приоритет</th>
-              <th class="text-center">Исполнитель</th>
-              <th class="text-center">Заявитель</th>
-              <th class="text-center">Статус</th>
-              <th class="text-center">Срок выполнения</th>
-              <th class="text-center">Время обновления</th>
+              {% for field in fieldset.fields.all %}
+                <th class="text-center column-{{ field.name|lower }}">{{ field.name }}</th>
+              {% endfor %}
               <th class="text-center">Действия</th>
             </tr>
           </thead>
@@ -71,14 +77,9 @@
             {% for item in requests_with_field_values %}
             <tr class="align-middle">
                 <td class="text-center"><input type="checkbox" name="selected_requests" value="{{ item.request.pk }}"></td>
-                <td class="text-center">{{ item.field_values.Title }}</td>
-                <td class="text-center">{{ item.field_values.Request_Type }}</td>
-                <td class="text-center">{{ item.field_values.Priority }}</td>
-                <td class="text-center">{{ item.field_values.Assignee }}</td>
-                <td class="text-center">{{ item.field_values.Requester }}</td>
-                <td class="text-center">{{ item.field_values.Status }}</td>
-                <td class="text-center">{% if item.field_values.Due_Date %}{{ item.field_values.Due_Date|date:"d.m.Y" }}{% else %}Не указано{% endif %}</td>
-                <td class="text-center">{% if item.request.updated_at %}{{ item.request.updated_at|date:"d.m.Y H:i" }}{% else %}Не указано{% endif %}</td>
+                {% for field in fieldset.fields.all %}
+                  <td class="text-center column-{{ field.name|lower }}">{{ item.field_values.field_meta.name }}</td>
+                {% endfor %}
                 <td class="flex gap-2 justify-evenly">
                     <button onclick="window.location.href='{% url 'request_edit' item.request.pk %}'" type="button" class="btn btn-primary">Редактировать</button>
                 </td>
@@ -96,26 +97,46 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const openFiltersButton = document.getElementById('openFilters');
-    const closeFiltersButton = document.getElementById('closeFilters');
-    const filtersDiv = document.getElementById('filters');
-    const modalBackdrop = document.getElementById('modalBackdrop');
+    const openColumnModalButton = document.getElementById('openColumnModal');
+    const closeColumnModalButton = document.getElementById('closeColumnModal');
+    const columnModal = document.getElementById('columnModal');
+    const saveColumnsButton = document.getElementById('saveColumns');
+    const columnToggles = document.querySelectorAll('.column-toggle');
 
-    // Инициализация Select2
-    openFiltersButton.addEventListener('click', function() {
-        modalBackdrop.style.display = 'block';
-        filtersDiv.style.display = 'block';
-        $(filtersDiv).find('.select2').select2({
-            width: '100%',
-            dropdownParent: $(filtersDiv)
+    // Открытие модального окна выбора столбцов
+    openColumnModalButton.addEventListener('click', function() {
+        columnModal.style.display = 'block';
+    });
+
+    // Закрытие модального окна выбора столбцов
+    closeColumnModalButton.addEventListener('click', function() {
+        columnModal.style.display = 'none';
+    });
+
+    // Сохранение выбранных столбцов в локальное хранилище
+    saveColumnsButton.addEventListener('click', function() {
+        const selectedColumns = {};
+        columnToggles.forEach(toggle => {
+            selectedColumns[toggle.dataset.column] = toggle.checked;
         });
+        localStorage.setItem('selectedColumns', JSON.stringify(selectedColumns));
+        columnModal.style.display = 'none';
+        applyColumnVisibility(selectedColumns);
     });
 
-    closeFiltersButton.addEventListener('click', function() {
-        modalBackdrop.style.display = 'none';
-        filtersDiv.style.display = 'none';
-        $(filtersDiv).find('.select2').select2('destroy');
-    });
+    // Применение видимости столбцов на основе сохраненных настроек
+    function applyColumnVisibility(selectedColumns) {
+        for (const [column, visible] of Object.entries(selectedColumns)) {
+            const elements = document.querySelectorAll(`.column-${column}`);
+            elements.forEach(element => {
+                element.style.display = visible ? '' : 'none';
+            });
+        }
+    }
+
+    // Загрузка сохраненных настроек столбцов при загрузке страницы
+    const savedColumns = JSON.parse(localStorage.getItem('selectedColumns')) || {};
+    applyColumnVisibility(savedColumns);
 
     // Инициализация DataTables
     $('#requestsTable').DataTable({
@@ -123,29 +144,29 @@ document.addEventListener('DOMContentLoaded', function() {
             "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Russian.json" // Подключение русского языка
         }
     });
-});
 
-document.getElementById('exportPdf').addEventListener('click', function() {
-    window.location.href = '{% url "export_pdf" %}';
-});
-
-document.querySelectorAll('.delete-btn').forEach(function(button) {
-    button.addEventListener('click', function(event) {
-        if (!confirm('Вы уверены, что хотите удалить эту заявку?')) {
-            event.preventDefault();
-        }
+    // Прочие функции
+    document.getElementById('exportPdf').addEventListener('click', function() {
+        window.location.href = '{% url "export_pdf" %}';
     });
-});
 
-// Select all checkboxes
-document.getElementById('select-all').addEventListener('click', function(event) {
-    var isChecked = event.target.checked;
-    document.querySelectorAll('input[name="selected_requests"]').forEach(function(checkbox) {
-        checkbox.checked = isChecked;
+    document.querySelectorAll('.delete-btn').forEach(function(button) {
+        button.addEventListener('click', function(event) {
+            if (!confirm('Вы уверены, что хотите удалить эту заявку?')) {
+                event.preventDefault();
+            }
+        });
+    });
+
+    // Select all checkboxes
+    document.getElementById('select-all').addEventListener('click', function(event) {
+        var isChecked = event.target.checked;
+        document.querySelectorAll('input[name="selected_requests"]').forEach(function(checkbox) {
+            checkbox.checked = isChecked;
+        });
     });
 });
 </script>
-
 <style>
 .modal-backdrop {
   position: fixed;
