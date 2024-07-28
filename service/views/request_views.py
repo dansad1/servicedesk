@@ -167,6 +167,7 @@ def request_edit(request, request_id):
     })
 
 
+
 @login_required
 def request_list(request):
     fieldset, created = FieldSet.objects.get_or_create(name="Request Filters")
@@ -193,7 +194,7 @@ def request_list(request):
     requests_with_field_values = [
         {
             'request': req,
-            'field_values': {field.name: req.get_field_values().get(field.name) for field in fieldset.fields.all()}
+            'field_values': req.get_field_values()
         }
         for req in filtered_requests
     ]
@@ -207,6 +208,9 @@ def request_list(request):
         'saved_filters': saved_filters,
         'fieldset': fieldset,
     })
+
+
+
 
 @login_required
 def request_delete(request):

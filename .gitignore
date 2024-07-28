@@ -4,3 +4,4 @@ media
 .venv/
 data/
 rag/data
+/staticfiles/

@@ -390,6 +390,8 @@ class Request(models.Model):
             elif field_type == 'file':
                 values[field_value.field_meta.name] = field_value.value_file.url if field_value.value_file else None
         return values
+
+
 class Comment(models.Model):
     request = models.ForeignKey(Request, on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
