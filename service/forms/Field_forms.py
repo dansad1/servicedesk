@@ -41,11 +41,22 @@ class FieldMetaForm(forms.ModelForm):
         }
         return field_type_mapping.get(field_type, forms.CharField(label="Значение по умолчанию", required=False, widget=forms.TextInput()))
 
+    def clean_default_value(self):
+        default_value = self.cleaned_data.get('default_value')
+        field_type = self.cleaned_data.get('field_type')
+
+        if field_type in ['status', 'company', 'priority', 'requester', 'assignee'] and default_value:
+            return default_value.id
+        return default_value
+
     def save(self, commit=True):
         instance = super(FieldMetaForm, self).save(commit=False)
         default_value_field = self.cleaned_data.get('default_value')
         if default_value_field is not None:
-            instance.default_value = default_value_field
+            if isinstance(default_value_field, (Status, Company, Priority, CustomUser)):
+                instance.default_value = default_value_field.id
+            else:
+                instance.default_value = default_value_field
         if commit:
             instance.save()
         return instance

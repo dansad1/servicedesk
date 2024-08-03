@@ -332,28 +332,31 @@ class Request(models.Model):
                 )
 
     def get_default_value(self, field_meta, user):
-        type_map = {
-            'text': {'value_text': ''},
-            'textarea': {'value_text': ''},
-            'select': {'value_text': None},
-            'number': {'value_number': 0},
-            'date': {'value_date': timezone.now().date() if field_meta.name.lower() == 'due date' else None},
-            'boolean': {'value_boolean': False},
-            'email': {'value_email': user.email if field_meta.field_type == 'email' else ''},
-            'url': {'value_url': ''},
-            'json': {'value_json': {}},
-            'status': {
-                'value_status': Status.objects.get(id=field_meta.default_value) if field_meta.default_value else None},
-            'company': {'value_company': user.company if hasattr(user, 'company') else None},
-            'priority': {'value_priority': Priority.objects.get(
-                id=field_meta.default_value) if field_meta.default_value else None},
-            'requester': {'value_requester': user},
-            'assignee': {'value_assignee': None},
-            'request_type': {
-                'value_request_type': self.request_type if field_meta.field_type == 'request_type' else None},
-            'file': {'value_file': None},
-        }
-        return type_map.get(field_meta.field_type, {})
+        try:
+            if field_meta.field_type == 'status' and field_meta.default_value:
+                return {'value_status': Status.objects.get(id=field_meta.default_value)}
+            elif field_meta.field_type == 'company' and field_meta.default_value:
+                return {'value_company': Company.objects.get(id=field_meta.default_value)}
+            elif field_meta.field_type == 'priority' and field_meta.default_value:
+                return {'value_priority': Priority.objects.get(id=field_meta.default_value)}
+            elif field_meta.field_type == 'requester':
+                return {'value_requester': user}
+            elif field_meta.field_type == 'assignee':
+                return {'value_assignee': None}
+            else:
+                return {
+                    'text': {'value_text': field_meta.default_value},
+                    'textarea': {'value_text': field_meta.default_value},
+                    'number': {'value_number': float(field_meta.default_value) if field_meta.default_value else 0},
+                    'date': {'value_date': field_meta.default_value if field_meta.default_value else timezone.now().date()},
+                    'boolean': {'value_boolean': field_meta.default_value.lower() == 'true' if field_meta.default_value else False},
+                    'email': {'value_email': field_meta.default_value},
+                    'url': {'value_url': field_meta.default_value},
+                    'json': {'value_json': field_meta.default_value},
+                    'file': {'value_file': field_meta.default_value},
+                }.get(field_meta.field_type, {})
+        except (Status.DoesNotExist, Company.DoesNotExist, Priority.DoesNotExist, CustomUser.DoesNotExist):
+            return {}
 
     def get_field_values(self):
         values = {}
