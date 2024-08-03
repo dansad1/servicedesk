@@ -1,4 +1,6 @@
 from datetime import timezone
+
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
 from ckeditor.widgets import CKEditorWidget
@@ -193,6 +195,7 @@ class DescriptionMultiValueField(forms.MultiValueField):
             return ','.join([str(data) if data else '' for data in data_list])
         return ''
 
+
 class RequestForm(forms.ModelForm):
     class Meta:
         model = Request
@@ -208,18 +211,33 @@ class RequestForm(forms.ModelForm):
         if request_type:
             for field_meta in request_type.field_set.fields.all():
                 field_name = f'custom_field_{field_meta.id}'
-                initial_value = None
-                if self.instance.pk:
-                    try:
-                        field_value = FieldValue.objects.get(request=self.instance, field_meta=field_meta)
-                        initial_value = field_value.get_value()
-                    except FieldValue.DoesNotExist:
-                        pass
-                else:
-                    initial_value = self.get_initial_value(field_meta, self.user)
+                initial_value = self.get_initial_value(field_meta)
                 field = self.get_form_field(field_meta, initial_value)
                 field.widget.attrs['widget_class'] = field.widget.__class__.__name__
                 self.fields[field_name] = field
+
+    def get_initial_value(self, field_meta):
+        if self.instance.pk:
+            try:
+                field_value = FieldValue.objects.get(request=self.instance, field_meta=field_meta)
+                return field_value.get_value()
+            except FieldValue.DoesNotExist:
+                return None
+        else:
+            if field_meta.field_type == 'company':
+                return self.user.company if self.user and hasattr(self.user, 'company') else None
+            elif field_meta.field_type == 'requester':
+                return self.user
+            elif field_meta.field_type == 'assignee':
+                return None
+            elif field_meta.default_value:
+                if field_meta.field_type == 'status':
+                    return get_object_or_404(Status, id=field_meta.default_value)
+                elif field_meta.field_type == 'priority':
+                    return get_object_or_404(Priority, id=field_meta.default_value)
+                elif field_meta.field_type in ['text', 'textarea', 'number', 'date', 'boolean', 'email', 'url', 'json']:
+                    return field_meta.default_value
+            return None
 
     def get_form_field(self, field_meta, initial_value):
         field_class = {
@@ -239,29 +257,15 @@ class RequestForm(forms.ModelForm):
             'assignee': forms.ModelChoiceField,
             'comment': CommentMultiValueField,
             'description': DescriptionMultiValueField,
-
         }.get(field_meta.field_type, forms.CharField)
 
-        if field_meta.field_type == 'comment':
-            return CommentMultiValueField(
-                label=field_meta.name,
-                required=field_meta.is_required,
-                initial=initial_value,
-            )
-        if field_meta.field_type == 'description':
-            return DescriptionMultiValueField(
-                label=field_meta.name,
-                required=field_meta.is_required,
-                initial=initial_value,
-            )
         if field_meta.field_type in ['status', 'company', 'priority', 'requester', 'assignee']:
             queryset = self.get_queryset(field_meta.field_type)
-            initial = field_meta.default_value if field_meta.field_type == 'status' and field_meta.default_value else initial_value
             return field_class(
                 label=field_meta.name,
                 required=field_meta.is_required,
                 queryset=queryset,
-                initial=initial,
+                initial=initial_value,
                 widget=forms.Select(attrs={'class': 'form-select'})
             )
         else:
@@ -290,8 +294,7 @@ class RequestForm(forms.ModelForm):
             'requester': forms.Select(attrs={'class': 'form-select'}),
             'assignee': forms.Select(attrs={'class': 'form-select'}),
             'comment': CommentFormWidget(),
-            'description': DescriptionFormWidget(),  # Виджет для описания
-
+            'description': DescriptionFormWidget(),
         }
         return widgets.get(field_meta.field_type, forms.TextInput(attrs={'class': 'form-control'}))
 
@@ -305,34 +308,6 @@ class RequestForm(forms.ModelForm):
         }
         return querysets.get(field_type, CustomUser.objects.none())
 
-    def get_initial_value(self, field_meta, user):
-        if self.instance.pk:
-            try:
-                field_value = FieldValue.objects.get(request=self.instance, field_meta=field_meta)
-                return field_value.get_value()
-            except FieldValue.DoesNotExist:
-                return None
-        else:
-            type_map = {
-                'text': '',
-                'textarea': '',
-                'select': None,
-                'number': 0,
-                'date': timezone.now().date() if field_meta.name.lower() == 'due date' else None,
-                'boolean': False,
-                'email': user.email if field_meta.field_type == 'email' else '',
-                'url': '',
-                'json': {},
-                'status': Status.objects.get(id=field_meta.default_value) if field_meta.default_value else None,
-                'company': user.company if hasattr(user, 'company') else None,
-                'priority': None,
-                'requester': user if field_meta.field_type == 'requester' else None,
-                'assignee': None,
-                'request_type': None,
-                'file': None,
-            }
-            return type_map.get(field_meta.field_type, '')
-
     def save(self, commit=True):
         instance = super(RequestForm, self).save(commit=False)
         if commit:
@@ -340,7 +315,7 @@ class RequestForm(forms.ModelForm):
             for field_name, field_value in self.cleaned_data.items():
                 if field_name.startswith('custom_field_'):
                     field_id = int(field_name.split('_')[-1])
-                    field_meta = FieldMeta.objects.get(id=field_id)
+                    field_meta = get_object_or_404(FieldMeta, id=field_id)
                     if field_meta.field_type != 'comment':
                         field_value_obj, created = FieldValue.objects.get_or_create(
                             request=instance,
@@ -349,7 +324,6 @@ class RequestForm(forms.ModelForm):
                         field_value_obj.set_value(field_value)
                         field_value_obj.save()
                     else:
-                        # Avoid creating duplicate comments by checking existing ones
                         existing_comment = Comment.objects.filter(
                             request=instance,
                             author=self.user,

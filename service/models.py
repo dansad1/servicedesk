@@ -344,9 +344,10 @@ class Request(models.Model):
             'json': {'value_json': {}},
             'status': {
                 'value_status': Status.objects.get(id=field_meta.default_value) if field_meta.default_value else None},
-            'company': {'value_company': user.company if field_meta.field_type == 'company' else None},
-            'priority': {'value_priority': None},
-            'requester': {'value_requester': user if field_meta.field_type == 'requester' else None},
+            'company': {'value_company': user.company if hasattr(user, 'company') else None},
+            'priority': {'value_priority': Priority.objects.get(
+                id=field_meta.default_value) if field_meta.default_value else None},
+            'requester': {'value_requester': user},
             'assignee': {'value_assignee': None},
             'request_type': {
                 'value_request_type': self.request_type if field_meta.field_type == 'request_type' else None},
@@ -390,7 +391,6 @@ class Request(models.Model):
             elif field_type == 'file':
                 values[field_value.field_meta.name] = field_value.value_file.url if field_value.value_file else None
         return values
-
 
 class Comment(models.Model):
     request = models.ForeignKey(Request, on_delete=models.CASCADE, related_name='comments')
