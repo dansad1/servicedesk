@@ -21,9 +21,13 @@
               <input type="checkbox" name="selected_companies" value="{{ company.pk }}">
             </td>
             <td class="text-center items-center align-middle">
-              <a href="{% url 'company_edit' company.pk %}">
-                <span class="badge text-bg-success px-8 py-2 hover:scale-110">{{ company.name }}</span>
-              </a>
+              {% if 'companies_can_edit' in user_permissions %}
+                <a href="{% url 'company_edit' company.pk %}">
+                  <span class="badge text-bg-success px-8 py-2 hover:scale-110">{{ company.name }}</span>
+                </a>
+              {% else %}
+                <span class="badge text-bg-secondary px-8 py-2">{{ company.name }}</span>
+              {% endif %}
             </td>
             <td class="text-center items-center align-middle">{{ company.address }}</td>
           </tr>
@@ -33,9 +37,15 @@
     {% if not companies %}
       <p>Компаний не найдено.</p>
     {% endif %}
-    <button type="submit" class="btn btn-danger mb-3">Удалить выбранные компании</button>
+
+    {% if 'companies_can_delete' in user_permissions %}
+      <button type="submit" class="btn btn-danger mb-3">Удалить выбранные компании</button>
+    {% endif %}
   </form>
-  <button onclick="window.location.href='{% url 'create_company' %}'" class="btn btn-success mt-2" type="button">Создать компанию</button>
+
+  {% if 'companies_can_create' in user_permissions %}
+    <button onclick="window.location.href='{% url 'create_company' %}'" class="btn btn-success mt-2" type="button">Создать компанию</button>
+  {% endif %}
 </div>
 
 <!-- Подключение DataTables -->

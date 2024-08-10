@@ -9,8 +9,7 @@ from service.views.asset_type_views import *
 from service.views.asset_views import create_asset, edit_asset, delete_asset, asset_list, get_attributes_by_asset_type
 from service.views.attribute_views import attribute_create,  attribute_edit
 from service.views.file_views import file_view
-from service.views.request_field_views import request_field_edit, request_field_create, get_default_value_widget, \
-    request_field_delete
+from service.views.request_field_views import request_field_edit, request_field_create, get_default_value_widget,request_field_delete
 from service.views.request_views import *
 from service.views.company_views import company_create,company_edit,company_list,company_delete,department_create,department_delete,department_edit,subdepartment_create
 from service.views.profile_views import *

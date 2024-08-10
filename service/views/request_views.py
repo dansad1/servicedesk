@@ -26,7 +26,6 @@ import json
 from django.core.exceptions import ValidationError
 import json
 from django.contrib import messages
-from ..permissions import can_view_request,can_edit_request
 from django.http import HttpResponse, HttpResponseRedirect
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
