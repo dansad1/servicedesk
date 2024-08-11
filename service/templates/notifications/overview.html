@@ -36,7 +36,7 @@
                 <td>
                     {% for setting in settings %}
                         {% if setting.group_id == group.id and setting.event_key == event_key %}
-                            {% if setting.email_template %}
+                            {% if setting.has_template %}
                                 Да
                             {% else %}
                                 Нет
@@ -48,8 +48,8 @@
                 {% for status in statuses %}
                 <td>
                     {% for setting in settings %}
-                        {% if setting.group_id == group.id and setting.status_id == status.id %}
-                            {% if setting.email_template %}
+                        {% if setting.group_id == group.id and setting.event_key == "status_"|add:status.id %}
+                            {% if setting.has_template %}
                                 Да
                             {% else %}
                                 Нет

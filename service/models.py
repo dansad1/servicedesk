@@ -9,8 +9,6 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.translation import gettext_lazy as _
 from model_utils import FieldTracker
-
-from service.variables import EVENT_CHOICES
 from servicedesk import settings
 
 
@@ -450,7 +448,12 @@ class EmailSettings(models.Model):
     def use_ssl(self):
         return self.connection_type == 'ssl'
 
-
+EVENT_CHOICES = [
+    ('create_request', 'Создание заявки'),
+    ('update_request', 'Изменение полей заявки'),
+    ('add_comment', 'Добавление комментария'),
+    ('deadline_expiration', 'Истечение срока заявки'),
+]
 class NotificationTemplate(models.Model):
     type = models.CharField(max_length=100, choices=[('email', 'Email'), ('sms', 'SMS'), ('push', 'Push Notification')])
     name = models.CharField(max_length=255)
