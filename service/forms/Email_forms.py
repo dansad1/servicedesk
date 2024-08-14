@@ -33,13 +33,9 @@ class EmailSettingsForm(forms.ModelForm):
             'email_from': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'example@example.com'}),
         }
 
-    def clean(self):
-        cleaned_data = super().clean()
-        connection_type = cleaned_data.get("connection_type")
-        if connection_type == 'tls':
-            cleaned_data['use_tls'] = True
-            cleaned_data['use_ssl'] = False
-        elif connection_type == 'ssl':
-            cleaned_data['use_tls'] = False
-            cleaned_data['use_ssl'] = True
-        return cleaned_data
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        # Здесь уже не нужно устанавливать use_tls и use_ssl напрямую, так как они определяются через connection_type
+        if commit:
+            instance.save()
+        return instance

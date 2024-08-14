@@ -77,3 +77,9 @@ def update_group_permissions(group, post_data):
                 custompermission=permission,
                 access_level=access_level
             )
+def determine_users_for_functional_role(role, request):
+    if role == 'requester':
+        return [request.requester] if request.requester else []
+    elif role == 'assignee':
+        return [request.assignee] if request.assignee else []
+    return []

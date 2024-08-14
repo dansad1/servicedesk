@@ -26,6 +26,15 @@
             </div>
         </div>
 
+        <div id="construction-panel" class="construction-panel">
+            <h3>Конструкции</h3>
+            <ul class="list-group">
+                {% for key, construction in PREDEFINED_CONSTRUCTIONS.items %}
+                <li class="list-group-item" onclick="insertConstruction('{{ construction }}')">{{ key }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
         <button type="submit" class="btn btn-primary mt-3">Сохранить</button>
     </form>
 </div>
@@ -62,17 +71,48 @@
 .variable-category li:hover {
     background-color: #f0f0f0;
 }
+
+.construction-panel {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-top: 20px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.construction-panel ul {
+    list-style: none;
+    padding: 0;
+}
+
+.construction-panel li {
+    cursor: pointer;
+    padding: 5px;
+    border-bottom: 1px solid #eee;
+}
+
+.construction-panel li:hover {
+    background-color: #f0f0f0;
+}
 </style>
 
 <script src="{% static 'js/variable_panel.js' %}"></script>
 <script>
 function insertVariable(variable) {
-    var editor = CKEDITOR.instances['id_body']; // Замените 'id_body' на ID вашего CKEditor
+    var editor = CKEDITOR.instances['id_body'];
     if (editor) {
-        // Вставляем переменную в формате, который сохраняет её визуальное представление
-        var templateVariable = '{{ ' + variable + ' }}'; // Django шаблонная переменная
-        var displayVariable = '<span class="template-variable">' + variable + '</span>'; // Визуальный элемент
-        editor.insertHtml(displayVariable); // Вставляем в редактор
+        var templateVariable = '{{ ' + variable + ' }}';
+        var displayVariable = '<span class="template-variable">' + variable + '</span>';
+        editor.insertHtml(displayVariable);
+    } else {
+        console.error('CKEditor instance not found');
+    }
+}
+
+function insertConstruction(construction) {
+    var editor = CKEDITOR.instances['id_body'];
+    if (editor) {
+        editor.insertHtml(construction);
     } else {
         console.error('CKEditor instance not found');
     }

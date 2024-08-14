@@ -15,7 +15,7 @@
     <table id="summaryTable" class="table">
         <thead>
             <tr>
-                <th>Роль</th>
+                <th>Функциональная роль</th>
                 {% for event_key, event_name in events %}
                 <th>{{ event_name }}</th>
                 {% endfor %}
@@ -25,17 +25,17 @@
             </tr>
         </thead>
         <tbody>
-            {% for group in groups %}
+            {% for role_key, role_name in roles %}
             <tr>
                 <td>
-                    <button type="button" class="btn btn-link" data-toggle="modal" data-target="#modal-{{ group.id }}">
-                        {{ group.name }}
+                    <button type="button" class="btn btn-link" data-toggle="modal" data-target="#modal-{{ role_key }}">
+                        {{ role_name }}
                     </button>
                 </td>
                 {% for event_key, _ in events %}
                 <td>
                     {% for setting in settings %}
-                        {% if setting.group_id == group.id and setting.event_key == event_key %}
+                        {% if setting.role_key == role_key and setting.event_key == event_key %}
                             {% if setting.has_template %}
                                 Да
                             {% else %}
@@ -48,7 +48,7 @@
                 {% for status in statuses %}
                 <td>
                     {% for setting in settings %}
-                        {% if setting.group_id == group.id and setting.event_key == "status_"|add:status.id %}
+                        {% if setting.role_key == role_key and setting.event_key == "status_"|add:status.id %}
                             {% if setting.has_template %}
                                 Да
                             {% else %}
@@ -64,12 +64,12 @@
     </table>
 </div>
 
-{% for group in groups %}
-<div class="modal fade" id="modal-{{ group.id }}" tabindex="-1" role="dialog" aria-labelledby="modalLabel-{{ group.id }}" aria-hidden="true">
+{% for role_key, role_name in roles %}
+<div class="modal fade" id="modal-{{ role_key }}" tabindex="-1" role="dialog" aria-labelledby="modalLabel-{{ role_key }}" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalLabel-{{ group.id }}">Редактировать уведомления для роли: {{ group.name }}</h5>
+                <h5 class="modal-title" id="modalLabel-{{ role_key }}">Редактировать уведомления для роли: {{ role_name }}</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -77,7 +77,7 @@
             <div class="modal-body">
                 <form method="post" action="{% url 'update_notifications' %}">
                     {% csrf_token %}
-                    <input type="hidden" name="group_id" value="{{ group.id }}">
+                    <input type="hidden" name="role_key" value="{{ role_key }}">
                     <h4>События</h4>
                     <table class="table">
                         <thead>
@@ -94,8 +94,8 @@
                             {% for event_key, event_name in events %}
                             <tr>
                                 <td>{{ event_name }}</td>
-                                {% for form_group_id, form_event_key, form in event_forms %}
-                                    {% if form_group_id == group.id and form_event_key == event_key %}
+                                {% for form_role_key, form_event_key, form in event_forms %}
+                                    {% if form_role_key == role_key and form_event_key == event_key %}
                                         <td>{{ form.email_template }}</td>
                                         <td>{{ form.push_template }}</td>
                                         <td>{{ form.sms_template }}</td>
@@ -123,8 +123,8 @@
                             {% for status in statuses %}
                             <tr>
                                 <td>{{ status.name }}</td>
-                                {% for form_group_id, form_status_id, form in status_forms %}
-                                    {% if form_group_id == group.id and form_status_id == status.id %}
+                                {% for form_role_key, form_status_id, form in status_forms %}
+                                    {% if form_role_key == role_key and form_status_id == status.id %}
                                         <td>{{ form.email_template }}</td>
                                         <td>{{ form.push_template }}</td>
                                         <td>{{ form.sms_template }}</td>

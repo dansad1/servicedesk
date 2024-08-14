@@ -464,7 +464,12 @@ class NotificationTemplate(models.Model):
         return self.name
 
 class NotificationSetting(models.Model):
-    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    ROLE_CHOICES = [
+        ('requester', 'Заявитель'),
+        ('assignee', 'Исполнитель'),
+    ]
+
+    functional_role = models.CharField(max_length=50,choices=ROLE_CHOICES,null=True,  blank=True)
     event = models.CharField(max_length=50, choices=EVENT_CHOICES)
     email_template = models.ForeignKey(NotificationTemplate, on_delete=models.CASCADE, null=True, blank=True, related_name='email_settings')
     sms_template = models.ForeignKey(NotificationTemplate, on_delete=models.CASCADE, null=True, blank=True, related_name='sms_settings')
@@ -473,7 +478,7 @@ class NotificationSetting(models.Model):
     whatsapp_template = models.ForeignKey(NotificationTemplate, on_delete=models.CASCADE, null=True, blank=True, related_name='whatsapp_settings')
 
     def __str__(self):
-        return f'{self.group.name} - {self.get_event_display()}'
+        return f'{self.get_functional_role_display()} - {self.get_event_display()}'
 
     def get_event_display(self):
         event_dict = dict(EVENT_CHOICES)

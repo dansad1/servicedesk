@@ -17,11 +17,11 @@ from service.views.user_views import user_list,create_user_view,user_delete
 from service.views.settings_views import types_list
 from service.views.settings_views import *
 from service.views.role_views import role_delete, role_edit
-from service.views.email_notification_views import *
+from service.views.notification_views import *
 from service.views.perform_views import *
 from service.views.chat_views import *
 from service.views.user_views import CustomLoginView
-
+from  service.views.email_views import *
 urlpatterns = [
 
 # URL-паттерны для регистрации
@@ -93,8 +93,8 @@ urlpatterns = [
 
 
     path('export_pdf/', service.views.request_views.export_requests_pdf, name='export_pdf'),
-    path('email-settings/',service.views.email_notification_views.email_settings_view, name='email_settings'),
-    path('send-test-email/', service.views.email_notification_views.send_test_email, name='send_test_email'),
+    path('email-settings/', service.views.email_views.email_settings_view, name='email_settings'),
+    path('send-test-email/', service.views.email_views.send_test_email, name='send_test_email'),
 
     #Группы исполнителей
     path('groups/', performer_group_list, name='performer_group_list'),
