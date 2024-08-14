@@ -178,32 +178,29 @@ class FieldSet(models.Model):
 
     def add_default_fields(self):
         default_fields = [
-            {"name": "Title", "field_type": "text", "is_required": True, "show_name": True, "default_value": "", "unit": "", "hint": ""},
-            {"name": "Description", "field_type": "textarea", "is_required": True, "show_name": True, "default_value": "", "unit": "", "hint": ""},
-            {"name": "Due Date", "field_type": "date", "is_required": False, "show_name": True, "default_value": "", "unit": "", "hint": ""},
-            {"name": "Attachment", "field_type": "file", "is_required": False, "show_name": True, "default_value": "", "unit": "", "hint": ""},
-            {"name": "Requester", "field_type": "requester", "is_required": True, "show_name": True, "default_value": "", "unit": "", "hint": ""},
-            {"name": "Assignee", "field_type": "assignee", "is_required": False, "show_name": True, "default_value": "", "unit": "", "hint": ""},
-            {"name": "Company", "field_type": "company", "is_required": True, "show_name": True, "default_value": "", "unit": "", "hint": ""},
-            {"name": "Status", "field_type": "status", "is_required": True, "show_name": True, "default_value": "", "unit": "", "hint": ""},
-            {"name": "Priority", "field_type": "priority", "is_required": False, "show_name": True, "default_value": "", "unit": "", "hint": ""},
-            {"name": "Comments", "field_type": "comment", "is_required": False, "show_name": True, "default_value": "",
-             "unit": "", "hint": ""},
-
+            {"name": "Title", "field_type": "text", "default_value": "", "unit": "", "hint": ""},
+            {"name": "Description", "field_type": "textarea", "default_value": "", "unit": "", "hint": ""},
+            {"name": "Due Date", "field_type": "date", "default_value": "", "unit": "", "hint": ""},
+            {"name": "Attachment", "field_type": "file", "default_value": "", "unit": "", "hint": ""},
+            {"name": "Requester", "field_type": "requester", "default_value": "", "unit": "", "hint": ""},
+            {"name": "Assignee", "field_type": "assignee", "default_value": "", "unit": "", "hint": ""},
+            {"name": "Company", "field_type": "company", "default_value": "", "unit": "", "hint": ""},
+            {"name": "Status", "field_type": "status", "default_value": "", "unit": "", "hint": ""},
+            {"name": "Priority", "field_type": "priority", "default_value": "", "unit": "", "hint": ""},
+            {"name": "Comments", "field_type": "comment", "default_value": "", "unit": "", "hint": ""},
         ]
         for field in default_fields:
             field_meta, created = FieldMeta.objects.get_or_create(
                 name=field["name"],
                 field_type=field["field_type"],
                 defaults={
-                    "is_required": field["is_required"],
-                    "show_name": field["show_name"],
                     "default_value": field["default_value"],
                     "unit": field["unit"],
                     "hint": field["hint"]
                 }
             )
             self.fields.add(field_meta)
+
 
 
 class RequestType(models.Model):

@@ -1,4 +1,4 @@
-from datetime import timezone
+from datetime import timezone, timedelta
 
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -8,7 +8,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.forms import SelectMultiple, DateInput
 from service.models import StatusTransition, Status, Comment, Request, Company, Priority, RequestType, SavedFilter, \
-    FieldAccess, FieldMeta, FieldValue, CustomUser
+    FieldAccess, FieldMeta, FieldValue, CustomUser, PriorityDuration
 from django.forms.widgets import Select
 from django.contrib.auth.models import Group
 
@@ -206,15 +206,33 @@ class RequestForm(forms.ModelForm):
         request_type = kwargs.pop('request_type', None)
         super(RequestForm, self).__init__(*args, **kwargs)
 
+        # Set the CSS class for the request_type field
         self.fields['request_type'].widget.attrs.update({'class': 'form-select'})
 
+        # If request_type is provided, initialize dynamic fields
         if request_type:
+            self.fields['request_type'].initial = request_type
+            self.fields['request_type'].disabled = True  # Make the field read-only
+
             for field_meta in request_type.field_set.fields.all():
                 field_name = f'custom_field_{field_meta.id}'
                 initial_value = self.get_initial_value(field_meta)
                 field = self.get_form_field(field_meta, initial_value)
-                field.widget.attrs['widget_class'] = field.widget.__class__.__name__
+                field.required = field_meta.is_required  # Set field requirement based on FieldMeta
                 self.fields[field_name] = field
+
+            # Add the due_date custom field as read-only
+            due_date_field_meta = FieldMeta.objects.filter(name='Due Date', field_type='date').first()
+            if due_date_field_meta:
+                due_date_field_name = f'custom_field_{due_date_field_meta.id}'
+                due_date_value = self.calculate_due_date(self.instance)
+                due_date_field = forms.DateTimeField(
+                    label=due_date_field_meta.name,  # Set the correct field label
+                    initial=due_date_value,
+                    required=False,
+                    widget=forms.DateTimeInput(attrs={'class': 'form-control', 'readonly': 'readonly', 'type': 'datetime-local'})
+                )
+                self.fields[due_date_field_name] = due_date_field
 
     def get_initial_value(self, field_meta):
         if self.instance.pk:
@@ -262,7 +280,7 @@ class RequestForm(forms.ModelForm):
         if field_meta.field_type in ['status', 'company', 'priority', 'requester', 'assignee']:
             queryset = self.get_queryset(field_meta.field_type)
             return field_class(
-                label=field_meta.name,
+                label=field_meta.name,  # Set the correct field label
                 required=field_meta.is_required,
                 queryset=queryset,
                 initial=initial_value,
@@ -271,7 +289,7 @@ class RequestForm(forms.ModelForm):
         else:
             widget = self.get_widget(field_meta)
             return field_class(
-                label=field_meta.name,
+                label=field_meta.name,  # Set the correct field label
                 required=field_meta.is_required,
                 initial=initial_value,
                 widget=widget
@@ -308,10 +326,41 @@ class RequestForm(forms.ModelForm):
         }
         return querysets.get(field_type, CustomUser.objects.none())
 
+    def calculate_due_date(self, request_instance):
+        """Calculates and returns the due_date value for the custom field based on priority, accurate to minutes."""
+        if not request_instance.created_at:
+            request_instance.created_at = timezone.now()  # Set current date and time if not set
+
+        priority_value = request_instance.field_values.filter(field_meta__field_type='priority').first()
+        if priority_value:
+            priority_duration = PriorityDuration.objects.filter(
+                request_type=request_instance.request_type,
+                priority=priority_value.value_priority
+            ).first()
+            if priority_duration:
+                return request_instance.created_at + timedelta(hours=priority_duration.duration_in_hours)
+        return None
+
     def save(self, commit=True):
         instance = super(RequestForm, self).save(commit=False)
+
+        if not instance.created_at:
+            instance.created_at = timezone.now()  # Set current date and time if not set
+
         if commit:
-            instance.save()
+            instance.save()  # Save the Request first to get the primary key
+
+            # Save the due_date custom field after the Request has been saved
+            due_date_field_meta = FieldMeta.objects.filter(name='Due Date', field_type='date').first()
+            if due_date_field_meta:
+                due_date_value = self.calculate_due_date(instance)
+                FieldValue.objects.update_or_create(
+                    request=instance,
+                    field_meta=due_date_field_meta,
+                    defaults={'value_date': due_date_value}
+                )
+
+            # Save other custom fields
             for field_name, field_value in self.cleaned_data.items():
                 if field_name.startswith('custom_field_'):
                     field_id = int(field_name.split('_')[-1])

@@ -165,7 +165,17 @@ def request_edit(request, request_id):
         'excluded_fields': ['title', 'description', 'attachment', 'request_type']
     })
 
-
+def calculate_due_date(request_instance):
+    """Рассчитывает и возвращает значение due_date для кастомного поля на основе приоритета."""
+    priority_value = request_instance.field_values.filter(field_meta__field_type='priority').first()
+    if priority_value:
+        priority_duration = PriorityDuration.objects.filter(
+            request_type=request_instance.request_type,
+            priority=priority_value.value_priority
+        ).first()
+        if priority_duration:
+            return request_instance.created_at + timedelta(hours=priority_duration.duration_in_hours)
+    return None
 
 @login_required
 def request_list(request):
