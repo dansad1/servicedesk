@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from service.models import FieldMeta, FieldAccess, RequestType
+from service.models import RequestFieldMeta, RequestFieldAccess, RequestType
 from service.forms.Field_forms import FieldMetaForm, FieldAccessForm
 from django.contrib.auth.models import Group
 from django.http import JsonResponse
@@ -17,7 +17,7 @@ def save_field_access(field_meta, groups, request):
     for group in groups:
         can_read = request.POST.get(f'can_read_{group.id}') == 'on'
         can_update = request.POST.get(f'can_update_{group.id}') == 'on'
-        access, created = FieldAccess.objects.get_or_create(field_meta=field_meta, role=group)
+        access, created = RequestFieldAccess.objects.get_or_create(field_meta=field_meta, role=group)
         access.can_read = can_read
         access.can_update = can_update
         access.save()
@@ -43,14 +43,14 @@ def request_field_create(request, request_type_id):
     })
 
 def request_field_edit(request, request_type_id, pk):
-    field_meta = get_object_or_404(FieldMeta, pk=pk)
+    field_meta = get_object_or_404(RequestFieldMeta, pk=pk)
     request_type = get_object_or_404(RequestType, pk=request_type_id)
     groups = Group.objects.all()
     group_permissions = [
         {
             'group': group,
-            'can_read': FieldAccess.objects.filter(field_meta=field_meta, role=group, can_read=True).exists(),
-            'can_update': FieldAccess.objects.filter(field_meta=field_meta, role=group, can_update=True).exists(),
+            'can_read': RequestFieldAccess.objects.filter(field_meta=field_meta, role=group, can_read=True).exists(),
+            'can_update': RequestFieldAccess.objects.filter(field_meta=field_meta, role=group, can_update=True).exists(),
         }
         for group in groups
     ]
@@ -78,7 +78,7 @@ def request_field_list(request, request_type_id):
     })
 
 def request_field_delete(request, request_type_id, pk):
-    field_meta = get_object_or_404(FieldMeta, pk=pk)
+    field_meta = get_object_or_404(RequestFieldMeta, pk=pk)
     request_type = get_object_or_404(RequestType, pk=request_type_id)
     if request.method == 'POST':
         request_type.field_set.fields.remove(field_meta)

@@ -82,7 +82,7 @@ def request_create(request, request_type_id):
             for field_name, field_value in form.cleaned_data.items():
                 if field_name.startswith('custom_field_'):
                     field_id = int(field_name.split('_')[-1])
-                    field_meta = get_object_or_404(FieldMeta, id=field_id)
+                    field_meta = get_object_or_404(RequestFieldMeta, id=field_id)
                     if field_meta.field_type == 'comment':
                         if field_value[0].strip() or field_value[1]:
                             comment = Comment(
@@ -94,14 +94,14 @@ def request_create(request, request_type_id):
                             comment.save()
                     elif field_meta.field_type == 'description':
                         if field_value[0].strip() or field_value[1]:
-                            description = FieldValue(
+                            description = RequestFiledValue(
                                 request=new_request,
                                 field_meta=field_meta
                             )
                             description.set_value(f"{field_value[0]},{field_value[1]}")
                             description.save()
                     else:
-                        field_value_obj, created = FieldValue.objects.get_or_create(
+                        field_value_obj, created = RequestFiledValue.objects.get_or_create(
                             request=new_request,
                             field_meta=field_meta
                         )
@@ -129,7 +129,7 @@ def request_edit(request, request_id):
             for field_name, field_value in form.cleaned_data.items():
                 if field_name.startswith('custom_field_'):
                     field_id = int(field_name.split('_')[-1])
-                    field_meta = get_object_or_404(FieldMeta, id=field_id)
+                    field_meta = get_object_or_404(RequestFieldMeta, id=field_id)
                     if field_meta.field_type == 'comment':
                         if field_value[0].strip() or field_value[1]:
                             comment = Comment(
@@ -141,14 +141,14 @@ def request_edit(request, request_id):
                             comment.save()
                     elif field_meta.field_type == 'description':
                         if field_value[0].strip() or field_value[1]:
-                            description = FieldValue(
+                            description = RequestFiledValue(
                                 request=req,
                                 field_meta=field_meta
                             )
                             description.set_value(f"{field_value[0]},{field_value[1]}")
                             description.save()
                     else:
-                        field_value_obj, created = FieldValue.objects.get_or_create(
+                        field_value_obj, created = RequestFiledValue.objects.get_or_create(
                             request=req,
                             field_meta=field_meta
                         )
@@ -179,7 +179,7 @@ def calculate_due_date(request_instance):
 
 @login_required
 def request_list(request):
-    fieldset, created = FieldSet.objects.get_or_create(name="Request Filters")
+    fieldset, created = RequestFieldSet.objects.get_or_create(name="Request Filters")
     if created:
         fieldset.add_default_fields()
 

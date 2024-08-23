@@ -2,74 +2,118 @@ from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 from service.forms.Company_forms import CompanyForm,DepartmentForm
 from django.urls import reverse_lazy
-from service.models import CustomUser, Company, Request, Status,Department
+from service.models import CustomUser, Company, Request, Status, Department, CompanyFieldSet, CompanyFieldValue
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.contrib import messages
+from django.shortcuts import render, redirect
+from service.models import CompanyFieldMeta
+from service.forms.Company_forms import CompanyFieldMetaForm
 
 
-@login_required
+# Представление для создания нового поля компании
+# Представление для создания нового поля CompanyFieldMeta
+def company_field_meta_create(request):
+    if request.method == 'POST':
+        form = CompanyFieldMetaForm(request.POST)
+        if form.is_valid():
+            field_meta = form.save()
+
+            return redirect('company_field_meta_list')  # Перенаправление на список полей после сохранения
+    else:
+        form = CompanyFieldMetaForm()
+
+    return render(request, 'company/company_field_meta_create.html', {
+        'form': form,
+        'title': 'Создать поле компании',
+    })
+
+
+# Представление для редактирования существующего поля CompanyFieldMeta
+def company_field_meta_edit(request, field_meta_id):
+    field_meta = get_object_or_404(CompanyFieldMeta, id=field_meta_id)
+    if request.method == 'POST':
+        form = CompanyFieldMetaForm(request.POST, instance=field_meta)
+        if form.is_valid():
+            form.save()
+            return redirect('company_field_meta_list')  # Перенаправление на список полей после сохранения
+    else:
+        form = CompanyFieldMetaForm(instance=field_meta)
+
+    return render(request, 'company/company_field_meta_edit.html', {
+        'form': form,
+        'title': 'Редактировать поле компании',
+    })
+
+
+# Представление для отображения списка полей CompanyFieldMeta
+def company_field_meta_list(request):
+    field_metas = CompanyFieldMeta.objects.all()
+    return render(request, 'company/company_field_meta_list.html', {
+        'field_metas': field_metas,
+        'title': 'Список полей компании',
+    })
+def company_field_meta_delete(request, field_meta_id):
+    """Удаление существующего поля компании"""
+    field_meta = get_object_or_404(CompanyFieldMeta, id=field_meta_id)
+    if request.method == 'POST':
+        field_meta.delete()
+        return redirect('company_field_meta_list')
+
+    return render(request, 'company/company_field_meta_confirm_delete.html', {
+        'field_meta': field_meta,
+        'title': 'Удалить поле компании',
+    })
+
 def company_create(request):
     if request.method == 'POST':
-        form = CompanyForm(request.POST)
+        form = CompanyForm(request.POST, request.FILES)
         if form.is_valid():
-            new_company = form.save()
-            return redirect('company_edit', pk=new_company.pk)
+            company = form.save()
+            return redirect('company_list')  # Перенаправление на список компаний после сохранения
     else:
         form = CompanyForm()
 
-    return render(request, 'company/company_create.html', {'form': form})
+    return render(request, 'company/company_create.html', {
+        'form': form,
+        'title': 'Создать компанию',
+    })
 
-
-@login_required
-def company_edit(request, pk):
-    company = get_object_or_404(Company, pk=pk)
-    form = CompanyForm(instance=company)
-    employees = company.customuser_set.all()
-
-    # Получение всех заявок, связанных с компанией через динамические поля
-    employee_ids = employees.values_list('id', flat=True)
-    company_requests = Request.objects.filter(
-        field_values__field_meta__name='Requester',
-        field_values__value_requester__in=employee_ids
-    ).select_related('request_type', 'request_type__field_set')
-
-    departments = company.departments.all()
-    subdepartments = Department.objects.filter(parent__company=company).select_related('parent')
-
+def company_edit(request, company_id):
+    company = get_object_or_404(Company, id=company_id)
     if request.method == 'POST':
-        form = CompanyForm(request.POST, instance=company)
+        form = CompanyForm(request.POST, request.FILES, instance=company)
         if form.is_valid():
             form.save()
-            messages.success(request, "Информация о компании обновлена.")
-            return redirect('company_edit', pk=company.pk)
+            return redirect('company_list')  # Перенаправление на список компаний после сохранения
+    else:
+        form = CompanyForm(instance=company)
 
-    context = {
+    return render(request, 'company/company_edit.html', {
         'form': form,
-        'company': company,
-        'employees': employees,
-        'requests': company_requests,
-        'departments': departments,
-        'subdepartments': subdepartments,
-    }
-    return render(request, 'company/company_edit.html', context)
-@login_required
+        'title': 'Редактировать компанию',
+    })
+
 def company_list(request):
+    """Отображает список всех компаний"""
     companies = Company.objects.all()
-    return render(request, 'company/company_list.html', {'companies': companies})
-@require_http_methods(["POST"])
-@login_required
-def company_delete(request, pk):
+    return render(request, 'company/company_list.html', {
+        'companies': companies,
+        'title': 'Список компаний',
+    })
+def company_delete(request, company_id):
+    company = get_object_or_404(Company, id=company_id)
     if request.method == 'POST':
-        company_ids = request.POST.getlist('selected_companies')
-        if company_ids:
-            Company.objects.filter(id__in=company_ids).delete()
-            messages.success(request, 'Выбранные компании были удалены.')
-        else:
-            messages.warning(request, 'Пожалуйста, выберите хотя бы одну компанию для удаления.')
-    return redirect('company_list')
+        company.delete()
+        return redirect('company_list')  # Перенаправление на список компаний после удаления
+
+    return render(request, 'company/company_confirm_delete.html', {
+        'company': company,
+        'title': 'Удалить компанию',
+    })
+
 @login_required
 def department_create(request, company_pk):
     company = get_object_or_404(Company, pk=company_pk)

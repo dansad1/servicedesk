@@ -1,6 +1,6 @@
 import json
 from django.utils import timezone
-from service.models import PriorityDuration, FieldMetadata, FieldValue, Status
+from service.models import PriorityDuration, FieldMetadata, RequestFiledValue, Status
 
 def serialize_data(data):
     """Сериализация данных в JSON строку."""

@@ -1,10 +1,10 @@
 from django import forms
-from service.models import Status, Priority, RequestType, PriorityDuration, StatusTransition, FieldMeta
+from service.models import Status, Priority, RequestType, PriorityDuration, StatusTransition, RequestFieldMeta
 from colorfield.fields import ColorField, ColorWidget
 
 class RequestTypeForm(forms.ModelForm):
     fields = forms.ModelMultipleChoiceField(
-        queryset=FieldMeta.objects.all(),
+        queryset=RequestFieldMeta.objects.all(),
         required=False,
         widget=forms.CheckboxSelectMultiple,
         label='Поля'

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Создать новое поле компании</h2>
+    <div class="card mt-4">
+        <div class="card-body">
+            <form method="post" id="companyFieldMetaForm">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="id_name">Название поля:</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                        <div class="text-danger">
+                            {{ form.name.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="id_field_type">Тип поля:</label>
+                    {{ form.field_type }}
+                    {% if form.field_type.errors %}
+                        <div class="text-danger">
+                            {{ form.field_type.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="id_is_required">Обязательное:</label>
+                    {{ form.is_required }}
+                    {% if form.is_required.errors %}
+                        <div class="text-danger">
+                            {{ form.is_required.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Создать</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#id_field_type').change(function() {
+            var fieldType = $(this).val();
+            $.ajax({
+                url: "{% url 'get_default_value_widget' %}",  // Убедитесь, что этот URL определен правильно
+                data: {
+                    'field_type': fieldType
+                },
+                success: function(data) {
+                    // Убедитесь, что у вас есть контейнер для отображения значений по умолчанию
+                    $('#default_value_container').html(data.widget);
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -10,33 +10,127 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.translation import gettext_lazy as _
 from model_utils import FieldTracker
 from servicedesk import settings
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
+class CompanyFieldMeta(models.Model):
+    FIELD_TYPES = [
+        ('text', 'Text'),
+        ('textarea', 'Textarea'),
+        ('select', 'Select'),
+        ('number', 'Number'),
+        ('date', 'Date'),
+        ('boolean', 'Boolean'),
+        ('email', 'Email'),  # Для ввода электронной почты
+        ('url', 'URL'),      # Для ввода веб-сайта
+        ('json', 'JSON'),
+        ('file', 'File'),
+    ]
 
+    name = models.CharField(max_length=255)
+    field_type = models.CharField(max_length=50, choices=FIELD_TYPES)
+    is_required = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.name
+class CompanyFieldSet(models.Model):
+    fields = models.ManyToManyField(CompanyFieldMeta, blank=True, related_name='company_field_sets')
+
+    def __str__(self):
+        return "Набор полей компании"
+
+class CompanyFieldValue(models.Model):
+    company_field_meta = models.ForeignKey(CompanyFieldMeta, on_delete=models.CASCADE)
+    company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='company_field_values')
+    value_text = models.TextField(blank=True, null=True)
+    value_number = models.FloatField(blank=True, null=True)
+    value_date = models.DateField(blank=True, null=True)
+    value_boolean = models.BooleanField(null=True, blank=True)
+    value_email = models.EmailField(null=True, blank=True)
+    value_url = models.URLField(null=True, blank=True)
+    value_json = models.JSONField(null=True, blank=True)
+    value_file = models.FileField(upload_to='company_field_files/', null=True, blank=True)
+   # value_phone = PhoneNumberField(blank=True, null=True)  # Поле для телефона
+
+    def __str__(self):
+        return f"{self.company.name} - {self.company_field_meta.name}: {self.get_value()}"
+
+    def get_value(self):
+        type_map = {
+            'text': self.value_text,
+            'textarea': self.value_text,
+            'number': self.value_number,
+            'date': self.value_date,
+            'boolean': self.value_boolean,
+            'email': self.value_email,
+            'url': self.value_url,
+            'json': self.value_json,
+            'file': self.value_file.name if self.value_file else None,
+            #'phone': str(self.value_phone) if self.value_phone else None,  # Преобразование телефона в строку
+        }
+        return type_map.get(self.company_field_meta.field_type)
+
+    def set_value(self, value):
+        field_name = {
+            'text': 'value_text',
+            'textarea': 'value_text',
+            'number': 'value_number',
+            'date': 'value_date',
+            'boolean': 'value_boolean',
+            'email': 'value_email',
+            'url': 'value_url',
+            'json': 'value_json',
+            'file': 'value_file',
+            #'phone': 'value_phone',
+        }.get(self.company_field_meta.field_type)
+        if field_name:
+            setattr(self, field_name, value)
+
+class CompanyCustomField(models.Model):
+    company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='company_custom_fields')
+    name = models.CharField(max_length=255)
+    field_type = models.CharField(max_length=50, choices=CompanyFieldMeta.FIELD_TYPES)
+    value_text = models.TextField(blank=True, null=True)
+    value_number = models.FloatField(blank=True, null=True)
+    value_date = models.DateField(blank=True, null=True)
+    value_boolean = models.BooleanField(null=True, blank=True)
+    value_email = models.EmailField(null=True, blank=True)
+    value_url = models.URLField(null=True, blank=True)
+    value_json = models.JSONField(null=True, blank=True)
+    value_file = models.FileField(upload_to='company_custom_field_files/', null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.company.name}: {self.name}"
+
+    def get_value(self):
+        type_map = {
+            'text': self.value_text,
+            'textarea': self.value_text,
+            'number': self.value_number,
+            'date': self.value_date,
+            'boolean': self.value_boolean,
+            'email': self.value_email,
+            'url': self.value_url,
+            'json': self.value_json,
+            'file': self.value_file.name if self.value_file else None,
+        }
+        return type_map.get(self.field_type)
+
+    def set_value(self, value):
+        field_name = {
+            'text': 'value_text',
+            'textarea': 'value_text',
+            'number': 'value_number',
+            'date': 'value_date',
+            'boolean': 'value_boolean',
+            'email': 'value_email',
+            'url': 'value_url',
+            'json': 'value_json',
+            'file': 'value_file',
+        }.get(self.field_type)
+        if field_name:
+            setattr(self, field_name, value)
 class Company(models.Model):
-    # Общие данные
     name = models.CharField(_("Название компании"), max_length=255, unique=True)
-    region = models.CharField(_("Регион"), max_length=255, default="Не указан")
-
-    # Контактные данные
-    address = models.CharField(_("Адрес"), max_length=1024, blank=True)
-    phone = models.CharField(_("Телефон"), max_length=20, blank=True)
-    email = models.EmailField(_("Электронная почта"), blank=True)
-    website = models.URLField(_("Веб-сайт"), blank=True)
-
-    # Дополнительные данные
-    description = models.TextField(_("Описание"), blank=True)
-
-    # Новые поля
-    ceo = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='company_ceo',
-                            on_delete=models.SET_NULL, null=True, blank=True,
-                            verbose_name=_("Генеральный директор"))
-    deputy = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='company_deputy',
-                               on_delete=models.SET_NULL, null=True, blank=True,
-                               verbose_name=_("Заместитель генерального директора"))
-    contact_person = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='company_contact_person',
-                                       on_delete=models.SET_NULL, null=True, blank=True,
-                                       verbose_name=_("Контактное лицо"))
-    timezone = models.CharField(_("Часовой пояс"), max_length=50, default='UTC')
 
     class Meta:
         verbose_name = _("компания")
@@ -44,6 +138,29 @@ class Company(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_field_values(self):
+        values = {}
+        # Поля из общего набора
+        for field_value in self.company_field_values.all():
+            values[field_value.company_field_meta.name] = field_value.get_value()
+        # Индивидуальные поля
+        for custom_field in self.company_custom_fields.all():
+            values[custom_field.name] = custom_field.get_value()
+        return values
+
+    def set_field_values(self, field_values):
+        for company_field_meta, value in field_values.items():
+            field_value, created = CompanyFieldValue.objects.get_or_create(company=self, company_field_meta=company_field_meta)
+            field_value.set_value(value)
+            field_value.save()
+
+    def set_custom_fields(self, custom_fields):
+        for field_name, value in custom_fields.items():
+            custom_field, created = CompanyCustomField.objects.get_or_create(company=self, name=field_name)
+            custom_field.set_value(value)
+            custom_field.save()
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, email, password=None, **extra_fields):
         if not email:
@@ -83,9 +200,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'username'
     EMAIL_FIELD = 'email'
     REQUIRED_FIELDS = ['email', 'first_name', 'last_name']
-
-    def __str__(self):
-        return self.username
 class Department(models.Model):
     name = models.CharField(max_length=200, verbose_name="Название")
     parent = models.ForeignKey('self', related_name='subdepartments', on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Родительское подразделение")
@@ -128,7 +242,7 @@ class Priority(models.Model):
     name = models.CharField(max_length=50, unique=True)
     def __str__(self):
         return self.name
-class FieldMeta(models.Model):
+class RequestFieldMeta(models.Model):
     FIELD_TYPES = [
         ('text', 'Text'),
         ('textarea', 'Textarea'),
@@ -169,9 +283,9 @@ def get_default_value(self):
         # Другие типы полей могут быть добавлены аналогично
         return self.default_value
 
-class FieldSet(models.Model):
+class RequestFieldSet(models.Model):
     name = models.CharField(max_length=100)
-    fields = models.ManyToManyField(FieldMeta, blank=True, related_name='field_sets')
+    fields = models.ManyToManyField(RequestFieldMeta, blank=True, related_name='field_sets')
 
     def __str__(self):
         return self.name
@@ -190,7 +304,7 @@ class FieldSet(models.Model):
             {"name": "Comments", "field_type": "comment", "default_value": "", "unit": "", "hint": ""},
         ]
         for field in default_fields:
-            field_meta, created = FieldMeta.objects.get_or_create(
+            field_meta, created = RequestFieldMeta.objects.get_or_create(
                 name=field["name"],
                 field_type=field["field_type"],
                 defaults={
@@ -206,11 +320,11 @@ class FieldSet(models.Model):
 class RequestType(models.Model):
     name = models.CharField(max_length=50, unique=True)
     description = models.TextField(blank=True, null=True)
-    field_set = models.ForeignKey(FieldSet, on_delete=models.SET_NULL, null=True, blank=True)
+    field_set = models.ForeignKey(RequestFieldSet, on_delete=models.SET_NULL, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.field_set:
-            default_field_set = FieldSet.objects.create(name=f"Default for {self.name}")
+            default_field_set = RequestFieldSet.objects.create(name=f"Default for {self.name}")
             default_field_set.add_default_fields()
             self.field_set = default_field_set
         super().save(*args, **kwargs)
@@ -229,14 +343,17 @@ class PriorityDuration(models.Model):
     def __str__(self):
         return f"{self.priority.name} for {self.request_type.name} : {self.duration_in_hours} hours"
 
-class FieldAccess(models.Model):
+class RequestFieldAccess(models.Model):
     role = models.ForeignKey(Group, on_delete=models.CASCADE)
-    field_meta = models.ForeignKey('FieldMeta', on_delete=models.CASCADE)
+    field_meta = models.ForeignKey('RequestFieldMeta', on_delete=models.CASCADE)  # Изменено на 'RequestFieldMeta'
     can_read = models.BooleanField(default=True)
     can_update = models.BooleanField(default=False)
 
-class FieldValue(models.Model):
-    field_meta = models.ForeignKey(FieldMeta, on_delete=models.CASCADE)
+    def __str__(self):
+        return f"{self.role.name} - {self.field_meta.name}"
+
+class RequestFiledValue(models.Model):
+    field_meta = models.ForeignKey(RequestFieldMeta, on_delete=models.CASCADE)
     request = models.ForeignKey('Request', on_delete=models.CASCADE, related_name='field_values')
     value_text = models.TextField(blank=True, null=True)
     value_number = models.FloatField(blank=True, null=True)
@@ -318,9 +435,9 @@ class Request(models.Model):
 
         default_fields = self.request_type.field_set.fields.all()
         for field_meta in default_fields:
-            if not FieldValue.objects.filter(request=self, field_meta=field_meta).exists():
+            if not RequestFiledValue.objects.filter(request=self, field_meta=field_meta).exists():
                 default_value = self.get_default_value(field_meta, user)
-                FieldValue.objects.create(
+                RequestFiledValue.objects.create(
                     request=self,
                     field_meta=field_meta,
                     **default_value

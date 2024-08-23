@@ -1,12 +1,36 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2 class="m-auto max-w-2xl text-center p-10 text-5xl">Создание новой компании</h2>
+<h2 class="m-auto text-center p-10 text-5xl">{{ title }}</h2>
 
-<div class="container mt-5 max-w-6xl">
-  <form method="post">
+<div class="container mt-5" style="max-width: 100%;">
+  <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form.as_p }}
+
+    <!-- Отображаем ошибки формы, если они есть -->
+    {% if form.errors %}
+      <div class="alert alert-danger">
+        <ul>
+          {% for field in form %}
+            {% for error in field.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <!-- Динамические поля формы -->
+    {% for field in form %}
+      {% if not field.is_hidden %}
+        <div class="form-group">
+          {{ field.label_tag }}
+          {{ field }}
+          <div class="text-danger">{{ field.errors }}</div>
+        </div>
+      {% endif %}
+    {% endfor %}
+
     <button type="submit" class="btn btn-primary">Создать компанию</button>
   </form>
 </div>

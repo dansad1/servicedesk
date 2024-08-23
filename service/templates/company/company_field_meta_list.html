@@ -1,0 +1,28 @@
+{% extends 'settings/settings_sidebar.html' %}
+
+{% block settings_content %}
+<h2>Список полей компании</h2>
+<a href="{% url 'company_field_meta_create' %}" class="btn btn-success">Добавить новое поле</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Имя</th>
+            <th>Тип</th>
+            <th>Обязательное</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for field_meta in field_metas %}
+        <tr>
+            <td>{{ field_meta.name }}</td>
+            <td>{{ field_meta.get_field_type_display }}</td>
+            <td>{{ field_meta.is_required }}</td>
+            <td>
+                <a href="{% url 'company_field_meta_edit' field_meta.id %}" class="btn btn-sm btn-primary">Редактировать</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -7,8 +7,7 @@ from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.contrib.auth import get_user_model
 from django.forms import SelectMultiple, DateInput
-from service.models import StatusTransition, Status, Comment, Request, Company, Priority, RequestType, SavedFilter, \
-    FieldAccess, FieldMeta, FieldValue, CustomUser, PriorityDuration
+from service.models import StatusTransition, Status, Comment, Request, Company, Priority, RequestType, SavedFilter,RequestFieldAccess, RequestFieldMeta, RequestFiledValue, CustomUser, PriorityDuration
 from django.forms.widgets import Select
 from django.contrib.auth.models import Group
 
@@ -222,7 +221,7 @@ class RequestForm(forms.ModelForm):
                 self.fields[field_name] = field
 
             # Add the due_date custom field as read-only
-            due_date_field_meta = FieldMeta.objects.filter(name='Due Date', field_type='date').first()
+            due_date_field_meta = RequestFieldMeta.objects.filter(name='Due Date', field_type='date').first()
             if due_date_field_meta:
                 due_date_field_name = f'custom_field_{due_date_field_meta.id}'
                 due_date_value = self.calculate_due_date(self.instance)
@@ -237,9 +236,9 @@ class RequestForm(forms.ModelForm):
     def get_initial_value(self, field_meta):
         if self.instance.pk:
             try:
-                field_value = FieldValue.objects.get(request=self.instance, field_meta=field_meta)
+                field_value = RequestFiledValue.objects.get(request=self.instance, field_meta=field_meta)
                 return field_value.get_value()
-            except FieldValue.DoesNotExist:
+            except RequestFiledValue.DoesNotExist:
                 return None
         else:
             if field_meta.field_type == 'company':
@@ -351,10 +350,10 @@ class RequestForm(forms.ModelForm):
             instance.save()  # Save the Request first to get the primary key
 
             # Save the due_date custom field after the Request has been saved
-            due_date_field_meta = FieldMeta.objects.filter(name='Due Date', field_type='date').first()
+            due_date_field_meta = RequestFieldMeta.objects.filter(name='Due Date', field_type='date').first()
             if due_date_field_meta:
                 due_date_value = self.calculate_due_date(instance)
-                FieldValue.objects.update_or_create(
+                RequestFiledValue.objects.update_or_create(
                     request=instance,
                     field_meta=due_date_field_meta,
                     defaults={'value_date': due_date_value}
@@ -364,9 +363,9 @@ class RequestForm(forms.ModelForm):
             for field_name, field_value in self.cleaned_data.items():
                 if field_name.startswith('custom_field_'):
                     field_id = int(field_name.split('_')[-1])
-                    field_meta = get_object_or_404(FieldMeta, id=field_id)
+                    field_meta = get_object_or_404(RequestFieldMeta, id=field_id)
                     if field_meta.field_type != 'comment':
-                        field_value_obj, created = FieldValue.objects.get_or_create(
+                        field_value_obj, created = RequestFiledValue.objects.get_or_create(
                             request=instance,
                             field_meta=field_meta
                         )

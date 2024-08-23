@@ -1,11 +1,11 @@
 from service.forms.Request_forms import User
-from service.models import FieldMeta, FieldAccess, Priority, Status, Company, CustomUser
+from service.models import RequestFieldMeta, RequestFieldAccess, Priority, Status, Company, CustomUser
 from django import forms
 from django.contrib.auth.models import Group
 
 class FieldMetaForm(forms.ModelForm):
     class Meta:
-        model = FieldMeta
+        model = RequestFieldMeta
         fields = ['name', 'field_type', 'is_required', 'show_name', 'unit', 'hint', 'default_value']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -65,7 +65,7 @@ class FieldAccessForm(forms.ModelForm):
     role = forms.ModelChoiceField(queryset=Group.objects.all(), required=True, widget=forms.Select(attrs={'class': 'form-control'}))
 
     class Meta:
-        model = FieldAccess
+        model = RequestFieldAccess
         fields = ['role', 'can_read', 'can_update']
         widgets = {
             'can_read': forms.CheckboxInput(attrs={'class': 'form-check-input'}),

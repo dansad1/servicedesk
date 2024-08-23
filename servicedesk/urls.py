@@ -11,7 +11,7 @@ from service.views.attribute_views import attribute_create,  attribute_edit
 from service.views.file_views import file_view
 from service.views.request_field_views import request_field_edit, request_field_create, get_default_value_widget,request_field_delete
 from service.views.request_views import *
-from service.views.company_views import company_create,company_edit,company_list,company_delete,department_create,department_delete,department_edit,subdepartment_create
+from service.views.company_views import *
 from service.views.profile_views import *
 from service.views.user_views import user_list,create_user_view,user_delete
 from service.views.settings_views import types_list
@@ -153,6 +153,11 @@ urlpatterns = [
     path('request_field/edit/<int:request_type_id>/<int:pk>/', request_field_edit, name='request_field_edit'),
     path('get_default_value_widget/', get_default_value_widget, name='get_default_value_widget'),
     path('request_field/delete/<int:request_type_id>/<int:pk>/', request_field_delete, name='request_field_delete'),
+
+    #Поля компаний
+    path('company/fields/', company_field_meta_list, name='company_field_meta_list'),
+    path('company/fields/create/', company_field_meta_create, name='company_field_meta_create'),
+    path('company/fields/<int:field_meta_id>/edit/', company_field_meta_edit, name='company_field_meta_edit'),
 ]
 
 

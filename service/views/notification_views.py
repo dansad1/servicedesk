@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from service.forms.Notification_forms import NotificationTemplateForm, NotificationSettingForm
 from service.models import Request, Asset, Comment, CustomUser, Department, Status, NotificationTemplate, \
-    NotificationSetting, FieldMeta
+    NotificationSetting, RequestFieldMeta
 from django.core.mail import EmailMessage, get_connection
 from .. import models
 from ..forms.Email_forms import EmailSettingsForm
@@ -57,7 +57,7 @@ def generate_variables_from_model(model):
         # Если поле представляет собой динамическое значение, например, через FieldMeta
         elif field.name == 'field_values':
             # Проходим по всем возможным типам полей в FieldMeta
-            for field_meta in FieldMeta.objects.all():
+            for field_meta in RequestFieldMeta.objects.all():
                 dynamic_var_name = f"{field_meta.name}_{field_meta.field_type}"
                 dynamic_var_desc = f"Значение поля {field_meta.name.capitalize()} ({field_meta.field_type.capitalize()})"
                 # Убедитесь, что динамическая переменная не пересекается с существующими
