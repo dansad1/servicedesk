@@ -50,6 +50,8 @@ class CompanyFieldValue(models.Model):
     value_json = models.JSONField(null=True, blank=True)
     value_file = models.FileField(upload_to='company_field_files/', null=True, blank=True)
    # value_phone = PhoneNumberField(blank=True, null=True)  # Поле для телефона
+    is_hidden = models.BooleanField(default=False)  # Новое поле для скрытия
+
 
     def __str__(self):
         return f"{self.company.name} - {self.company_field_meta.name}: {self.get_value()}"
@@ -131,6 +133,7 @@ class CompanyCustomField(models.Model):
             setattr(self, field_name, value)
 class Company(models.Model):
     name = models.CharField(_("Название компании"), max_length=255, unique=True)
+    hidden_fields = models.ManyToManyField('CompanyFieldMeta', blank=True, related_name='hidden_for_companies')
 
     class Meta:
         verbose_name = _("компания")
@@ -143,7 +146,8 @@ class Company(models.Model):
         values = {}
         # Поля из общего набора
         for field_value in self.company_field_values.all():
-            values[field_value.company_field_meta.name] = field_value.get_value()
+            if field_value.company_field_meta not in self.hidden_fields.all():  # Проверяем, скрыто ли поле
+                values[field_value.company_field_meta.name] = field_value.get_value()
         # Индивидуальные поля
         for custom_field in self.company_custom_fields.all():
             values[custom_field.name] = custom_field.get_value()
@@ -160,7 +164,6 @@ class Company(models.Model):
             custom_field, created = CompanyCustomField.objects.get_or_create(company=self, name=field_name)
             custom_field.set_value(value)
             custom_field.save()
-
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, email, password=None, **extra_fields):
         if not email:

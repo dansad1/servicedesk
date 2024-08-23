@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
-from service.forms.Company_forms import CompanyForm,DepartmentForm
+from service.forms.Company_forms import CompanyForm, DepartmentForm, CompanyCustomFieldForm
 from django.urls import reverse_lazy
-from service.models import CustomUser, Company, Request, Status, Department, CompanyFieldSet, CompanyFieldValue
+from service.models import CustomUser, Company, Request, Status, Department, CompanyFieldSet, CompanyFieldValue, \
+    CompanyCustomField
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import get_object_or_404
@@ -14,7 +15,6 @@ from service.forms.Company_forms import CompanyFieldMetaForm
 
 
 # Представление для создания нового поля компании
-# Представление для создания нового поля CompanyFieldMeta
 def company_field_meta_create(request):
     if request.method == 'POST':
         form = CompanyFieldMetaForm(request.POST)
@@ -38,7 +38,7 @@ def company_field_meta_edit(request, field_meta_id):
         form = CompanyFieldMetaForm(request.POST, instance=field_meta)
         if form.is_valid():
             form.save()
-            return redirect('company_field_meta_list')  # Перенаправление на список полей после сохранения
+            return redirect('standard_fields_list')  # Перенаправление на правильный список полей
     else:
         form = CompanyFieldMetaForm(instance=field_meta)
 
@@ -48,13 +48,22 @@ def company_field_meta_edit(request, field_meta_id):
     })
 
 
+
 # Представление для отображения списка полей CompanyFieldMeta
-def company_field_meta_list(request):
-    field_metas = CompanyFieldMeta.objects.all()
-    return render(request, 'company/company_field_meta_list.html', {
-        'field_metas': field_metas,
-        'title': 'Список полей компании',
-    })
+
+
+@login_required
+def standard_fields_list(request):
+    # Получаем все стандартные поля
+    standard_fields = CompanyFieldMeta.objects.all()
+
+    context = {
+        'standard_fields': standard_fields,
+        'title': 'Список стандартных полей компании',
+    }
+
+    return render(request, 'company/standard_fields_list.html', context)
+
 def company_field_meta_delete(request, field_meta_id):
     """Удаление существующего поля компании"""
     field_meta = get_object_or_404(CompanyFieldMeta, id=field_meta_id)
@@ -81,21 +90,72 @@ def company_create(request):
         'title': 'Создать компанию',
     })
 
+
+@login_required
 def company_edit(request, company_id):
     company = get_object_or_404(Company, id=company_id)
+
+    # Получение сотрудников, связанных с компанией
+    employees = CustomUser.objects.filter(company=company)
+
+    # Получение заявок, связанных с компанией
+    company_requests = Request.objects.filter(
+        field_values__field_meta__name='Requester',
+        field_values__value_requester__in=employees.values_list('id', flat=True)
+    ).select_related('request_type', 'request_type__field_set')
+
+    # Получение всех полей компании
+    standard_fields = CompanyFieldMeta.objects.all()
+    custom_fields = company.company_custom_fields.all()
+
     if request.method == 'POST':
         form = CompanyForm(request.POST, request.FILES, instance=company)
         if form.is_valid():
             form.save()
-            return redirect('company_list')  # Перенаправление на список компаний после сохранения
+
+            # Обновление видимости полей
+            hidden_fields = []
+            for field_meta in standard_fields:
+                if f'visible_{field_meta.id}' not in request.POST:
+                    hidden_fields.append(field_meta)
+
+            company.hidden_fields.set(hidden_fields)
+            messages.success(request, "Информация о компании обновлена.")
+            return redirect('company_edit', company_id=company.id)
     else:
         form = CompanyForm(instance=company)
 
-    return render(request, 'company/company_edit.html', {
+    context = {
         'form': form,
         'title': 'Редактировать компанию',
-    })
+        'company': company,
+        'employees': employees,
+        'requests': company_requests,
+        'standard_fields': standard_fields,
+        'custom_fields': custom_fields,
+        'hidden_fields': company.hidden_fields.all(),  # Скрытые поля
+    }
 
+    return render(request, 'company/company_edit.html', context)
+
+
+@login_required
+def manage_fields_visibility(request, company_id):
+    company = get_object_or_404(Company, id=company_id)
+
+    if request.method == 'POST':
+        # Обновляем видимость полей
+        for field_meta in CompanyFieldMeta.objects.all():
+            field_visibility_key = f"field_visibility_{field_meta.id}"
+            if field_visibility_key in request.POST:
+                company.hidden_fields.remove(field_meta)
+            else:
+                company.hidden_fields.add(field_meta)
+
+        messages.success(request, "Видимость полей обновлена.")
+        return redirect('company_edit', company_id=company.id)
+
+    return redirect('company_edit', company_id=company.id)
 def company_list(request):
     """Отображает список всех компаний"""
     companies = Company.objects.all()
@@ -112,6 +172,61 @@ def company_delete(request, company_id):
     return render(request, 'company/company_confirm_delete.html', {
         'company': company,
         'title': 'Удалить компанию',
+    })
+
+def company_custom_field_create(request, company_id):
+    """Создание нового кастомного поля для компании"""
+    company = get_object_or_404(Company, id=company_id)
+
+    if request.method == 'POST':
+        form = CompanyCustomFieldForm(request.POST)
+        if form.is_valid():
+            custom_field = form.save(commit=False)
+            custom_field.company = company
+            custom_field.save()
+            return redirect('company_edit', pk=company.id)  # Перенаправление на редактирование компании
+    else:
+        form = CompanyCustomFieldForm()
+
+    return render(request, 'company/company_custom_field_create.html', {
+        'form': form,
+        'title': 'Создать кастомное поле для компании',
+        'company': company,
+    })
+
+
+def company_custom_field_edit(request, custom_field_id):
+    """Редактирование существующего кастомного поля компании"""
+    custom_field = get_object_or_404(CompanyCustomField, id=custom_field_id)
+    company = custom_field.company
+
+    if request.method == 'POST':
+        form = CompanyCustomFieldForm(request.POST, instance=custom_field)
+        if form.is_valid():
+            form.save()
+            return redirect('company_edit', pk=company.id)  # Перенаправление на редактирование компании
+    else:
+        form = CompanyCustomFieldForm(instance=custom_field)
+
+    return render(request, 'company/company_custom_field_edit.html', {
+        'form': form,
+        'title': 'Редактировать кастомное поле компании',
+        'company': company,
+    })
+
+
+def company_custom_field_delete(request, custom_field_id):
+    """Удаление кастомного поля компании"""
+    custom_field = get_object_or_404(CompanyCustomField, id=custom_field_id)
+    company = custom_field.company
+
+    if request.method == 'POST':
+        custom_field.delete()
+        return redirect('company_edit', pk=company.id)
+
+    return render(request, 'company/company_custom_field_confirm_delete.html', {
+        'custom_field': custom_field,
+        'title': 'Удалить кастомное поле компании',
     })
 
 @login_required

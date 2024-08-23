@@ -1,9 +1,8 @@
 {% extends "base.html" %}
 
-{% block content %}
 <style>
-  .container {
-    max-width: 800px;
+  .container-fluid {
+    max-width: 100%;
     margin: auto;
     padding: 20px;
     background-color: #fff;
@@ -13,6 +12,7 @@
 
   .row {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     margin-bottom: 15px;
   }
@@ -61,11 +61,16 @@
   button:hover {
     background-color: #0056b3;
   }
+
+  .hidden-field {
+    display: none;
+  }
 </style>
 
-<h2 class="my-4 text-center text-4xl">Редактировать профиль компании</h2>
+{% block content %}
+<div class="container-fluid">
+  <h2 class="my-4 text-center text-4xl">{{ title }}</h2>
 
-<div class="container">
   <ul class="nav nav-tabs mb-4" id="companyTabs" role="tablist">
     <li class="nav-item">
       <a class="nav-link active" id="edit-company-tab" data-bs-toggle="tab" href="#edit-company" role="tab" aria-controls="edit-company" aria-selected="true">Общие</a>
@@ -77,82 +82,30 @@
       <a class="nav-link" id="requests-tab" data-bs-toggle="tab" href="#requests" role="tab" aria-controls="requests" aria-selected="false">Заявки</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" id="departments-tab" data-bs-toggle="tab" href="#departments" role="tab" aria-controls="departments" aria-selected="false">Отделы</a>
+      <a class="nav-link" id="fields-tab" data-bs-toggle="tab" href="#fields" role="tab" aria-controls="fields" aria-selected="false">Поля</a>
     </li>
   </ul>
+
   <div class="tab-content" id="companyTabsContent">
     <!-- Общие -->
     <div class="tab-pane fade show active" id="edit-company" role="tabpanel" aria-labelledby="edit-company-tab">
-      <form method="post">
+      <form method="post" enctype="multipart/form-data" id="companyForm">
         {% csrf_token %}
-        <div class="row">
-          <div class="form-group">
-            {{ form.name.label_tag }}
-            {{ form.name }}
-            {{ form.name.errors }}
-          </div>
-          <div class="form-group">
-            {{ form.region.label_tag }}
-            {{ form.region }}
-            {{ form.region.errors }}
-          </div>
-        </div>
-        <div class="row">
-          <div class="form-group">
-            {{ form.address.label_tag }}
-            {{ form.address }}
-            {{ form.address.errors }}
-          </div>
-          <div class="form-group">
-            {{ form.phone.label_tag }}
-            {{ form.phone }}
-            {{ form.phone.errors }}
-          </div>
-        </div>
-        <div class="row">
-          <div class="form-group">
-            {{ form.email.label_tag }}
-            {{ form.email }}
-            {{ form.email.errors }}
-          </div>
-          <div class="form-group">
-            {{ form.website.label_tag }}
-            {{ form.website }}
-            {{ form.website.errors }}
-          </div>
-        </div>
-        <div class="full-width-group">
-          {{ form.description.label_tag }}
-          {{ form.description }}
-          {{ form.description.errors }}
-        </div>
-        <div class="row">
-          <div class="form-group">
-            {{ form.ceo.label_tag }}
-            {{ form.ceo }}
-            {{ form.ceo.errors }}
-          </div>
-          <div class="form-group">
-            {{ form.deputy.label_tag }}
-            {{ form.deputy }}
-            {{ form.deputy.errors }}
-          </div>
-        </div>
-        <div class="row">
-          <div class="form-group">
-            {{ form.contact_person.label_tag }}
-            {{ form.contact_person }}
-            {{ form.contact_person.errors }}
-          </div>
-          <div class="form-group">
-            {{ form.timezone.label_tag }}
-            {{ form.timezone }}
-            {{ form.timezone.errors }}
-          </div>
-        </div>
+        {% for field in form %}
+          {% if not field.name|slice:":8" == "visible_" and not field.is_hidden %}
+            <div class="row" id="field_{{ field.name }}">
+              <div class="form-group">
+                {{ field.label_tag }}
+                {{ field }}
+                <div class="text-danger">{{ field.errors }}</div>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
         <button type="submit" class="btn btn-primary">Сохранить изменения</button>
       </form>
     </div>
+
     <!-- Пользователи -->
     <div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">
       <h3>Пользователи компании</h3>
@@ -183,6 +136,7 @@
         </tbody>
       </table>
     </div>
+
     <!-- Заявки -->
     <div class="tab-pane fade" id="requests" role="tabpanel" aria-labelledby="requests-tab">
       <h3>Заявки компании</h3>
@@ -221,47 +175,40 @@
         </table>
       </div>
     </div>
-    <!-- Отделы -->
-    <div class="tab-pane fade" id="departments" role="tabpanel" aria-labelledby="departments-tab">
-      <h3>Отделы</h3>
-      <a href="{% url 'department_create' company_pk=company.id %}" class="btn btn-success mb-3">Создать отдел</a>
-      <div class="table-responsive">
-        <table class="table table-bordered">
+
+    <!-- Поля -->
+    <div class="tab-pane fade" id="fields" role="tabpanel" aria-labelledby="fields-tab">
+      <h3>Поля компании</h3>
+      <form method="post" enctype="multipart/form-data" id="fieldForm">
+        {% csrf_token %}
+        <table class="table">
           <thead>
             <tr>
-              <th>Название отдела</th>
-              <th>Действия</th>
+              <th>Название поля</th>
+              <th>Тип поля</th>
+              <th>Показать поле</th>
             </tr>
           </thead>
           <tbody>
-            {% for department in departments %}
+            {% for field_meta in standard_fields %}
               <tr>
-                <td>{{ department.name }}</td>
-                <td>
-                  <a href="{% url 'department_edit' department.id %}" class="btn btn-secondary btn-sm">Редактировать</a>
-                  <form action="{% url 'department_delete' department.id %}" method="post" class="d-inline">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Вы уверены, что хотите удалить этот отдел?');">Удалить</button>
-                  </form>
-                </td>
+                <td>{{ field_meta.name }}</td>
+                <td>{{ field_meta.get_field_type_display }}</td>
+                <td>{{ form|add:'visible_'|add:field_meta.id }}</td>
               </tr>
-              {% for subdepartment in department.subdepartments.all %}
-                <tr>
-                  <td>— {{ subdepartment.name }}</td>
-                  <td></td>
-                </tr>
-              {% endfor %}
             {% empty %}
               <tr>
-                <td colspan="2">Отделы не найдены.</td>
+                <td colspan="3">Нет стандартных полей для отображения.</td>
               </tr>
             {% endfor %}
           </tbody>
         </table>
-      </div>
+        <button type="submit" class="btn btn-primary">Сохранить видимость полей</button>
+      </form>
     </div>
   </div>
 </div>
+
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     var triggerTabList = [].slice.call(document.querySelectorAll('#companyTabs a'))
@@ -271,7 +218,20 @@
         event.preventDefault()
         tabTrigger.show()
       })
-    })
+    });
+
+    // JS для показа и скрытия полей
+    document.querySelectorAll('.field-toggle').forEach(function(checkbox) {
+      checkbox.addEventListener('change', function() {
+        var fieldId = this.getAttribute('data-field-id');
+        var fieldRow = document.getElementById('field_field_' + fieldId);
+        if (this.checked) {
+          fieldRow.classList.remove('hidden-field');
+        } else {
+          fieldRow.classList.add('hidden-field');
+        }
+      });
+    });
   });
 </script>
 {% endblock %}

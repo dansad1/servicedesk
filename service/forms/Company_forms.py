@@ -101,15 +101,23 @@ class CompanyCustomFieldForm(forms.ModelForm):
         self.fields['value_json'].label = "Значение (JSON)"
         self.fields['value_file'].label = "Значение (File)"
 
+
 class CompanyForm(forms.ModelForm):
     class Meta:
         model = Company
-        fields = []  # Поле 'name' удалено
+        fields = ['name']  # Поле 'name' оставляем статическим
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+        }
 
     def __init__(self, *args, **kwargs):
+        company = kwargs.get('instance')
         super().__init__(*args, **kwargs)
 
-        # Получаем все поля из списка CompanyFieldMeta
+        # Получаем скрытые поля компании
+        hidden_fields = company.hidden_fields.all() if company else CompanyFieldMeta.objects.none()
+
+        # Добавляем стандартные поля компании в форму
         for field_meta in CompanyFieldMeta.objects.all():
             field_name = f'field_{field_meta.id}'
             initial_value = None
@@ -121,6 +129,14 @@ class CompanyForm(forms.ModelForm):
                     pass
 
             self.fields[field_name] = self.get_form_field(field_meta, initial_value)
+
+            # Добавляем checkbox для управления видимостью этого поля
+            visible_field_name = f'visible_{field_meta.id}'
+            self.fields[visible_field_name] = forms.BooleanField(
+                required=False,
+                initial=(field_meta not in hidden_fields),
+                label=f"Показать поле: {field_meta.name}"
+            )
 
     def get_form_field(self, field_meta, initial_value=None):
         field_class = {
@@ -168,10 +184,35 @@ class CompanyForm(forms.ModelForm):
                 field_name = f'field_{field_meta.id}'
                 value = self.cleaned_data.get(field_name)
 
+                # Определяем правильное имя поля в зависимости от типа
+                field_type_map = {
+                    'text': 'value_text',
+                    'textarea': 'value_text',
+                    'number': 'value_number',
+                    'date': 'value_date',
+                    'boolean': 'value_boolean',
+                    'email': 'value_email',
+                    'url': 'value_url',
+                    'json': 'value_json',
+                    'file': 'value_file',
+                }
+                field_name_to_update = field_type_map.get(field_meta.field_type)
+
+                # Обновляем или создаем значение поля
                 CompanyFieldValue.objects.update_or_create(
                     company=company,
                     company_field_meta=field_meta,
-                    defaults={field_meta.field_type: value}
+                    defaults={field_name_to_update: value}
                 )
+
+            # Обновляем видимость полей
+            hidden_fields = []
+            for field_meta in CompanyFieldMeta.objects.all():
+                visible_field_name = f'visible_{field_meta.id}'
+                if not self.cleaned_data.get(visible_field_name):
+                    hidden_fields.append(field_meta)
+
+            company.hidden_fields.set(hidden_fields)
+            company.save()
 
         return company

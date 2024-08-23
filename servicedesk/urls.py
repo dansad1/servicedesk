@@ -49,9 +49,9 @@ urlpatterns = [
 
     #Компании
     path('company/create/', company_create, name='create_company'),
-    path('company/<int:pk>/edit/', company_edit, name='company_edit'),
+    path('company/<int:company_id>/edit/', company_edit, name='company_edit'),
     path('company/', company_list, name='company_list'),
-    path('company/delete/', company_delete, name='company_delete'),
+    path('company/delete/<int:company_id>/', company_delete, name='company_delete'),
 
 # Типы заявок
     path('request_type/create/', create_or_edit_request_type, name='create_request_type'),
@@ -154,10 +154,22 @@ urlpatterns = [
     path('get_default_value_widget/', get_default_value_widget, name='get_default_value_widget'),
     path('request_field/delete/<int:request_type_id>/<int:pk>/', request_field_delete, name='request_field_delete'),
 
-    #Поля компаний
-    path('company/fields/', company_field_meta_list, name='company_field_meta_list'),
+    path('company/standard-fields/', standard_fields_list, name='standard_fields_list'),
     path('company/fields/create/', company_field_meta_create, name='company_field_meta_create'),
     path('company/fields/<int:field_meta_id>/edit/', company_field_meta_edit, name='company_field_meta_edit'),
+    path('company/fields/<int:field_meta_id>/delete/', company_field_meta_delete, name='company_field_meta_delete'),
+    path('company/<int:company_id>/fields/manage/', manage_fields_visibility, name='manage_fields_visibility'),
+
+    # Дополнительно добавьте путь для просмотра списка стандартных полей
+    path('company/fields/list/', standard_fields_list, name='company_field_meta_list'),
+
+    path('company/<int:company_id>/custom-fields/create/', company_custom_field_create,
+         name='company_custom_field_create'),
+    path('company/<int:company_id>/custom-fields/<int:custom_field_id>/edit/', company_custom_field_edit,
+         name='company_custom_field_edit'),
+    path('company/<int:company_id>/custom-fields/<int:custom_field_id>/delete/', company_custom_field_delete,
+         name='company_custom_field_delete'),
+
 ]
 
 
