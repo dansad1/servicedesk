@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+  <h2 class="my-4 text-center">{{ company.name }} - Управление видимостью полей</h2>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Название поля</th>
+          <th>Видимость</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for field in form %}
+        <tr>
+          <td>{{ field.label }}</td>
+          <td>{{ field }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+  </form>
+</div>
+{% endblock %}

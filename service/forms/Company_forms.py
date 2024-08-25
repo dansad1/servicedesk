@@ -120,25 +120,27 @@ class CompanyForm(forms.ModelForm):
         # Добавляем стандартные поля компании в форму
         for field_meta in CompanyFieldMeta.objects.all():
             field_name = f'field_{field_meta.id}'
-            initial_value = None
-            if self.instance.pk:
-                try:
-                    field_value = CompanyFieldValue.objects.get(company=self.instance, company_field_meta=field_meta)
-                    initial_value = field_value.get_value()
-                except CompanyFieldValue.DoesNotExist:
-                    pass
+            initial_value = self.get_initial_field_value(company, field_meta)
 
+            # Добавляем поле формы для каждого метаданных поля
             self.fields[field_name] = self.get_form_field(field_meta, initial_value)
 
-            # Добавляем checkbox для управления видимостью этого поля
-            visible_field_name = f'visible_{field_meta.id}'
-            self.fields[visible_field_name] = forms.BooleanField(
-                required=False,
-                initial=(field_meta not in hidden_fields),
-                label=f"Показать поле: {field_meta.name}"
-            )
+    def get_initial_field_value(self, company, field_meta):
+        """
+        Получает начальное значение для поля на основе данных компании.
+        """
+        if company:
+            try:
+                field_value = CompanyFieldValue.objects.get(company=company, company_field_meta=field_meta)
+                return field_value.get_value()
+            except CompanyFieldValue.DoesNotExist:
+                return None
+        return None
 
     def get_form_field(self, field_meta, initial_value=None):
+        """
+        Генерирует поле формы в зависимости от типа метаданных поля.
+        """
         field_class = {
             'text': forms.CharField,
             'textarea': forms.CharField,
@@ -160,6 +162,9 @@ class CompanyForm(forms.ModelForm):
         )
 
     def get_widget(self, field_meta):
+        """
+        Возвращает соответствующий виджет для типа поля.
+        """
         widgets = {
             'text': forms.TextInput(attrs={'class': 'form-control'}),
             'textarea': forms.Textarea(attrs={'class': 'form-control'}),
@@ -205,14 +210,25 @@ class CompanyForm(forms.ModelForm):
                     defaults={field_name_to_update: value}
                 )
 
-            # Обновляем видимость полей
-            hidden_fields = []
-            for field_meta in CompanyFieldMeta.objects.all():
-                visible_field_name = f'visible_{field_meta.id}'
-                if not self.cleaned_data.get(visible_field_name):
-                    hidden_fields.append(field_meta)
-
-            company.hidden_fields.set(hidden_fields)
-            company.save()
-
         return company
+
+
+class FieldVisibilityForm(forms.Form):
+    """
+    Форма для управления видимостью полей компании.
+    Генерирует динамические поля-чекбоксы для каждого метаданных поля.
+    """
+    def __init__(self, *args, **kwargs):
+        # Получаем компанию из дополнительных аргументов
+        company = kwargs.pop('company', None)
+        super().__init__(*args, **kwargs)
+
+        # Если компания передана, создаем поля-чекбоксы
+        if company:
+            for field_meta in CompanyFieldMeta.objects.all():
+                field_name = f'visible_{field_meta.id}'
+                self.fields[field_name] = forms.BooleanField(
+                    required=False,
+                    initial=(field_meta not in company.hidden_fields.all()),
+                    label=field_meta.name
+                )

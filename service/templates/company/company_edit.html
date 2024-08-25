@@ -61,10 +61,6 @@
   button:hover {
     background-color: #0056b3;
   }
-
-  .hidden-field {
-    display: none;
-  }
 </style>
 
 {% block content %}
@@ -81,9 +77,6 @@
     <li class="nav-item">
       <a class="nav-link" id="requests-tab" data-bs-toggle="tab" href="#requests" role="tab" aria-controls="requests" aria-selected="false">Заявки</a>
     </li>
-    <li class="nav-item">
-      <a class="nav-link" id="fields-tab" data-bs-toggle="tab" href="#fields" role="tab" aria-controls="fields" aria-selected="false">Поля</a>
-    </li>
   </ul>
 
   <div class="tab-content" id="companyTabsContent">
@@ -91,19 +84,22 @@
     <div class="tab-pane fade show active" id="edit-company" role="tabpanel" aria-labelledby="edit-company-tab">
       <form method="post" enctype="multipart/form-data" id="companyForm">
         {% csrf_token %}
+        <!-- Основные поля компании -->
         {% for field in form %}
-          {% if not field.name|slice:":8" == "visible_" and not field.is_hidden %}
-            <div class="row" id="field_{{ field.name }}">
-              <div class="form-group">
-                {{ field.label_tag }}
-                {{ field }}
-                <div class="text-danger">{{ field.errors }}</div>
-              </div>
+          <div class="row">
+            <div class="form-group">
+              {{ field.label_tag }}
+              {{ field }}
+              <div class="text-danger">{{ field.errors }}</div>
             </div>
-          {% endif %}
+          </div>
         {% endfor %}
         <button type="submit" class="btn btn-primary">Сохранить изменения</button>
       </form>
+      <div class="mt-4">
+        <!-- Добавляем ссылку на управление видимостью полей -->
+        <a href="{% url 'manage_fields_visibility' company.id %}" class="btn btn-secondary">Управление видимостью полей</a>
+      </div>
     </div>
 
     <!-- Пользователи -->
@@ -175,37 +171,6 @@
         </table>
       </div>
     </div>
-
-    <!-- Поля -->
-    <div class="tab-pane fade" id="fields" role="tabpanel" aria-labelledby="fields-tab">
-      <h3>Поля компании</h3>
-      <form method="post" enctype="multipart/form-data" id="fieldForm">
-        {% csrf_token %}
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Название поля</th>
-              <th>Тип поля</th>
-              <th>Показать поле</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for field_meta in standard_fields %}
-              <tr>
-                <td>{{ field_meta.name }}</td>
-                <td>{{ field_meta.get_field_type_display }}</td>
-                <td>{{ form|add:'visible_'|add:field_meta.id }}</td>
-              </tr>
-            {% empty %}
-              <tr>
-                <td colspan="3">Нет стандартных полей для отображения.</td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-        <button type="submit" class="btn btn-primary">Сохранить видимость полей</button>
-      </form>
-    </div>
   </div>
 </div>
 
@@ -218,19 +183,6 @@
         event.preventDefault()
         tabTrigger.show()
       })
-    });
-
-    // JS для показа и скрытия полей
-    document.querySelectorAll('.field-toggle').forEach(function(checkbox) {
-      checkbox.addEventListener('change', function() {
-        var fieldId = this.getAttribute('data-field-id');
-        var fieldRow = document.getElementById('field_field_' + fieldId);
-        if (this.checked) {
-          fieldRow.classList.remove('hidden-field');
-        } else {
-          fieldRow.classList.add('hidden-field');
-        }
-      });
     });
   });
 </script>

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
-from service.forms.Company_forms import CompanyForm, DepartmentForm, CompanyCustomFieldForm
+from service.forms.Company_forms import CompanyForm, DepartmentForm, CompanyCustomFieldForm, FieldVisibilityForm
 from django.urls import reverse_lazy
 from service.models import CustomUser, Company, Request, Status, Department, CompanyFieldSet, CompanyFieldValue, \
     CompanyCustomField
@@ -112,14 +112,6 @@ def company_edit(request, company_id):
         form = CompanyForm(request.POST, request.FILES, instance=company)
         if form.is_valid():
             form.save()
-
-            # Обновление видимости полей
-            hidden_fields = []
-            for field_meta in standard_fields:
-                if f'visible_{field_meta.id}' not in request.POST:
-                    hidden_fields.append(field_meta)
-
-            company.hidden_fields.set(hidden_fields)
             messages.success(request, "Информация о компании обновлена.")
             return redirect('company_edit', company_id=company.id)
     else:
@@ -144,18 +136,29 @@ def manage_fields_visibility(request, company_id):
     company = get_object_or_404(Company, id=company_id)
 
     if request.method == 'POST':
-        # Обновляем видимость полей
-        for field_meta in CompanyFieldMeta.objects.all():
-            field_visibility_key = f"field_visibility_{field_meta.id}"
-            if field_visibility_key in request.POST:
-                company.hidden_fields.remove(field_meta)
-            else:
-                company.hidden_fields.add(field_meta)
+        form = FieldVisibilityForm(request.POST, company=company)
+        if form.is_valid():
+            hidden_fields = []
+            for field_meta in CompanyFieldMeta.objects.all():
+                field_visibility_key = f"visible_{field_meta.id}"
+                if not form.cleaned_data.get(field_visibility_key):
+                    hidden_fields.append(field_meta)
 
-        messages.success(request, "Видимость полей обновлена.")
-        return redirect('company_edit', company_id=company.id)
+            company.hidden_fields.set(hidden_fields)
+            messages.success(request, "Видимость полей обновлена.")
+            return redirect('manage_fields_visibility', company_id=company.id)
+    else:
+        form = FieldVisibilityForm(company=company)
 
-    return redirect('company_edit', company_id=company.id)
+    context = {
+        'form': form,
+        'company': company,
+        'standard_fields': CompanyFieldMeta.objects.all(),
+        'hidden_fields': company.hidden_fields.all(),
+    }
+
+    return render(request, 'company/manage_fields_visibility.html', context)
+
 def company_list(request):
     """Отображает список всех компаний"""
     companies = Company.objects.all()
