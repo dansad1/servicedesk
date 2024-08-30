@@ -294,3 +294,35 @@ class FieldVisibilityForm(forms.Form):
                     initial=(custom_field_meta not in company.hidden_custom_fields.all()),
                     label=custom_field_meta.name
                 )
+class StandardFieldsFilterForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Получаем все стандартные поля из CompanyFieldMeta
+        for field_meta in CompanyFieldMeta.objects.all():
+            field_name = field_meta.name.lower().replace(' ', '_')
+
+            if field_meta.field_type in ['text', 'textarea', 'email', 'url']:
+                self.fields[field_name] = forms.CharField(
+                    required=False,
+                    label=field_meta.name,
+                    widget=forms.TextInput(attrs={'class': 'form-control'})
+                )
+            elif field_meta.field_type == 'number':
+                self.fields[field_name] = forms.FloatField(
+                    required=False,
+                    label=field_meta.name,
+                    widget=forms.NumberInput(attrs={'class': 'form-control'})
+                )
+            elif field_meta.field_type == 'date':
+                self.fields[field_name] = forms.DateField(
+                    required=False,
+                    label=field_meta.name,
+                    widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
+                )
+            elif field_meta.field_type == 'boolean':
+                self.fields[field_name] = forms.BooleanField(
+                    required=False,
+                    label=field_meta.name,
+                    widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+                )

@@ -19,7 +19,6 @@ from service.models import *
 from datetime import timedelta
 
 from ..forms.Request_forms import *
-from ..status_logic import *
 from ..models import SavedFilter
 from django.db.models import QuerySet
 import json

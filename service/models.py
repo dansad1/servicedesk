@@ -158,9 +158,16 @@ class Company(models.Model):
         for field_value in self.company_field_values.all():
             if field_value.company_field_meta not in self.hidden_fields.all():  # Проверяем, скрыто ли поле
                 values[field_value.company_field_meta.name] = field_value.get_value()
-        # Индивидуальные поля
-        for custom_field in self.company_custom_fields.all():
-            values[custom_field.name] = custom_field.get_value()
+
+        # Индивидуальные поля (кастомные поля)
+        for custom_field in self.custom_field_meta.all():
+            custom_field_value = CompanyCustomFieldValue.objects.filter(
+                company=self,
+                custom_field_meta=custom_field
+            ).first()
+            if custom_field_value:
+                values[custom_field.name] = custom_field_value.get_value()
+
         return values
 
     def set_field_values(self, field_values):

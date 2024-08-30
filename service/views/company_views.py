@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
-from service.forms.Company_forms import CompanyForm, DepartmentForm, FieldVisibilityForm, CompanyCustomFieldMetaForm
+from service.forms.Company_forms import CompanyForm, DepartmentForm, FieldVisibilityForm, CompanyCustomFieldMetaForm, \
+    StandardFieldsFilterForm
 from django.urls import reverse_lazy
 from service.models import CustomUser, Company, Request, Status, Department, CompanyFieldSet, CompanyFieldValue, CompanyCustomFieldMeta
 from django.contrib.auth.models import Group
@@ -11,6 +12,7 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from service.models import CompanyFieldMeta
 from service.forms.Company_forms import CompanyFieldMetaForm
+from django.http import JsonResponse
 
 
 # Представление для создания нового поля компании
@@ -203,10 +205,43 @@ def manage_fields_visibility(request, company_id):
 
 
 def company_list(request):
-    """Отображает список всех компаний"""
+    """Отображает список всех компаний с фильтрацией по стандартным полям"""
+
+    # Инициализация формы фильтрации
+    form = StandardFieldsFilterForm(request.GET or None)
+
+    # Получаем все компании
     companies = Company.objects.all()
+
+    # Применяем фильтры, если они есть
+    if form.is_valid():
+        for field_name, value in form.cleaned_data.items():
+            if value:
+                # Получаем метаданные поля по имени
+                field_meta_name = field_name.replace('_', ' ')
+                try:
+                    field_meta = CompanyFieldMeta.objects.get(name__iexact=field_meta_name)
+                    field_values = CompanyFieldValue.objects.filter(
+                        company_field_meta=field_meta,
+                        **{f'value_{field_meta.field_type}__icontains': value}
+                    )
+                    company_ids = field_values.values_list('company_id', flat=True)
+                    companies = companies.filter(id__in=company_ids)
+                except CompanyFieldMeta.DoesNotExist:
+                    pass
+
+    # Подготовка данных для отображения
+    companies_with_field_values = [
+        {
+            'company': company,
+            'field_values': company.get_field_values()
+        }
+        for company in companies
+    ]
+
     return render(request, 'company/company_list.html', {
-        'companies': companies,
+        'companies_with_field_values': companies_with_field_values,
+        'filter_form': form,
         'title': 'Список компаний',
     })
 def company_delete(request, company_id):
@@ -345,3 +380,34 @@ def subdepartment_create(request, department_id):
         form = DepartmentForm()
 
     return render(request, 'company/subdepartment_create.html', {'form': form, 'parent_department': parent_department})
+def ajax_filter_companies(request):
+    """Асинхронная фильтрация компаний по стандартным полям"""
+    form = StandardFieldsFilterForm(request.GET or None)
+    companies = Company.objects.all()
+
+    if form.is_valid():
+        for field_name, value in form.cleaned_data.items():
+            if value:
+                field_meta_name = field_name.replace('_', ' ')
+                try:
+                    field_meta = CompanyFieldMeta.objects.get(name__iexact=field_meta_name)
+                    field_values = CompanyFieldValue.objects.filter(
+                        company_field_meta=field_meta,
+                        **{f'value_{field_meta.field_type}__icontains': value}
+                    )
+                    company_ids = field_values.values_list('company_id', flat=True)
+                    companies = companies.filter(id__in=company_ids)
+                except CompanyFieldMeta.DoesNotExist:
+                    pass
+
+    # Преобразование результатов в JSON
+    data = [
+        {
+            'id': company.id,
+            'name': company.name,
+            'fields': company.get_field_values(),
+        }
+        for company in companies
+    ]
+
+    return JsonResponse(data, safe=False)
