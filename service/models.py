@@ -87,10 +87,17 @@ class CompanyFieldValue(models.Model):
         if field_name:
             setattr(self, field_name, value)
 
-class CompanyCustomField(models.Model):
-    company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='company_custom_fields')
+class CompanyCustomFieldMeta(models.Model):
+    company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='custom_field_meta')
     name = models.CharField(max_length=255)
     field_type = models.CharField(max_length=50, choices=CompanyFieldMeta.FIELD_TYPES)
+    is_required = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.company.name}: {self.name}"
+class CompanyCustomFieldValue(models.Model):
+    custom_field_meta = models.ForeignKey(CompanyCustomFieldMeta, on_delete=models.CASCADE)
+    company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='custom_field_values')
     value_text = models.TextField(blank=True, null=True)
     value_number = models.FloatField(blank=True, null=True)
     value_date = models.DateField(blank=True, null=True)
@@ -98,12 +105,13 @@ class CompanyCustomField(models.Model):
     value_email = models.EmailField(null=True, blank=True)
     value_url = models.URLField(null=True, blank=True)
     value_json = models.JSONField(null=True, blank=True)
-    value_file = models.FileField(upload_to='company_custom_field_files/', null=True, blank=True)
+    value_file = models.FileField(upload_to='custom_field_files/', null=True, blank=True)
 
     def __str__(self):
-        return f"{self.company.name}: {self.name}"
+        return f"{self.company.name} - {self.custom_field_meta.name}: {self.get_value()}"
 
     def get_value(self):
+        """Возвращает значение поля на основе типа."""
         type_map = {
             'text': self.value_text,
             'textarea': self.value_text,
@@ -115,9 +123,10 @@ class CompanyCustomField(models.Model):
             'json': self.value_json,
             'file': self.value_file.name if self.value_file else None,
         }
-        return type_map.get(self.field_type)
+        return type_map.get(self.custom_field_meta.field_type)
 
     def set_value(self, value):
+        """Устанавливает значение поля в зависимости от типа."""
         field_name = {
             'text': 'value_text',
             'textarea': 'value_text',
@@ -128,12 +137,13 @@ class CompanyCustomField(models.Model):
             'url': 'value_url',
             'json': 'value_json',
             'file': 'value_file',
-        }.get(self.field_type)
+        }.get(self.custom_field_meta.field_type)
         if field_name:
             setattr(self, field_name, value)
 class Company(models.Model):
     name = models.CharField(_("Название компании"), max_length=255, unique=True)
     hidden_fields = models.ManyToManyField('CompanyFieldMeta', blank=True, related_name='hidden_for_companies')
+    hidden_custom_fields = models.ManyToManyField('CompanyCustomFieldMeta', blank=True, related_name='hidden_custom_for_companies')
 
     class Meta:
         verbose_name = _("компания")
@@ -161,7 +171,7 @@ class Company(models.Model):
 
     def set_custom_fields(self, custom_fields):
         for field_name, value in custom_fields.items():
-            custom_field, created = CompanyCustomField.objects.get_or_create(company=self, name=field_name)
+            custom_field, created = CompanyCustomFieldMeta.objects.get_or_create(company=self, name=field_name)
             custom_field.set_value(value)
             custom_field.save()
 class CustomUserManager(BaseUserManager):

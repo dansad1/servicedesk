@@ -7,18 +7,47 @@
   <form method="post">
     {% csrf_token %}
 
+    <!-- Стандартные поля -->
     <table class="table">
       <thead>
         <tr>
-          <th>Название поля</th>
+          <th>Название стандартного поля</th>
           <th>Видимость</th>
         </tr>
       </thead>
       <tbody>
-        {% for field in form %}
+        {% for field in standard_field_form_fields %}
         <tr>
           <td>{{ field.label }}</td>
           <td>{{ field }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <hr>
+
+    <!-- Кастомные поля -->
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Название кастомного поля</th>
+          <th>Видимость</th>
+          <th>Действие</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in custom_field_form_fields %}
+        <tr>
+          <td>{{ item.field.label }}</td>
+          <td>{{ item.field }}</td>
+          <td>
+            <a href="{% url 'company_custom_field_meta_edit' item.id %}" class="btn btn-warning btn-sm">Редактировать</a>
+            <form method="post" action="{% url 'company_custom_field_meta_delete' item.id %}" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+            </form>
+          </td>
         </tr>
         {% endfor %}
       </tbody>

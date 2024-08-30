@@ -84,8 +84,21 @@
     <div class="tab-pane fade show active" id="edit-company" role="tabpanel" aria-labelledby="edit-company-tab">
       <form method="post" enctype="multipart/form-data" id="companyForm">
         {% csrf_token %}
-        <!-- Основные поля компании -->
+        <!-- Отображаем только видимые стандартные поля -->
         {% for field in form %}
+          {% if field.name in visible_field_names %}
+            <div class="row">
+              <div class="form-group">
+                {{ field.label_tag }}
+                {{ field }}
+                <div class="text-danger">{{ field.errors }}</div>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+
+        <!-- Отображаем кастомные поля -->
+        {% for field_name, field in custom_fields_form_data.items %}
           <div class="row">
             <div class="form-group">
               {{ field.label_tag }}
@@ -94,11 +107,16 @@
             </div>
           </div>
         {% endfor %}
+
         <button type="submit" class="btn btn-primary">Сохранить изменения</button>
       </form>
       <div class="mt-4">
         <!-- Добавляем ссылку на управление видимостью полей -->
         <a href="{% url 'manage_fields_visibility' company.id %}" class="btn btn-secondary">Управление видимостью полей</a>
+      </div>
+      <div class="mt-2">
+        <!-- Добавляем ссылку для создания нового кастомного поля -->
+        <a href="{% url 'company_custom_field_create' company.id %}" class="btn btn-secondary">Создать кастомное поле</a>
       </div>
     </div>
 
@@ -187,3 +205,4 @@
   });
 </script>
 {% endblock %}
+

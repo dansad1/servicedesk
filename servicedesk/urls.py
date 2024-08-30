@@ -163,12 +163,12 @@ urlpatterns = [
     # Дополнительно добавьте путь для просмотра списка стандартных полей
     path('company/fields/list/', standard_fields_list, name='company_field_meta_list'),
 
-    path('company/<int:company_id>/custom-fields/create/', company_custom_field_create,
+    path('company/<int:company_id>/custom-fields/create/', company_custom_field_meta_create,
          name='company_custom_field_create'),
-    path('company/<int:company_id>/custom-fields/<int:custom_field_id>/edit/', company_custom_field_edit,
-         name='company_custom_field_edit'),
-    path('company/<int:company_id>/custom-fields/<int:custom_field_id>/delete/', company_custom_field_delete,
-         name='company_custom_field_delete'),
+    path('company/custom_field/edit/<int:custom_field_meta_id>/', company_custom_field_meta_edit,
+         name='company_custom_field_meta_edit'),
+    path('company/custom_field/delete/<int:custom_field_meta_id>/', company_custom_field_meta_delete,
+         name='company_custom_field_meta_delete'),
 
 ]
 
