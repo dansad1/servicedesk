@@ -722,3 +722,32 @@ class Doc(models.Model):
 
     def __str__(self):
         return self.title
+class Book(models.Model):
+    """
+    Модель для хранения справочников.
+    """
+    name = models.CharField(max_length=255, unique=True, verbose_name='Название справочника')
+    description = models.TextField(blank=True, null=True, verbose_name='Описание')
+
+    class Meta:
+        verbose_name = 'Справочник'
+        verbose_name_plural = 'Справочники'
+
+    def __str__(self):
+        return self.name
+
+
+class BookItem(models.Model):
+    """
+    Модель для хранения элементов справочников.
+    """
+    reference = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='items', verbose_name='Справочник')
+    value = models.CharField(max_length=255, verbose_name='Значение')
+
+    class Meta:
+        verbose_name = 'Элемент справочника'
+        verbose_name_plural = 'Элементы справочников'
+        unique_together = ('reference', 'value')
+
+    def __str__(self):
+        return f'{self.reference.name} - {self.value}'

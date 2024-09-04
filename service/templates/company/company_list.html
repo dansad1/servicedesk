@@ -1,157 +1,220 @@
 {% extends "base.html" %}
-
 {% block content %}
-<link href="https://cdn.jsdelivr.net/npm/select2/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2/dist/js/select2.min.js"></script>
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
+<div class="container">
+  <link href="https://cdn.jsdelivr.net/npm/select2/dist/css/select2.min.css" rel="stylesheet" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2/dist/js/select2.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
 
-<!-- Модальное окно для выбора столбцов -->
-<div id="columnModal" class="modal">
-  <div class="modal-content">
-    <span class="close" id="closeColumnModal">&times;</span>
-    <h2>Выберите столбцы для отображения</h2>
-    <form id="columnForm">
-      {% for field in filter_form.fields %}
-        <label><input type="checkbox" class="column-toggle" data-column="{{ field.name }}" checked> {{ field.label }}</label><br>
-      {% endfor %}
-      <button type="button" id="saveColumns" class="btn btn-primary">Сохранить</button>
-    </form>
+  <!-- Модальное окно для выбора столбцов -->
+  <div id="columnModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeColumnModal">&times;</span>
+      <h2>Выберите столбцы для отображения</h2>
+      <form id="columnForm">
+        <label>
+          <input type="checkbox" class="column-toggle" data-column="name" checked>
+          Название компании
+        </label><br>
+        {% for field in standard_fields %}
+          <label>
+            <input type="checkbox" class="column-toggle" data-column="{{ field.id }}" checked>
+            {{ field.name }}
+          </label><br>
+        {% endfor %}
+        <button type="button" id="saveColumns" class="btn btn-primary">Сохранить</button>
+      </form>
+    </div>
   </div>
-</div>
 
-<!-- Модальное окно для фильтрации -->
-<div id="filterModal" class="modal">
-  <div class="modal-content">
-    <span class="close" id="closeFilterModal">&times;</span>
-    <h2>Фильтры</h2>
-    <form method="get" id="filterForm">
-      {% csrf_token %}
-      {{ filter_form.as_p }}
-      <button type="submit" class="btn btn-primary">Применить фильтр</button>
-    </form>
+  <!-- Модальное окно для фильтров -->
+  <div id="filterModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeFilterModal">&times;</span>
+      <h2>Выберите фильтры для отображения</h2>
+      <form method="get" id="filterForm">
+        <div class='mb-2'>
+          {{ filter_form.as_p }}
+        </div>
+        <button type="submit" class="btn btn-secondary">Применить фильтр</button>
+      </form>
+    </div>
   </div>
-</div>
 
-<div class="company-list">
+  <div class="requests-list">
     <h3 class="text-center text-4xl p-10 max-w-4xl m-auto">{{ title }}</h3>
 
-    <!-- Кнопки для открытия модальных окон -->
+    <!-- Кнопка для открытия модального окна выбора столбцов -->
     <button class="btn btn-primary" id="openColumnModal">Выбрать столбцы</button>
-    <button class="btn btn-secondary" id="openFilterModal">Открыть фильтры</button>
+    <!-- Кнопка для открытия модального окна фильтров -->
+    <button class="btn btn-primary" id="openFilterModal">Открыть фильтры</button>
+    <a href="{% url 'create_company' %}" class="btn btn-success">Создать компанию</a>
 
-  {% if not companies_with_field_values %}
-    <p class="text-center text-xl">Нет доступных компаний</p>
-  {% else %}
-    <form id="delete-form" method="post">
-        {% csrf_token %}
-        <table id="companiesTable" class="table">
+    {% if not companies_with_field_values %}
+      <p class="text-center text-xl p-4 max-w-4xl m-auto">Нет доступных компаний</p>
+    {% else %}
+      <form id="delete-form" method="post" action="{% url 'company_delete' 0 %}">
+          {% csrf_token %}
+          <table id="companiesTable" class="display">
             <thead>
-                <tr>
-                    <th class="text-center"><input type="checkbox" id="select-all"></th>
-                    <th class="text-center">Название компании</th>
-                    {% for field in filter_form.fields %}
-                        <th class="text-center column-{{ field.name }}">{{ field.label }}</th>
-                    {% endfor %}
-                    <th class="text-center">Действия</th>
-                </tr>
+              <tr>
+                <th class="text-center"><input type="checkbox" id="select-all"></th>
+                <th class="text-center">Название компании</th>
+                {% for field in standard_fields %}
+                  {% if field.id in selected_fields %}
+                    <th class="text-center column-{{ field.id }}">{{ field.name }}</th>
+                  {% endif %}
+                {% endfor %}
+              </tr>
             </thead>
             <tbody>
-                {% for item in companies_with_field_values %}
-                    <tr class="align-middle">
-                        <td class="text-center"><input type="checkbox" name="selected_companies" value="{{ item.company.pk }}"></td>
-                        <td class="text-center">{{ item.company.name }}</td>
-                        {% for key, value in item.field_values.items %}
-                            <td class="text-center column-{{ key }}">{{ value|default_if_none:'' }}</td>
-                        {% endfor %}
-                        <td class="flex gap-2 justify-evenly">
-                            <button onclick="window.location.href='{% url 'company_edit' item.company.pk %}'" type="button" class="btn btn-primary">Редактировать</button>
-                            <form method="post" action="{% url 'company_delete' item.company.pk %}" style="display:inline;">
-                              {% csrf_token %}
-                              <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
-                            </form>
-                        </td>
-                    </tr>
-                {% endfor %}
+              {% for item in companies_with_field_values %}
+                <tr class="align-middle">
+                  <td class="text-center"><input type="checkbox" name="selected_companies" value="{{ item.company.pk }}"></td>
+                  <td class="text-center">
+                    <a href="{% url 'company_edit' item.company.id %}">{{ item.company.name }}</a>
+                  </td>
+                  {% for field in standard_fields %}
+                    {% if field.id in selected_fields %}
+                      <td class="text-center column-{{ field.id }}">
+                        {% if item.field_values %}
+                          {% for key, value in item.field_values.items %}
+                            {% if key == field.name %}
+                              {{ value|default_if_none:'' }}
+                            {% endif %}
+                          {% endfor %}
+                        {% else %}
+                          {{ '' }}
+                        {% endif %}
+                      </td>
+                    {% endif %}
+                  {% endfor %}
+                </tr>
+              {% endfor %}
             </tbody>
-        </table>
-        <button type="submit" class="btn btn-danger mb-3">Удалить выбранные компании</button>
-    </form>
-  {% endif %}
-</div>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const openColumnModalButton = document.getElementById('openColumnModal');
-    const closeColumnModalButton = document.getElementById('closeColumnModal');
-    const columnModal = document.getElementById('columnModal');
-    const saveColumnsButton = document.getElementById('saveColumns');
-    const columnToggles = document.querySelectorAll('.column-toggle');
+          </table>
+          <button type="submit" class="btn btn-danger mt-3">Удалить выбранные компании</button>
+      </form>
+    {% endif %}
+  </div>
 
-    const openFilterModalButton = document.getElementById('openFilterModal');
-    const closeFilterModalButton = document.getElementById('closeFilterModal');
-    const filterModal = document.getElementById('filterModal');
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const openColumnModalButton = document.getElementById('openColumnModal');
+      const closeColumnModalButton = document.getElementById('closeColumnModal');
+      const columnModal = document.getElementById('columnModal');
+      const saveColumnsButton = document.getElementById('saveColumns');
+      const columnToggles = document.querySelectorAll('.column-toggle');
 
-    // Открытие модального окна выбора столбцов
-    openColumnModalButton.addEventListener('click', function() {
-        columnModal.style.display = 'block';
-    });
+      const openFilterModalButton = document.getElementById('openFilterModal');
+      const closeFilterModalButton = document.getElementById('closeFilterModal');
+      const filterModal = document.getElementById('filterModal');
 
-    // Закрытие модального окна выбора столбцов
-    closeColumnModalButton.addEventListener('click', function() {
-        columnModal.style.display = 'none';
-    });
+      openColumnModalButton.addEventListener('click', function() {
+          columnModal.style.display = 'block';
+      });
 
-    // Открытие модального окна фильтрации
-    openFilterModalButton.addEventListener('click', function() {
-        filterModal.style.display = 'block';
-    });
+      closeColumnModalButton.addEventListener('click', function() {
+          columnModal.style.display = 'none';
+      });
 
-    // Закрытие модального окна фильтрации
-    closeFilterModalButton.addEventListener('click', function() {
-        filterModal.style.display = 'none';
-    });
+      openFilterModalButton.addEventListener('click', function() {
+          filterModal.style.display = 'block';
+      });
 
-    // Сохранение выбранных столбцов в локальное хранилище
-    saveColumnsButton.addEventListener('click', function() {
-        const selectedColumns = {};
-        columnToggles.forEach(toggle => {
-            selectedColumns[toggle.dataset.column] = toggle.checked;
-        });
-        localStorage.setItem('selectedColumns', JSON.stringify(selectedColumns));
-        columnModal.style.display = 'none';
-        applyColumnVisibility(selectedColumns);
-    });
+      closeFilterModalButton.addEventListener('click', function() {
+          filterModal.style.display = 'none';
+      });
 
-    // Применение видимости столбцов на основе сохраненных настроек
-    function applyColumnVisibility(selectedColumns) {
-        for (const [column, visible] of Object.entries(selectedColumns)) {
-            const elements = document.querySelectorAll(`.column-${column}`);
-            elements.forEach(element => {
-                element.style.display = visible ? '' : 'none';
-            });
-        }
+      saveColumnsButton.addEventListener('click', function() {
+          const selectedColumns = {};
+          columnToggles.forEach(toggle => {
+              selectedColumns[toggle.dataset.column] = toggle.checked;
+          });
+          localStorage.setItem('selectedColumns', JSON.stringify(selectedColumns));
+          columnModal.style.display = 'none';
+          applyColumnVisibility(selectedColumns);
+      });
+
+      function applyColumnVisibility(selectedColumns) {
+          for (const [column, visible] of Object.entries(selectedColumns)) {
+              const elements = document.querySelectorAll(`.column-${column}`);
+              elements.forEach(element => {
+                  element.style.display = visible ? '' : 'none';
+              });
+          }
+      }
+
+      const savedColumns = JSON.parse(localStorage.getItem('selectedColumns')) || {};
+      applyColumnVisibility(savedColumns);
+
+      // Инициализация DataTables с кастомным стилем поиска
+      $('#companiesTable').DataTable({
+          "language": {
+              "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Russian.json"
+          },
+          "paging": true,
+          "ordering": true,
+          "info": true,
+          "searching": true,
+          "autoWidth": false,
+          "dom": 'Bfrtip', // Структура таблицы
+          "initComplete": function() {
+              // Применение Select2 к поисковым полям
+              $('.dataTables_filter input').addClass('form-control form-control-sm').attr('placeholder', 'Поиск...').css({
+                  'width': '300px',
+                  'display': 'inline-block',
+                  'margin-left': '10px'
+              });
+          }
+      });
+
+      document.getElementById('select-all').addEventListener('click', function(event) {
+          var isChecked = event.target.checked;
+          document.querySelectorAll('input[name="selected_companies"]').forEach(function(checkbox) {
+              checkbox.checked = isChecked;
+          });
+      });
+  });
+  </script>
+
+  <style>
+  .modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    z-index: 10;
+  }
+
+  .modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    z-index: 11;
+    display: none;
+    max-width: 90%;
+    max-height: 90%;
+    overflow-y: auto;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  }
+
+  @media (max-width: 600px) {
+    .modal {
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      overflow-y: auto;
     }
-
-    // Загрузка сохраненных настроек столбцов при загрузке страницы
-    const savedColumns = JSON.parse(localStorage.getItem('selectedColumns')) || {};
-    applyColumnVisibility(savedColumns);
-
-    // Инициализация DataTables
-    $('#companiesTable').DataTable({
-        "language": {
-            "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Russian.json" // Подключение русского языка
-        }
-    });
-
-    // Select all checkboxes
-    document.getElementById('select-all').addEventListener('click', function(event) {
-        var isChecked = event.target.checked;
-        document.querySelectorAll('input[name="selected_companies"]').forEach(function(checkbox) {
-            checkbox.checked = isChecked;
-        });
-    });
-});
-</script>
-
+  }
+  </style>
+</div>
 {% endblock %}

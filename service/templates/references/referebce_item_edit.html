@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="my-4 text-center">Редактировать элемент справочника</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Сохранить изменения</button>
+        <a href="{% url 'reference_item_list' reference.id %}" class="btn btn-secondary">Отмена</a>
+    </form>
+</div>
+{% endblock %}

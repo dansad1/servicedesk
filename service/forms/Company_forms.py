@@ -123,6 +123,7 @@ class CompanyCustomFieldValueForm(forms.ModelForm):
             self.fields['value_file'].label = field_meta.name
           #  self.fields['value_phone'].label = field_meta.name
 
+
 class CompanyForm(forms.ModelForm):
     class Meta:
         model = Company
@@ -223,26 +224,27 @@ class CompanyForm(forms.ModelForm):
         if commit:
             company.save()
 
+            field_type_map = {
+                'text': 'value_text',
+                'textarea': 'value_text',
+                'number': 'value_number',
+                'date': 'value_date',
+                'boolean': 'value_boolean',
+                'email': 'value_email',
+                'url': 'value_url',
+                'json': 'value_json',
+                'file': 'value_file',
+            }
+
             # Сохраняем значения стандартных полей
             for field_meta in CompanyFieldMeta.objects.all():
                 field_name = f'field_{field_meta.id}'
                 value = self.cleaned_data.get(field_name)
 
                 if value is not None:  # Проверяем, что значение не пустое
-                    field_type_map = {
-                        'text': 'value_text',
-                        'textarea': 'value_text',
-                        'number': 'value_number',
-                        'date': 'value_date',
-                        'boolean': 'value_boolean',
-                        'email': 'value_email',
-                        'url': 'value_url',
-                        'json': 'value_json',
-                        'file': 'value_file',
-                    }
                     field_name_to_update = field_type_map.get(field_meta.field_type)
 
-                    if field_name_to_update:  # Добавляем проверку
+                    if field_name_to_update:
                         CompanyFieldValue.objects.update_or_create(
                             company=company,
                             company_field_meta=field_meta,
@@ -254,10 +256,10 @@ class CompanyForm(forms.ModelForm):
                 field_name = f'custom_field_{custom_field_meta.id}'
                 value = self.cleaned_data.get(field_name)
 
-                if value is not None:  # Проверяем, что значение не пустое
+                if value is not None:
                     field_name_to_update = field_type_map.get(custom_field_meta.field_type)
 
-                    if field_name_to_update:  # Добавляем проверку
+                    if field_name_to_update:
                         CompanyCustomFieldValue.objects.update_or_create(
                             company=company,
                             custom_field_meta=custom_field_meta,

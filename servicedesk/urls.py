@@ -9,6 +9,7 @@ from service.views.asset_type_views import *
 from service.views.asset_views import create_asset, edit_asset, delete_asset, asset_list, get_attributes_by_asset_type
 from service.views.attribute_views import attribute_create,  attribute_edit
 from service.views.file_views import file_view
+from service.views.reference_views import reference_list, reference_create, reference_edit, reference_item_create, reference_item_edit, reference_item_delete, reference_delete
 from service.views.request_field_views import request_field_edit, request_field_create, get_default_value_widget,request_field_delete
 from service.views.request_views import *
 from service.views.company_views import *
@@ -170,6 +171,15 @@ urlpatterns = [
     path('company/custom_field/delete/<int:custom_field_meta_id>/', company_custom_field_meta_delete,
          name='company_custom_field_meta_delete'),
 
+    #Маршруты справочников
+    path('references/', reference_list, name='reference_list'),
+    path('references/create/', reference_create, name='reference_create'),
+    path('references/<int:reference_id>/edit/', reference_edit, name='reference_edit'),
+    path('references/<int:reference_id>/delete/',reference_delete, name='reference_delete'),
+
+    path('references/<int:reference_id>/items/create/', reference_item_create, name='reference_item_create'),
+    path('items/<int:item_id>/edit/', reference_item_edit, name='reference_item_edit'),
+    path('items/<int:item_id>/delete/', reference_item_delete, name='reference_item_delete'),
 ]
 
 

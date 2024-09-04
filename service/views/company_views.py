@@ -97,25 +97,28 @@ def company_edit(request, company_id):
     company = get_object_or_404(Company, id=company_id)
 
     employees = CustomUser.objects.filter(company=company)
-
     company_requests = Request.objects.filter(
         field_values__field_meta__name='Requester',
         field_values__value_requester__in=employees.values_list('id', flat=True)
     ).select_related('request_type', 'request_type__field_set')
 
-    hidden_fields = company.hidden_fields.all()
-    visible_field_names = [f'field_{field_meta.id}' for field_meta in CompanyFieldMeta.objects.exclude(id__in=hidden_fields.values_list('id', flat=True))]
-
     if request.method == 'POST':
         form = CompanyForm(request.POST, request.FILES, instance=company)
+
         if form.is_valid():
-            form.save()
+            company = form.save()
+
             messages.success(request, "Информация о компании обновлена.")
-            return redirect('company_edit', company_id=company.id)
+            return redirect('company_list')
+        else:
+            messages.error(request, "Пожалуйста, исправьте ошибки в форме.")
     else:
         form = CompanyForm(instance=company)
 
-    # Словарь для отображения кастомных полей
+    hidden_fields = company.hidden_fields.all()
+    visible_field_names = [f'field_{field_meta.id}' for field_meta in
+                           CompanyFieldMeta.objects.exclude(id__in=hidden_fields.values_list('id', flat=True))]
+
     custom_fields_form_data = {
         f'custom_field_{custom_field.id}': form[f'custom_field_{custom_field.id}']
         for custom_field in company.custom_field_meta.all()
@@ -124,16 +127,14 @@ def company_edit(request, company_id):
 
     context = {
         'form': form,
-        'custom_fields_form_data': custom_fields_form_data,  # Добавлено
-        'title': 'Редактировать компанию',
         'company': company,
         'employees': employees,
         'requests': company_requests,
         'visible_field_names': visible_field_names,
+        'custom_fields_form_data': custom_fields_form_data,
     }
 
     return render(request, 'company/company_edit.html', context)
-
 
 
 @login_required
@@ -205,45 +206,35 @@ def manage_fields_visibility(request, company_id):
 
 
 def company_list(request):
-    """Отображает список всех компаний с фильтрацией по стандартным полям"""
-
-    # Инициализация формы фильтрации
-    form = StandardFieldsFilterForm(request.GET or None)
-
-    # Получаем все компании
+    # Получаем компании и их значения полей
     companies = Company.objects.all()
 
-    # Применяем фильтры, если они есть
+    # Пример фильтрации и сортировки
+    form = StandardFieldsFilterForm(request.GET or None)
     if form.is_valid():
         for field_name, value in form.cleaned_data.items():
             if value:
-                # Получаем метаданные поля по имени
-                field_meta_name = field_name.replace('_', ' ')
-                try:
-                    field_meta = CompanyFieldMeta.objects.get(name__iexact=field_meta_name)
-                    field_values = CompanyFieldValue.objects.filter(
-                        company_field_meta=field_meta,
-                        **{f'value_{field_meta.field_type}__icontains': value}
-                    )
-                    company_ids = field_values.values_list('company_id', flat=True)
-                    companies = companies.filter(id__in=company_ids)
-                except CompanyFieldMeta.DoesNotExist:
-                    pass
+                # Фильтрация логика
+                pass
 
     # Подготовка данных для отображения
     companies_with_field_values = [
         {
             'company': company,
-            'field_values': company.get_field_values()
+            'field_values': company.get_field_values()  # Здесь проверяем, что эта функция возвращает корректные данные
         }
         for company in companies
     ]
 
-    return render(request, 'company/company_list.html', {
+    context = {
         'companies_with_field_values': companies_with_field_values,
-        'filter_form': form,
+        'standard_fields': CompanyFieldMeta.objects.all(),
+        'selected_fields': request.GET.getlist('fields') or [f.id for f in CompanyFieldMeta.objects.all()],
         'title': 'Список компаний',
-    })
+        'filter_form': form,
+    }
+
+    return render(request, 'company/company_list.html', context)
 def company_delete(request, company_id):
     company = get_object_or_404(Company, id=company_id)
     if request.method == 'POST':
