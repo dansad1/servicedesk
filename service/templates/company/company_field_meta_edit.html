@@ -18,6 +18,12 @@
             {{ form.is_required }}
         </div>
 
+        <!-- Добавляем блок для выбора справочника -->
+        <div class="form-group" id="referenceField" style="display: none;">
+            <label for="id_reference">Справочник:</label>
+            {{ form.reference }}
+        </div>
+
         <button type="submit" class="btn btn-primary">Сохранить изменения</button>
     </form>
 </div>
@@ -25,17 +31,22 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
+        // Функция для отображения или скрытия блока выбора справочника
+        function toggleReferenceField() {
+            var fieldType = $('#id_field_type').val();
+            if (fieldType === 'reference') {
+                $('#referenceField').show();
+            } else {
+                $('#referenceField').hide();
+            }
+        }
+
+        // Проверяем значение при загрузке страницы
+        toggleReferenceField();
+
+        // При изменении значения типа поля
         $('#id_field_type').change(function() {
-            var fieldType = $(this).val();
-            $.ajax({
-                url: "{% url 'get_default_value_widget' %}",  // Убедитесь, что этот URL определен правильно
-                data: {
-                    'field_type': fieldType
-                },
-                success: function(data) {
-                    $('#default_value_container').html(data.widget);
-                }
-            });
+            toggleReferenceField();
         });
     });
 </script>

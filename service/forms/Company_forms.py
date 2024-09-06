@@ -1,7 +1,7 @@
 from pytz import all_timezones
 
 from service.models import CustomUser, Company, Department, CompanyFieldMeta, CompanyFieldSet, CompanyFieldValue, \
-    CompanyCustomFieldValue, CompanyCustomFieldMeta
+    CompanyCustomFieldValue, CompanyCustomFieldMeta, ReferenceItem, Reference
 from django import forms
 from django.forms.widgets import CheckboxSelectMultiple
 
@@ -33,20 +33,26 @@ class DepartmentForm(forms.ModelForm):
 class CompanyFieldMetaForm(forms.ModelForm):
     class Meta:
         model = CompanyFieldMeta
-        fields = ['name', 'field_type', 'is_required']
+        fields = ['name', 'field_type', 'is_required', 'reference']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'field_type': forms.Select(attrs={'class': 'form-control'}),
             'is_required': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'reference': forms.Select(attrs={'class': 'form-control'}),  # Поле для выбора справочника
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Загружаем список справочников в виджет выбора
+        self.fields['reference'].queryset = Reference.objects.all()
+        self.fields['reference'].empty_label = "Выберите справочник"
 
 class CompanyFieldValueForm(forms.ModelForm):
     class Meta:
         model = CompanyFieldValue
         fields = [
             'value_text', 'value_number', 'value_date', 'value_boolean',
-            'value_email', 'value_url', 'value_json', 'value_file',
-            #'value_phone'
+            'value_email', 'value_url', 'value_json', 'value_file', 'value_reference'  # Добавлено 'value_reference'
         ]
         widgets = {
             'value_text': forms.TextInput(attrs={'class': 'form-control'}),
@@ -57,7 +63,7 @@ class CompanyFieldValueForm(forms.ModelForm):
             'value_url': forms.URLInput(attrs={'class': 'form-control'}),
             'value_json': forms.Textarea(attrs={'class': 'form-control'}),
             'value_file': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            #'value_phone': forms.TextInput(attrs={'class': 'form-control', 'type': 'tel'}),  # Виджет для телефона
+            'value_reference': forms.Select(attrs={'class': 'form-control'}),  # Виджет для справочника
         }
 
     def __init__(self, *args, **kwargs):
@@ -72,29 +78,44 @@ class CompanyFieldValueForm(forms.ModelForm):
             self.fields['value_url'].label = field_meta.name
             self.fields['value_json'].label = field_meta.name
             self.fields['value_file'].label = field_meta.name
-          #  self.fields['value_phone'].label = field_meta.name
+
+            # Если тип поля - справочник, то показываем поле выбора из справочника
+            if field_meta.field_type == 'reference' and field_meta.reference:
+                self.fields['value_reference'].queryset = ReferenceItem.objects.filter(reference=field_meta.reference)
+                self.fields['value_reference'].label = field_meta.name
+            else:
+                # Скрываем поле справочника, если тип поля не "reference"
+                self.fields['value_reference'].widget = forms.HiddenInput()
+
+
 class CompanyCustomFieldMetaForm(forms.ModelForm):
     class Meta:
         model = CompanyCustomFieldMeta
-        fields = ['name', 'field_type', 'is_required']
+        fields = ['name', 'field_type', 'is_required', 'reference']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'field_type': forms.Select(attrs={'class': 'form-control'}),
             'is_required': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'reference': forms.Select(attrs={'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
-        company = kwargs.pop('company', None)
         super().__init__(*args, **kwargs)
-        if company:
-            self.fields['name'].label = f"Название кастомного поля для {company.name}"
+        # Загружаем список справочников в виджет выбора
+        self.fields['reference'].queryset = Reference.objects.all()
+        self.fields['reference'].empty_label = "Выберите справочник"
+
+        # Скрываем поле справочника, если тип поля не "reference"
+        if self.instance and self.instance.field_type != 'reference':
+            self.fields['reference'].widget = forms.HiddenInput()
+
+
 class CompanyCustomFieldValueForm(forms.ModelForm):
     class Meta:
-        model = CompanyCustomFieldValue  # Исправлено: используем правильную модель
+        model = CompanyCustomFieldValue
         fields = [
             'value_text', 'value_number', 'value_date', 'value_boolean',
-            'value_email', 'value_url', 'value_json', 'value_file',
-            #'value_phone'
+            'value_email', 'value_url', 'value_json', 'value_file', 'value_reference'
         ]
         widgets = {
             'value_text': forms.TextInput(attrs={'class': 'form-control'}),
@@ -105,14 +126,13 @@ class CompanyCustomFieldValueForm(forms.ModelForm):
             'value_url': forms.URLInput(attrs={'class': 'form-control'}),
             'value_json': forms.Textarea(attrs={'class': 'form-control'}),
             'value_file': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            #'value_phone': forms.TextInput(attrs={'class': 'form-control', 'type': 'tel'}),  # Виджет для телефона
+            'value_reference': forms.Select(attrs={'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
         field_meta = kwargs.pop('field_meta', None)
         super().__init__(*args, **kwargs)
         if field_meta:
-            # Устанавливаем метки полей в зависимости от метаданных
             self.fields['value_text'].label = field_meta.name
             self.fields['value_number'].label = field_meta.name
             self.fields['value_date'].label = field_meta.name
@@ -121,7 +141,14 @@ class CompanyCustomFieldValueForm(forms.ModelForm):
             self.fields['value_url'].label = field_meta.name
             self.fields['value_json'].label = field_meta.name
             self.fields['value_file'].label = field_meta.name
-          #  self.fields['value_phone'].label = field_meta.name
+
+            # Если тип поля - справочник, то показываем поле выбора из справочника
+            if field_meta.field_type == 'reference' and field_meta.reference:
+                self.fields['value_reference'].queryset = ReferenceItem.objects.filter(reference=field_meta.reference)
+                self.fields['value_reference'].label = field_meta.name
+            else:
+                # Скрываем поле справочника, если тип поля не "reference"
+                self.fields['value_reference'].widget = forms.HiddenInput()
 
 
 class CompanyForm(forms.ModelForm):
@@ -171,7 +198,8 @@ class CompanyForm(forms.ModelForm):
         """
         if company:
             try:
-                custom_field_value = CompanyCustomFieldValue.objects.get(company=company, custom_field_meta=custom_field_meta)
+                custom_field_value = CompanyCustomFieldValue.objects.get(company=company,
+                                                                         custom_field_meta=custom_field_meta)
                 return custom_field_value.get_value()
             except CompanyCustomFieldValue.DoesNotExist:
                 return None
@@ -181,6 +209,17 @@ class CompanyForm(forms.ModelForm):
         """
         Генерирует поле формы в зависимости от типа метаданных поля.
         """
+        if field_meta.field_type == 'reference' and field_meta.reference:
+            # Если тип поля - справочник, используем выбор значений из справочника
+            choices = [(item.id, item.value) for item in field_meta.reference.items.all()]
+            return forms.ChoiceField(
+                choices=choices,
+                label=field_meta.name,
+                required=field_meta.is_required,
+                initial=initial_value,
+                widget=forms.Select(attrs={'class': 'form-control'})
+            )
+
         field_class = {
             'text': forms.CharField,
             'textarea': forms.CharField,
@@ -250,6 +289,13 @@ class CompanyForm(forms.ModelForm):
                             company_field_meta=field_meta,
                             defaults={field_name_to_update: value}
                         )
+                    elif field_meta.field_type == 'reference':
+                        # Обработка значения справочника
+                        CompanyFieldValue.objects.update_or_create(
+                            company=company,
+                            company_field_meta=field_meta,
+                            defaults={'value_reference': ReferenceItem.objects.get(id=value)}
+                        )
 
             # Сохраняем значения кастомных полей
             for custom_field_meta in company.custom_field_meta.all():
@@ -264,6 +310,13 @@ class CompanyForm(forms.ModelForm):
                             company=company,
                             custom_field_meta=custom_field_meta,
                             defaults={field_name_to_update: value}
+                        )
+                    elif custom_field_meta.field_type == 'reference':
+                        # Обработка значения справочника для кастомных полей
+                        CompanyCustomFieldValue.objects.update_or_create(
+                            company=company,
+                            custom_field_meta=custom_field_meta,
+                            defaults={'value_reference': ReferenceItem.objects.get(id=value)}
                         )
         return company
 

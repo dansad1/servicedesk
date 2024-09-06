@@ -3,7 +3,8 @@ from django.views.decorators.http import require_http_methods
 from service.forms.Company_forms import CompanyForm, DepartmentForm, FieldVisibilityForm, CompanyCustomFieldMetaForm, \
     StandardFieldsFilterForm
 from django.urls import reverse_lazy
-from service.models import CustomUser, Company, Request, Status, Department, CompanyFieldSet, CompanyFieldValue, CompanyCustomFieldMeta
+from service.models import CustomUser, Company, Request, Status, Department, CompanyFieldSet, CompanyFieldValue, \
+    CompanyCustomFieldMeta, Reference
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import get_object_or_404
@@ -16,13 +17,17 @@ from django.http import JsonResponse
 
 
 # Представление для создания нового поля компании
+@login_required
 def company_field_meta_create(request):
     if request.method == 'POST':
         form = CompanyFieldMetaForm(request.POST)
         if form.is_valid():
-            field_meta = form.save()
-
-            return redirect('company_field_meta_list')  # Перенаправление на список полей после сохранения
+            field_meta = form.save(commit=False)
+            # Обработка поля типа справочник
+            if field_meta.field_type == 'reference' and 'reference' in request.POST:
+                field_meta.reference = Reference.objects.get(id=request.POST['reference'])
+            field_meta.save()
+            return redirect('company_field_meta_list')
     else:
         form = CompanyFieldMetaForm()
 
@@ -31,15 +36,20 @@ def company_field_meta_create(request):
         'title': 'Создать поле компании',
     })
 
-
-# Представление для редактирования существующего поля CompanyFieldMeta
+@login_required
 def company_field_meta_edit(request, field_meta_id):
     field_meta = get_object_or_404(CompanyFieldMeta, id=field_meta_id)
     if request.method == 'POST':
         form = CompanyFieldMetaForm(request.POST, instance=field_meta)
         if form.is_valid():
-            form.save()
-            return redirect('standard_fields_list')  # Перенаправление на правильный список полей
+            field_meta = form.save(commit=False)
+            # Обработка поля типа справочник
+            if field_meta.field_type == 'reference' and 'reference' in request.POST:
+                field_meta.reference = Reference.objects.get(id=request.POST['reference'])
+            else:
+                field_meta.reference = None
+            field_meta.save()
+            return redirect('standard_fields_list')
     else:
         form = CompanyFieldMetaForm(instance=field_meta)
 
@@ -246,17 +256,19 @@ def company_delete(request, company_id):
         'title': 'Удалить компанию',
     })
 
-def company_custom_field_meta_create(request, company_id):
-    """Создание нового кастомного поля для компании"""
-    company = get_object_or_404(Company, id=company_id)
 
+@login_required
+def company_custom_field_meta_create(request, company_id):
+    company = get_object_or_404(Company, id=company_id)
     if request.method == 'POST':
         form = CompanyCustomFieldMetaForm(request.POST)
         if form.is_valid():
             custom_field_meta = form.save(commit=False)
             custom_field_meta.company = company
+            if custom_field_meta.field_type == 'reference' and 'reference' in request.POST:
+                custom_field_meta.reference = Reference.objects.get(id=request.POST['reference'])
             custom_field_meta.save()
-            return redirect('company_edit', company_id=company.id)  # Перенаправление на страницу редактирования компании
+            return redirect('company_edit', company_id=company.id)
     else:
         form = CompanyCustomFieldMetaForm()
 
@@ -266,7 +278,6 @@ def company_custom_field_meta_create(request, company_id):
         'company': company,
     })
 
-
 def company_custom_field_meta_edit(request, custom_field_meta_id):
     """Редактирование существующего кастомного поля компании"""
     custom_field_meta = get_object_or_404(CompanyCustomFieldMeta, id=custom_field_meta_id)
@@ -275,7 +286,15 @@ def company_custom_field_meta_edit(request, custom_field_meta_id):
     if request.method == 'POST':
         form = CompanyCustomFieldMetaForm(request.POST, instance=custom_field_meta)
         if form.is_valid():
-            form.save()
+            custom_field_meta = form.save(commit=False)
+
+            # Обработка поля типа справочник
+            if custom_field_meta.field_type == 'reference':
+                custom_field_meta.reference = form.cleaned_data.get('reference')
+            else:
+                custom_field_meta.reference = None
+
+            custom_field_meta.save()
             return redirect('company_edit', company_id=company.id)  # Перенаправление на страницу редактирования компании
     else:
         form = CompanyCustomFieldMetaForm(instance=custom_field_meta)
@@ -285,7 +304,6 @@ def company_custom_field_meta_edit(request, custom_field_meta_id):
         'title': 'Редактировать кастомное поле компании',
         'company': company,
     })
-
 @login_required
 def company_custom_field_meta_delete(request, custom_field_meta_id):
     """Удаление кастомного поля компании"""

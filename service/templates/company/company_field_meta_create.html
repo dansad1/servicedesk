@@ -1,61 +1,55 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block content %}
 <div class="container">
-    <h2>Создать новое поле компании</h2>
-    <div class="card mt-4">
-        <div class="card-body">
-            <form method="post" id="companyFieldMetaForm">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="id_name">Название поля:</label>
-                    {{ form.name }}
-                    {% if form.name.errors %}
-                        <div class="text-danger">
-                            {{ form.name.errors }}
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    <label for="id_field_type">Тип поля:</label>
-                    {{ form.field_type }}
-                    {% if form.field_type.errors %}
-                        <div class="text-danger">
-                            {{ form.field_type.errors }}
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    <label for="id_is_required">Обязательное:</label>
-                    {{ form.is_required }}
-                    {% if form.is_required.errors %}
-                        <div class="text-danger">
-                            {{ form.is_required.errors }}
-                        </div>
-                    {% endif %}
-                </div>
-                <button type="submit" class="btn btn-primary mt-3">Создать</button>
-            </form>
+  <h2 class="my-4 text-center">{{ title }}</h2>
+
+  <form method="post" enctype="multipart/form-data" id="customFieldForm">
+    {% csrf_token %}
+
+    <!-- Форма для создания нового кастомного поля -->
+    {% for field in form %}
+      <div class="row mb-3">
+        <div class="col">
+          {{ field.label_tag }}
+          {{ field }}
+          <div class="text-danger">{{ field.errors }}</div>
         </div>
-    </div>
+      </div>
+    {% endfor %}
+
+    <button type="submit" class="btn btn-primary">Создать поле</button>
+  </form>
+
+  <!-- Ссылка для возврата к форме редактирования компании -->
+  <div class="mt-4">
+    <a href="{% url 'company_edit' company.id %}" class="btn btn-secondary">Назад к редактированию компании</a>
+  </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
+        // Функция для отображения или скрытия поля справочника
+        function toggleReferenceField() {
+            var fieldType = $('#id_field_type').val();
+            // Показать поле справочника, если выбран тип 'reference'
+            if (fieldType === 'reference') {
+                $('#id_reference').closest('.row').show();
+            } else {
+                // Скрыть поле справочника для других типов
+                $('#id_reference').closest('.row').hide();
+            }
+        }
+
+        // Инициализация: вызов функции при загрузке страницы
+        toggleReferenceField();
+
+        // Обработчик события для изменения поля типа
         $('#id_field_type').change(function() {
-            var fieldType = $(this).val();
-            $.ajax({
-                url: "{% url 'get_default_value_widget' %}",  // Убедитесь, что этот URL определен правильно
-                data: {
-                    'field_type': fieldType
-                },
-                success: function(data) {
-                    // Убедитесь, что у вас есть контейнер для отображения значений по умолчанию
-                    $('#default_value_container').html(data.widget);
-                }
-            });
+            toggleReferenceField();
         });
     });
 </script>
+
 {% endblock %}

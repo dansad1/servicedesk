@@ -4,7 +4,7 @@
 <div class="container">
   <h2 class="my-4 text-center">{{ title }}</h2>
 
-  <form method="post" enctype="multipart/form-data">
+  <form method="post" enctype="multipart/form-data" id="customFieldForm">
     {% csrf_token %}
 
     <!-- Форма для создания нового кастомного поля -->
@@ -26,4 +26,28 @@
     <a href="{% url 'company_edit' company.id %}" class="btn btn-secondary">Назад к редактированию компании</a>
   </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Функция для отображения или скрытия поля справочника
+        function toggleReferenceField() {
+            var fieldType = $('#id_field_type').val();
+            if (fieldType === 'reference') {
+                $('#id_reference').closest('.row').show();
+            } else {
+                $('#id_reference').closest('.row').hide();
+            }
+        }
+
+        // Первоначальная настройка отображения поля справочника
+        toggleReferenceField();
+
+        // Событие изменения для поля выбора типа
+        $('#id_field_type').change(function() {
+            toggleReferenceField();
+        });
+    });
+</script>
+
 {% endblock %}

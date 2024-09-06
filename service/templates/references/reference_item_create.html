@@ -7,7 +7,7 @@
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="btn btn-success">Добавить</button>
-        <a href="{% url 'reference_item_list' reference.id %}" class="btn btn-secondary">Отмена</a>
+        <a href="{% url 'reference_edit' reference.id %}" class="btn btn-secondary">Отмена</a>
     </form>
 </div>
 {% endblock %}

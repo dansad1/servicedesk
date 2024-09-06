@@ -24,11 +24,14 @@ class CompanyFieldMeta(models.Model):
         ('url', 'URL'),      # Для ввода веб-сайта
         ('json', 'JSON'),
         ('file', 'File'),
+        ('reference', 'Reference'),  # Новый тип данных "Справочник"
+
     ]
 
     name = models.CharField(max_length=255)
     field_type = models.CharField(max_length=50, choices=FIELD_TYPES)
     is_required = models.BooleanField(default=False)
+    reference = models.ForeignKey('Reference', null=True, blank=True, on_delete=models.SET_NULL, verbose_name="Справочник")  # Связь со справочником
 
     def __str__(self):
         return self.name
@@ -51,6 +54,7 @@ class CompanyFieldValue(models.Model):
     value_file = models.FileField(upload_to='company_field_files/', null=True, blank=True)
    # value_phone = PhoneNumberField(blank=True, null=True)  # Поле для телефона
     is_hidden = models.BooleanField(default=False)  # Новое поле для скрытия
+    value_reference = models.ForeignKey('ReferenceItem', null=True, blank=True, on_delete=models.SET_NULL)  # Новое поле для значений справочника
 
 
     def __str__(self):
@@ -68,6 +72,8 @@ class CompanyFieldValue(models.Model):
             'json': self.value_json,
             'file': self.value_file.name if self.value_file else None,
             #'phone': str(self.value_phone) if self.value_phone else None,  # Преобразование телефона в строку
+            'reference': self.value_reference.value if self.value_reference else None,  # Получаем значение справочника
+
         }
         return type_map.get(self.company_field_meta.field_type)
 
@@ -83,6 +89,8 @@ class CompanyFieldValue(models.Model):
             'json': 'value_json',
             'file': 'value_file',
             #'phone': 'value_phone',
+            'reference': 'value_reference',  # Добавляем обработку типа "reference"
+
         }.get(self.company_field_meta.field_type)
         if field_name:
             setattr(self, field_name, value)
@@ -92,9 +100,12 @@ class CompanyCustomFieldMeta(models.Model):
     name = models.CharField(max_length=255)
     field_type = models.CharField(max_length=50, choices=CompanyFieldMeta.FIELD_TYPES)
     is_required = models.BooleanField(default=False)
+    reference = models.ForeignKey('Reference', null=True, blank=True, on_delete=models.SET_NULL, verbose_name="Справочник")
 
     def __str__(self):
         return f"{self.company.name}: {self.name}"
+
+
 class CompanyCustomFieldValue(models.Model):
     custom_field_meta = models.ForeignKey(CompanyCustomFieldMeta, on_delete=models.CASCADE)
     company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='custom_field_values')
@@ -106,6 +117,7 @@ class CompanyCustomFieldValue(models.Model):
     value_url = models.URLField(null=True, blank=True)
     value_json = models.JSONField(null=True, blank=True)
     value_file = models.FileField(upload_to='custom_field_files/', null=True, blank=True)
+    value_reference = models.ForeignKey('ReferenceItem', null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return f"{self.company.name} - {self.custom_field_meta.name}: {self.get_value()}"
@@ -122,6 +134,7 @@ class CompanyCustomFieldValue(models.Model):
             'url': self.value_url,
             'json': self.value_json,
             'file': self.value_file.name if self.value_file else None,
+            'reference': self.value_reference.value if self.value_reference else None,
         }
         return type_map.get(self.custom_field_meta.field_type)
 
@@ -137,6 +150,7 @@ class CompanyCustomFieldValue(models.Model):
             'url': 'value_url',
             'json': 'value_json',
             'file': 'value_file',
+            'reference': 'value_reference',
         }.get(self.custom_field_meta.field_type)
         if field_name:
             setattr(self, field_name, value)
@@ -722,7 +736,7 @@ class Doc(models.Model):
 
     def __str__(self):
         return self.title
-class Book(models.Model):
+class Reference(models.Model):
     """
     Модель для хранения справочников.
     """
@@ -737,11 +751,11 @@ class Book(models.Model):
         return self.name
 
 
-class BookItem(models.Model):
+class ReferenceItem(models.Model):
     """
     Модель для хранения элементов справочников.
     """
-    reference = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='items', verbose_name='Справочник')
+    reference = models.ForeignKey(Reference, on_delete=models.CASCADE, related_name='items', verbose_name='Справочник')
     value = models.CharField(max_length=255, verbose_name='Значение')
 
     class Meta:
