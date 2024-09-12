@@ -1,10 +1,11 @@
-{{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block content %}
 <h2 class="text-center max-w-2xl text-4xl p-10 m-auto">Список типов активов</h2>
+
 <form id="delete-form" method="post" action="{% url 'asset_type_delete' %}">
     {% csrf_token %}
-    <table id="assetTypesTable" class="table">
+    <table id="assetTypesTable" class="table table-striped table-bordered">
         <thead>
             <tr>
                 <th class="text-center"><input type="checkbox" id="select-all"></th>
@@ -15,18 +16,31 @@
         <tbody>
             {% for asset_type in asset_types %}
             <tr class="align-middle">
-                <td class="text-center"><input type="checkbox" name="selected_asset_types" value="{{ asset_type.pk }}"></td>
-                <td class="text-center"><a href="{% url 'asset_type_edit' pk=asset_type.pk %}">{{ asset_type.name }}</a></td>
-                <td class="flex justify-evenly">
-                    <button onclick="window.location.href='{% url 'attribute_create' asset_type_id=asset_type.pk %}'" type="button" class="btn btn-secondary">Создать атрибут</button>
+                <td class="text-center">
+                    <input type="checkbox" name="selected_asset_types" value="{{ asset_type.pk }}">
                 </td>
+                <td class="text-center">
+                    <a href="{% url 'asset_type_edit' asset_type_id=asset_type.pk %}">{{ asset_type.name }}</a>
+                </td>
+                <td class="text-center">
+                    <button onclick="window.location.href='{% url 'attribute_create' asset_type_id=asset_type.pk %}'" type="button" class="btn btn-secondary btn-sm">Создать атрибут</button>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" class="text-center">Типы активов не найдены.</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-    <button type="submit" class="btn btn-danger mb-3">Удалить выбранные типы</button>
+    <div class="text-center mt-3">
+        <button type="submit" class="btn btn-danger">Удалить выбранные типы</button>
+    </div>
 </form>
-<button onclick="window.location.href='{% url 'asset_type_create' %}'" type="button" class="btn btn-success">Добавить новый тип</button>
+
+<div class="text-center mt-4">
+    <button onclick="window.location.href='{% url 'asset_type_create' %}'" type="button" class="btn btn-success">Добавить новый тип</button>
+</div>
 
 <!-- Подключение DataTables -->
 <link href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css" rel="stylesheet">
@@ -35,9 +49,15 @@
 
 <script>
 $(document).ready(function() {
-    $('#assetTypesTable').DataTable();
+    // Инициализация DataTables
+    $('#assetTypesTable').DataTable({
+        "paging": true,
+        "searching": true,
+        "ordering": true,
+        "info": true
+    });
 
-    // Select all checkboxes
+    // Выбор всех чекбоксов
     $('#select-all').click(function() {
         var isChecked = $(this).is(':checked');
         $('input[name="selected_asset_types"]').prop('checked', isChecked);

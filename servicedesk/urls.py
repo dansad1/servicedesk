@@ -6,8 +6,10 @@ from django.conf.urls.static import static  # Import static for serving media fi
 import service.models
 from service.views.chat_views import chat_view
 from service.views.asset_type_views import *
-from service.views.asset_views import create_asset, edit_asset, delete_asset, asset_list, get_attributes_by_asset_type
-from service.views.attribute_views import attribute_create,  attribute_edit
+from service.views.asset_views import asset_create, asset_list, get_attributes_by_asset_type, asset_edit, asset_delete, \
+    get_attributes_by_asset
+from service.views.attribute_views import attribute_create, attribute_edit, attribute_delete_from_asset, \
+    attribute_delete_from_type
 from service.views.file_views import file_view
 from service.views.reference_views import reference_list, reference_create, reference_edit, reference_item_create, reference_item_edit, reference_item_delete, reference_delete
 from service.views.request_field_views import request_field_edit, request_field_create, get_default_value_widget,request_field_delete
@@ -103,15 +105,16 @@ urlpatterns = [
     path('groups/delete/', performer_group_delete, name='performer_group_delete'),
 
     #Активы
-    path('assets/create/', create_asset, name='create_asset'),
-    path('assets/edit/<int:pk>/', edit_asset, name='edit_asset'),
-    path('assets/delete/', delete_asset, name='delete_asset'),
+    path('assets/create/', asset_create, name='asset_create'),
+    path('assets/edit/<int:pk>/', asset_edit, name='asset_edit'),
+    path('assets/delete/<int:pk>/', asset_delete, name='asset_delete'),  # Используем 'pk'
     path('assets/', asset_list, name='asset_list'),
     path('asset-types/<int:asset_type_id>/attributes/', get_attributes_by_asset_type,name='get_attributes_by_asset_type'),
+    path('assets/<int:asset_id>/attributes/', get_attributes_by_asset, name='get_attributes_by_asset'),
 
     # Маршруты для типов активов
     path('asset_types/create/', asset_type_create, name='asset_type_create'),
-    path('asset_types/edit/<int:pk>/', asset_type_edit, name='asset_type_edit'),
+    path('asset_types/edit/<int:asset_type_id>/', asset_type_edit, name='asset_type_edit'),  # Используем 'asset_type_id'
     path('asset_types/delete/', asset_type_delete, name='asset_type_delete'),
     path('asset_types/', asset_type_list, name='asset_type_list'),
 
@@ -119,7 +122,8 @@ urlpatterns = [
     path('attributes/edit/<int:pk>/', attribute_edit, name='attribute_edit'),
     path('asset_types/<int:asset_type_id>/attributes/create/', service.views.attribute_views.attribute_create, name='attribute_create'),
     path('asset-types/<int:asset_type_id>/attributes/', get_attributes_by_asset_type, name='get_attributes_by_asset_type'),
-
+    path('attribute/delete/<int:pk>/from_type/<int:asset_type_id>/', attribute_delete_from_type,name='attribute_delete_from_type'),
+    path('attribute/delete/<int:pk>/from_asset/<int:asset_id>/', attribute_delete_from_asset, name='attribute_delete_from_asset'),
 # URL-паттерны для отделов
     path('department/<int:company_pk>/create_department/', department_create, name='department_create'),
     path('department/<int:department_id>/subdepartment_create/', subdepartment_create, name='subdepartment_create'),

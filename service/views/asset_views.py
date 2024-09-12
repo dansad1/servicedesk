@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 
 
 # Создание актива
-def create_asset(request):
+def asset_create(request):
     if request.method == 'POST':
         form = AssetForm(request.POST)
         if form.is_valid():
@@ -29,14 +29,14 @@ def create_asset(request):
                         )
 
             # Перенаправление на страницу списка активов после сохранения актива и его атрибутов
-            return redirect('assets_list')
+            return redirect('asset_list')
     else:
         form = AssetForm()
 
-    return render(request, 'assets/create_asset.html', {'form': form})
+    return render(request, 'assets/asset_create.html', {'form': form})
 
 # Функция редактирования актива
-def edit_asset(request, pk):
+def asset_edit(request, pk):
     asset = get_object_or_404(Asset, pk=pk)
     if request.method == 'POST':
         form = AssetForm(request.POST, instance=asset)
@@ -60,7 +60,7 @@ def edit_asset(request, pk):
                         # Add other types handling here
                         asset_attr.save()
 
-            return redirect('assets_list')  # Redirect to the asset list after updating
+            return redirect('asset_list')  # Redirect to the asset list after updating
     else:
         form = AssetForm(instance=asset)
 
@@ -71,7 +71,7 @@ def edit_asset(request, pk):
 
 # Функция удаления актива
 @login_required
-def delete_asset(request):
+def asset_delete(request):
     if request.method == 'POST':
         asset_ids = request.POST.getlist('selected_assets')
         if asset_ids:
@@ -89,3 +89,7 @@ def asset_list(request):
 def get_attributes_by_asset_type(request, asset_type_id):
     attributes = list(AssetTypeAttribute.objects.filter(asset_type_id=asset_type_id).values('id', 'attribute__name', 'attribute__attribute_type'))
     return JsonResponse(attributes, safe=False)
+def get_attributes_by_asset(request, asset_id):
+    attributes = AssetAttribute.objects.filter(asset_id=asset_id)
+    # Логика для получения и возвращения атрибутов в формате JSON или HTML
+    return JsonResponse({'attributes': list(attributes.values())})

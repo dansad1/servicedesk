@@ -1,22 +1,30 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2 class="m-auto max-w-2xl text-center text-4xl p-10">Создать новый тип актива</h2>
-<div class="m-auto max-w-2xl bg-slate-200 p-10 rounded-lg">
-    <form method="post">
-        {% csrf_token %}
+<h2 class="text-center mb-4">Создание нового типа актива</h2>
 
-        <div>
-            Название актива:
-            {{form.name}}
-        </div>
+<form method="post" class="form-horizontal">
+    {% csrf_token %}
 
-        <div>
-            Родительский актив:
-            {{form.parent}}
-        </div>
+    <div class="form-group mb-3">
+        {{ form.name.label_tag }}
+        {{ form.name }}
+        {% if form.name.errors %}
+        <div class="text-danger">{{ form.name.errors }}</div>
+        {% endif %}
+    </div>
 
-        <button type="submit" class="btn btn-success">Создать</button>
-    </form>
-</div>
+    <div class="form-group mb-3">
+        {{ form.parent.label_tag }}
+        {{ form.parent }}
+        {% if form.parent.errors %}
+        <div class="text-danger">{{ form.parent.errors }}</div>
+        {% endif %}
+    </div>
+
+    <div class="form-group text-center">
+        <button type="submit" class="btn btn-primary">Создать</button>
+    </div>
+</form>
+
 {% endblock %}

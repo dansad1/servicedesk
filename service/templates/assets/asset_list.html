@@ -1,8 +1,8 @@
-{{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block content %}
 <h2 class="m-auto max-w-4xl text-center text-4xl p-10">Список активов</h2>
-<form id="delete-form" method="post" action="{% url 'delete_asset' %}">
+<form id="delete-form" method="post">
   {% csrf_token %}
   <table id="assetsTable" class="table">
     <thead>
@@ -11,34 +11,48 @@
         <th class="text-center">Имя актива</th>
         <th class="text-center">Тип актива</th>
         <th class="text-center">Родительский актив</th>
+        <th class="text-center">Действия</th>
       </tr>
     </thead>
     <tbody>
       {% for asset in assets %}
       <tr class="align-middle">
         <td class="text-center"><input type="checkbox" name="selected_assets" value="{{ asset.id }}"></td>
-        <td class="text-center"><a href="{% url 'edit_asset' asset.id %}">{{ asset.name }}</a></td>
+        <td class="text-center"><a href="{% url 'asset_edit' asset.id %}">{{ asset.name }}</a></td>
         <td class="text-center">
-          <a href="{% url 'asset_type_edit' asset.asset_type.id %}"><span class="badge text-bg-success px-8 py-2 hover:scale-110">{{ asset.asset_type.name }}</span></a>
+          {% if asset.asset_type %}
+            <a href="{% url 'asset_type_edit' asset.asset_type.id %}">
+              <span class="badge text-bg-success">{{ asset.asset_type.name }}</span>
+            </a>
+          {% else %}
+            <span class="badge text-bg-warning">Тип не указан</span>
+          {% endif %}
         </td>
         <td class="text-center">{{ asset.parent_asset.name|default:"N/A" }}</td>
-        <td class="flex justify-evenly">
-
+        <td class="text-center">
+          <!-- Кнопка для редактирования -->
+          <button onclick="window.location.href='{% url 'asset_edit' asset.id %}'" type="button" class="btn btn-primary">Редактировать</button>
+          <!-- Форма для удаления -->
+          <form class="d-inline" action="{% url 'asset_delete' asset.id %}" method="post" onsubmit="return confirm('Вы уверены, что хотите удалить этот актив?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Удалить</button>
+          </form>
+        </td>
       </tr>
       {% empty %}
       <tr>
-        <td colspan="5">Активы не найдены.</td>
+        <td colspan="5" class="text-center">Активы не найдены.</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
-  <button type="submit" class="btn btn-danger mb-3">Удалить выбранные активы</button>
 </form>
-<button onclick="window.location.href='{% url 'create_asset' %}'" type="button" class="btn btn-success">Добавить новый актив</button>
+
+<button onclick="window.location.href='{% url 'asset_create' %}'" type="button" class="btn btn-success">Добавить новый актив</button>
 <button onclick="window.location.href='{% url 'asset_type_list' %}'" type="button" class="btn btn-secondary">Посмотреть типы активов</button>
 
 <script>
-  // Select all checkboxes
+  // Функция для выделения всех чекбоксов
   document.getElementById('select-all').addEventListener('click', function(event) {
     var isChecked = event.target.checked;
     var checkboxes = document.querySelectorAll('input[name="selected_assets"]');
