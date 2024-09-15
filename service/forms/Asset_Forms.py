@@ -94,5 +94,92 @@ class AssetForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(AssetForm, self).__init__(*args, **kwargs)
+
         # Добавление пустого значения для родительского актива
         self.fields['parent_asset'].empty_label = "Без родительского актива"
+
+        # Если есть инстанс актива, выполняем наследование атрибутов
+        if self.instance.pk:
+            self.inherit_attributes()
+
+    def inherit_attributes(self):
+        """
+        Функция наследует атрибуты от родительского актива и типа актива.
+        Приоритет: атрибуты текущего актива > атрибуты родительского актива > атрибуты типа актива.
+        """
+        # Сначала получаем текущие атрибуты актива
+        asset_attributes = {attr.attribute.pk: attr for attr in self.instance.asset_attributes.all()}
+
+        # Наследуем атрибуты от родителя
+        if self.instance.parent_asset:
+            parent_attributes = self.instance.parent_asset.asset_attributes.all()
+            for attr in parent_attributes:
+                if attr.attribute.pk not in asset_attributes:
+                    asset_attributes[attr.attribute.pk] = attr
+
+        # Наследуем атрибуты от типа актива
+        if self.instance.asset_type:
+            type_attributes = AssetTypeAttribute.objects.filter(asset_type=self.instance.asset_type)
+            for type_attr in type_attributes:
+                if type_attr.attribute.pk not in asset_attributes:
+                    asset_attributes[type_attr.attribute.pk] = AssetAttribute(
+                        asset=self.instance, attribute=type_attr.attribute, value_text=None
+                    )
+
+        # Для каждого атрибута создаём динамическое поле формы
+        for attribute_pk, asset_attr in asset_attributes.items():
+            field_name = f'attribute_{attribute_pk}_value'
+            field_value = asset_attr.get_value()
+            field_class, widget_class = self.get_field_class_and_widget(asset_attr.attribute.attribute_type)
+            self.fields[field_name] = field_class(
+                initial=field_value,
+                label=asset_attr.attribute.name,
+                widget=widget_class(attrs={'class': 'form-control'}),
+                required=False
+            )
+
+    def get_field_class_and_widget(self, attribute_type):
+        """
+        Возвращает класс поля и виджет в зависимости от типа атрибута.
+        """
+        type_map = {
+            Attribute.TEXT: (forms.CharField, forms.TextInput),
+            Attribute.NUMBER: (forms.FloatField, forms.NumberInput),
+            Attribute.DATE: (forms.DateField, forms.DateInput),
+            Attribute.BOOLEAN: (forms.BooleanField, forms.CheckboxInput),
+            Attribute.EMAIL: (forms.EmailField, forms.EmailInput),
+            Attribute.URL: (forms.URLField, forms.URLInput),
+            Attribute.JSON: (forms.JSONField, forms.Textarea),
+        }
+        return type_map.get(attribute_type, (forms.CharField, forms.TextInput))
+
+    def save(self, commit=True):
+        # Сохраняем основной объект актива
+        instance = super(AssetForm, self).save(commit=False)
+        if commit:
+            instance.save()
+
+        # Сохраняем атрибуты актива
+        for field_name in self.cleaned_data:
+            if field_name.startswith('attribute_'):
+                attribute_id = int(field_name.split('_')[1])
+                value = self.cleaned_data[field_name]
+
+                asset_attr, created = AssetAttribute.objects.get_or_create(
+                    asset=instance,
+                    attribute_id=attribute_id,
+                    defaults={'value_text': value}
+                )
+
+                if not created:
+                    if asset_attr.attribute.attribute_type == Attribute.TEXT:
+                        asset_attr.value_text = value
+                    elif asset_attr.attribute.attribute_type == Attribute.NUMBER:
+                        asset_attr.value_number = value
+                    elif asset_attr.attribute.attribute_type == Attribute.DATE:
+                        asset_attr.value_date = value
+                    elif asset_attr.attribute.attribute_type == Attribute.BOOLEAN:
+                        asset_attr.value_boolean = value == 'on'
+                    asset_attr.save()
+
+        return instance

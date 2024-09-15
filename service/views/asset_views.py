@@ -12,63 +12,25 @@ def asset_create(request):
     if request.method == 'POST':
         form = AssetForm(request.POST)
         if form.is_valid():
-            # Сохраняем актив и возвращаем созданный объект
-            asset = form.save()
-
-            # Итерация по динамически добавленным полям атрибутов
-            for attribute in Attribute.objects.all():
-                field_name = f'attribute_{attribute.pk}_value'
-                if field_name in request.POST:
-                    attribute_value = request.POST.get(field_name, '')
-                    # Создаем и связываем AssetAttribute, только если предоставлено значение
-                    if attribute_value:
-                        AssetAttribute.objects.create(
-                            asset=asset,
-                            attribute=attribute,
-                            value_text=attribute_value  # Предполагается текстовое значение, настройте в зависимости от типа атрибута
-                        )
-
-            # Перенаправление на страницу списка активов после сохранения актива и его атрибутов
+            form.save()  # Форма обрабатывает как актив, так и атрибуты
             return redirect('asset_list')
     else:
         form = AssetForm()
 
     return render(request, 'assets/asset_create.html', {'form': form})
-
 # Функция редактирования актива
 def asset_edit(request, pk):
     asset = get_object_or_404(Asset, pk=pk)
+
     if request.method == 'POST':
         form = AssetForm(request.POST, instance=asset)
         if form.is_valid():
-            form.save()
-            # We handle dynamic attribute fields, assuming they exist in the form
-            for attribute in Attribute.objects.all():
-                field_name = f'attribute_{attribute.pk}_value'
-                if field_name in request.POST:
-                    attribute_value = request.POST.get(field_name, '')
-                    # Retrieve or create the AssetAttribute instance
-                    asset_attr, created = AssetAttribute.objects.get_or_create(
-                        asset=asset,
-                        attribute=attribute,
-                        defaults={'value_text': attribute_value}  # or use appropriate field based on type
-                    )
-                    if not created:
-                        # If the instance was not created, we update the existing one
-                        if attribute.attribute_type == Attribute.TEXT:
-                            asset_attr.value_text = attribute_value
-                        # Add other types handling here
-                        asset_attr.save()
-
-            return redirect('asset_list')  # Redirect to the asset list after updating
+            form.save()  # Форма обрабатывает как актив, так и атрибуты
+            return redirect('asset_list')
     else:
         form = AssetForm(instance=asset)
 
-    return render(request, 'assets/asset_edit.html', {
-        'form': form,
-        'asset': asset
-    })
-
+    return render(request, 'assets/asset_edit.html', {'form': form, 'asset': asset})
 # Функция удаления актива
 @login_required
 def asset_delete(request):
@@ -80,16 +42,39 @@ def asset_delete(request):
         else:
             messages.warning(request, 'Пожалуйста, выберите хотя бы один актив для удаления.')
     return redirect('asset_list')
-
 # Функция вывода списка активов
 def asset_list(request):
-    assets = Asset.objects.prefetch_related('components', 'asset_attributes').all()
+    assets = Asset.objects.select_related('asset_type', 'parent_asset').prefetch_related('asset_attributes__attribute').all()
     return render(request, 'assets/asset_list.html', {'assets': assets})
 
-def get_attributes_by_asset_type(request, asset_type_id):
-    attributes = list(AssetTypeAttribute.objects.filter(asset_type_id=asset_type_id).values('id', 'attribute__name', 'attribute__attribute_type'))
+def get_inherited_attributes(request, asset_type_id):
+    parent_asset_id = request.GET.get('parent_asset_id')
+
+    # Список для хранения атрибутов
+    attributes = []
+
+    # Получаем атрибуты, связанные с типом актива
+    if asset_type_id:
+        type_attributes = AssetTypeAttribute.objects.filter(asset_type_id=asset_type_id).values('attribute__id', 'attribute__name', 'attribute__attribute_type')
+        attributes.extend(list(type_attributes))
+
+    # Если указан родительский актив, добавляем его атрибуты
+    if parent_asset_id:
+        parent_attributes = AssetAttribute.objects.filter(asset_id=parent_asset_id).values(
+            'attribute__id', 'attribute__name', 'attribute__attribute_type',
+            'value_text', 'value_number', 'value_date', 'value_boolean', 'value_email', 'value_url', 'value_json'
+        )
+        for attr in parent_attributes:
+            attr_value = (
+                attr['value_text'] or attr['value_number'] or attr['value_date'] or
+                attr['value_boolean'] or attr['value_email'] or attr['value_url'] or attr['value_json']
+            )
+            attributes.append({
+                'id': attr['attribute__id'],
+                'attribute__name': attr['attribute__name'],
+                'attribute__attribute_type': attr['attribute__attribute_type'],
+                'value': attr_value
+            })
+
+    # Возвращаем атрибуты в формате JSON
     return JsonResponse(attributes, safe=False)
-def get_attributes_by_asset(request, asset_id):
-    attributes = AssetAttribute.objects.filter(asset_id=asset_id)
-    # Логика для получения и возвращения атрибутов в формате JSON или HTML
-    return JsonResponse({'attributes': list(attributes.values())})

@@ -5,13 +5,12 @@
     <h2 class="text-center mb-4">Редактирование типа актива: {{ asset_type.name }}</h2>
 
     <!-- Форма редактирования типа актива -->
-    <form method="post" class="form-horizontal">
+    <form method="post" class="form-horizontal p-3" style="background-color: #f8f9fa; border-radius: 10px;">
         {% csrf_token %}
-
         <div class="row mb-3">
-            <div class="col">
+            <div class="col-md-6">
                 <div class="form-group">
-                    <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+                    {{ form.name.label_tag }}
                     {{ form.name }}
                     {% if form.name.errors %}
                     <div class="text-danger">{{ form.name.errors }}</div>
@@ -19,9 +18,9 @@
                 </div>
             </div>
 
-            <div class="col">
+            <div class="col-md-6">
                 <div class="form-group">
-                    <label for="{{ form.parent.id_for_label }}">{{ form.parent.label }}</label>
+                    {{ form.parent.label_tag }}
                     {{ form.parent }}
                     {% if form.parent.errors %}
                     <div class="text-danger">{{ form.parent.errors }}</div>
@@ -30,7 +29,7 @@
             </div>
         </div>
 
-        <div class="text-center">
+        <div class="text-center mt-4">
             <button type="submit" class="btn btn-primary">Сохранить изменения</button>
         </div>
     </form>

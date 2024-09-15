@@ -6,8 +6,7 @@ from django.conf.urls.static import static  # Import static for serving media fi
 import service.models
 from service.views.chat_views import chat_view
 from service.views.asset_type_views import *
-from service.views.asset_views import asset_create, asset_list, get_attributes_by_asset_type, asset_edit, asset_delete, \
-    get_attributes_by_asset
+from service.views.asset_views import asset_create, asset_list, get_inherited_attributes, asset_edit, asset_delete
 from service.views.attribute_views import attribute_create, attribute_edit, attribute_delete_from_asset, \
     attribute_delete_from_type
 from service.views.file_views import file_view
@@ -109,8 +108,6 @@ urlpatterns = [
     path('assets/edit/<int:pk>/', asset_edit, name='asset_edit'),
     path('assets/delete/<int:pk>/', asset_delete, name='asset_delete'),  # Используем 'pk'
     path('assets/', asset_list, name='asset_list'),
-    path('asset-types/<int:asset_type_id>/attributes/', get_attributes_by_asset_type,name='get_attributes_by_asset_type'),
-    path('assets/<int:asset_id>/attributes/', get_attributes_by_asset, name='get_attributes_by_asset'),
 
     # Маршруты для типов активов
     path('asset_types/create/', asset_type_create, name='asset_type_create'),
@@ -121,7 +118,7 @@ urlpatterns = [
     # Маршруты для атрибутов
     path('attributes/edit/<int:pk>/', attribute_edit, name='attribute_edit'),
     path('asset_types/<int:asset_type_id>/attributes/create/', service.views.attribute_views.attribute_create, name='attribute_create'),
-    path('asset-types/<int:asset_type_id>/attributes/', get_attributes_by_asset_type, name='get_attributes_by_asset_type'),
+    path('assets/types/<int:asset_type_id>/attributes/', get_inherited_attributes, name='get_inherited_attributes'),
     path('attribute/delete/<int:pk>/from_type/<int:asset_type_id>/', attribute_delete_from_type,name='attribute_delete_from_type'),
     path('attribute/delete/<int:pk>/from_asset/<int:asset_id>/', attribute_delete_from_asset, name='attribute_delete_from_asset'),
 # URL-паттерны для отделов

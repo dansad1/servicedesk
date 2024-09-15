@@ -2,108 +2,90 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-6 col-md-8 col-sm-12">
-            <div class="product-card shadow-sm mb-4">
-                <!-- Заголовок карточки -->
-                <div class="product-card-header text-center">
-                    <h2>Создание нового актива</h2>
-                </div>
+    <h2 class="text-center mb-4">Создать новый актив</h2>
 
-                <!-- Тело карточки с формой -->
-                <div class="product-card-body">
-                    <form method="post" enctype="multipart/form-data" id="assetForm">
-                        {% csrf_token %}
+    <!-- Форма создания актива -->
+    <form method="post" id="asset-form">
+        {% csrf_token %}
 
-                        <div class="mb-3">
-                            {{ form.as_p }} <!-- Основная форма -->
-                        </div>
-
-                        <div id="dynamicAttributesContainer" class="mt-4">
-                            <h4>Дополнительные атрибуты</h4>
-                            <div id="attributesWrapper">
-                                <!-- Динамически добавляемые атрибуты появятся здесь -->
-                            </div>
-                        </div>
-
-                        {% if form.errors %}
-                            <div class="alert alert-danger mt-3">
-                                <strong>Ошибка!</strong> Пожалуйста, исправьте ошибки ниже.
-                            </div>
-                        {% endif %}
-
-                        <!-- Кнопки действия -->
-                        <div class="mt-4 d-flex justify-content-between">
-                            <button type="submit" class="btn btn-primary">Создать актив</button>
-                            <a href="{% url 'asset_list' %}" class="btn btn-secondary">Вернуться к списку активов</a>
-                        </div>
-                    </form>
-                </div>
-            </div>
+        <!-- Поле имени актива -->
+        <div class="form-group mb-3">
+            {{ form.name.label_tag }}
+            {{ form.name }}
+            {% if form.name.errors %}
+            <div class="text-danger">{{ form.name.errors }}</div>
+            {% endif %}
         </div>
-    </div>
+
+        <!-- Поле типа актива -->
+        <div class="form-group mb-3">
+            {{ form.asset_type.label_tag }}
+            {{ form.asset_type }}
+            {% if form.asset_type.errors %}
+            <div class="text-danger">{{ form.asset_type.errors }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Поле родительского актива -->
+        <div class="form-group mb-3">
+            {{ form.parent_asset.label_tag }}
+            {{ form.parent_asset }}
+            {% if form.parent_asset.errors %}
+            <div class="text-danger">{{ form.parent_asset.errors }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Контейнер для динамически загружаемых атрибутов -->
+        <div id="attributes-container"></div>
+
+        <!-- Кнопка отправки формы -->
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary">Создать актив</button>
+        </div>
+    </form>
 </div>
 
-<!-- Подключение библиотеки jQuery и Bootstrap JS -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function loadAttributes() {
+        const assetTypeId = document.getElementById('id_asset_type').value;
+        const parentAssetId = document.getElementById('id_parent_asset').value;
 
-<!-- Стили для карточек -->
-<style>
-    .product-card {
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        padding: 20px;
-        background-color: #fff;
-        transition: transform 0.3s ease-in-out;
+        // Проверяем наличие assetTypeId или parentAssetId
+        if (assetTypeId || parentAssetId) {
+            // Отправляем AJAX-запрос для получения атрибутов
+            $.ajax({
+            const url = `/assets/types/${assetTypeId}/attributes/`;  // Динамически создаем URL
+                data: {
+                    'parent_asset_id': parentAssetId,  // Передаем родительский актив как параметр
+                },
+                success: function(data) {
+                    // Очищаем контейнер с атрибутами
+                    $('#attributes-container').html('');
+
+                    // Добавляем атрибуты в контейнер
+                    data.forEach(function(attr) {
+                        let field = `
+                            <div class="form-group mb-3">
+                                <label for="attribute_${attr.id}_value">${attr.attribute__name}</label>
+                                <input type="text" id="attribute_${attr.id}_value" name="attribute_${attr.id}_value" class="form-control" value="${attr.value || ''}">
+                            </div>
+                        `;
+                        $('#attributes-container').append(field);
+                    });
+                }
+            });
+        } else {
+            // Если ни тип, ни родительский актив не выбраны, очищаем контейнер с атрибутами
+            $('#attributes-container').html('');
+        }
     }
 
-    .product-card:hover {
-        transform: scale(1.02);
-    }
+    // Вызов функции при изменении типа актива или родительского актива
+    document.getElementById('id_asset_type').addEventListener('change', loadAttributes);
+    document.getElementById('id_parent_asset').addEventListener('change', loadAttributes);
 
-    .product-card-header {
-        background-color: #f8f9fa;
-        padding: 15px;
-        border-bottom: 1px solid #ddd;
-        border-radius: 10px 10px 0 0;
-    }
-
-    .product-card-body {
-        padding: 15px;
-    }
-
-    /* Отступы для заголовков и текста */
-    h2, h4 {
-        margin-bottom: 20px;
-    }
-
-    .mb-3 {
-        margin-bottom: 1.5rem;
-    }
-
-    /* Стили для динамических атрибутов */
-    #attributesWrapper {
-        padding: 15px;
-        background-color: #f9f9f9;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-    }
-
-    /* Стили для кнопок */
-    .btn {
-        padding: 10px 20px;
-    }
-
-    .btn-secondary {
-        background-color: #6c757d;
-        border: none;
-        color: white;
-    }
-
-    .btn-secondary:hover {
-        background-color: #5a6268;
-    }
-</style>
+    // Автоматическая загрузка атрибутов при загрузке страницы (если есть выбранные значения)
+    loadAttributes();
+</script>
 
 {% endblock %}

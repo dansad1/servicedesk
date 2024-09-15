@@ -27,7 +27,7 @@ def company_field_meta_create(request):
             if field_meta.field_type == 'reference' and 'reference' in request.POST:
                 field_meta.reference = Reference.objects.get(id=request.POST['reference'])
             field_meta.save()
-            return redirect('company_field_meta_list')
+            return redirect('standard_fields_list')
     else:
         form = CompanyFieldMetaForm()
 
