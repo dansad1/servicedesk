@@ -15,6 +15,7 @@ class AssetTypeForm(forms.ModelForm):
         super(AssetTypeForm, self).__init__(*args, **kwargs)
         # Если родительский тип не выбран, отображаем пустой вариант
         self.fields['parent'].empty_label = "Без родительского типа"
+
 class AttributeForm(forms.ModelForm):
     class Meta:
         model = Attribute
@@ -26,32 +27,42 @@ class AttributeForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(AttributeForm, self).__init__(*args, **kwargs)
-        # Логика для добавления поля значения в зависимости от типа атрибута
         attribute_instance = kwargs.get('instance')
+
+        # Если есть экземпляр атрибута (редактирование)
         if attribute_instance:
             attribute_type = attribute_instance.attribute_type
+        else:
+            # Получаем тип атрибута из POST данных, если он был выбран
+            attribute_type = self.data.get('attribute_type', None)
 
-            # Добавляем соответствующее поле для значения атрибута
-            if attribute_type == Attribute.TEXT:
-                self.fields['value'] = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
-            elif attribute_type == Attribute.NUMBER:
-                self.fields['value'] = forms.FloatField(widget=forms.NumberInput(attrs={'class': 'form-control'}), required=False)
-            elif attribute_type == Attribute.DATE:
-                self.fields['value'] = forms.DateField(widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}), required=False)
-            elif attribute_type == Attribute.BOOLEAN:
-                self.fields['value'] = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}), required=False)
-            elif attribute_type == Attribute.EMAIL:
-                self.fields['value'] = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}), required=False)
-            elif attribute_type == Attribute.URL:
-                self.fields['value'] = forms.URLField(widget=forms.URLInput(attrs={'class': 'form-control'}), required=False)
-            elif attribute_type == Attribute.JSON:
-                self.fields['value'] = forms.JSONField(widget=forms.Textarea(attrs={'class': 'form-control'}), required=False)
+        # Добавляем поле для значения, если тип атрибута определён
+        if attribute_type:
+            self.add_value_field(attribute_type)
+
+    def add_value_field(self, attribute_type):
+        """Динамически добавляет поле для значения атрибута."""
+        field_options = {'class': 'form-control'}
+        if attribute_type == Attribute.TEXT:
+            self.fields['value'] = forms.CharField(widget=forms.TextInput(attrs=field_options), required=False)
+        elif attribute_type == Attribute.NUMBER:
+            self.fields['value'] = forms.FloatField(widget=forms.NumberInput(attrs=field_options), required=False)
+        elif attribute_type == Attribute.DATE:
+            self.fields['value'] = forms.DateField(widget=forms.DateInput(attrs={**field_options, 'type': 'date'}), required=False)
+        elif attribute_type == Attribute.BOOLEAN:
+            self.fields['value'] = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}), required=False)
+        elif attribute_type == Attribute.EMAIL:
+            self.fields['value'] = forms.EmailField(widget=forms.EmailInput(attrs=field_options), required=False)
+        elif attribute_type == Attribute.URL:
+            self.fields['value'] = forms.URLField(widget=forms.URLInput(attrs=field_options), required=False)
+        elif attribute_type == Attribute.JSON:
+            self.fields['value'] = forms.JSONField(widget=forms.Textarea(attrs=field_options), required=False)
 
     def save(self, commit=True):
         instance = super(AttributeForm, self).save(commit=False)
+        value = self.cleaned_data.get('value')
 
-        # Логика сохранения значения атрибута в зависимости от его типа
-        value = self.cleaned_data.get('value', None)
+        # Сохранение значения в зависимости от его типа
         if instance.attribute_type == Attribute.TEXT:
             instance.value_text = value
         elif instance.attribute_type == Attribute.NUMBER:
@@ -81,7 +92,78 @@ class AssetTypeAttributeForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(AssetTypeAttributeForm, self).__init__(*args, **kwargs)
-        # Можно добавить дополнительную логику для динамической обработки атрибутов
+        # Можно добавить дополнительную логику для отображения атрибутов
+class AssetAttributeForm(forms.ModelForm):
+    class Meta:
+        model = AssetAttribute
+        fields = ['attribute']
+        widgets = {
+            'attribute': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(AssetAttributeForm, self).__init__(*args, **kwargs)
+        asset_attribute_instance = kwargs.get('instance')
+
+        # Если экземпляр существует (редактирование), получаем тип атрибута
+        if asset_attribute_instance:
+            attribute_type = asset_attribute_instance.attribute.attribute_type
+        else:
+            # Если POST данные, получаем атрибут из них, чтобы определить его тип
+            attribute_id = self.data.get('attribute')
+            if attribute_id:
+                attribute = Attribute.objects.get(pk=attribute_id)
+                attribute_type = attribute.attribute_type
+            else:
+                attribute_type = None
+
+        # Если тип атрибута известен, добавляем поле для значения
+        if attribute_type:
+            self.add_value_field(attribute_type)
+
+    def add_value_field(self, attribute_type):
+        """Динамически добавляет поле для значения в зависимости от типа атрибута."""
+        field_options = {'class': 'form-control'}
+        if attribute_type == Attribute.TEXT:
+            self.fields['value'] = forms.CharField(widget=forms.TextInput(attrs=field_options), required=False)
+        elif attribute_type == Attribute.NUMBER:
+            self.fields['value'] = forms.FloatField(widget=forms.NumberInput(attrs=field_options), required=False)
+        elif attribute_type == Attribute.DATE:
+            self.fields['value'] = forms.DateField(widget=forms.DateInput(attrs={**field_options, 'type': 'date'}), required=False)
+        elif attribute_type == Attribute.BOOLEAN:
+            self.fields['value'] = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}), required=False)
+        elif attribute_type == Attribute.EMAIL:
+            self.fields['value'] = forms.EmailField(widget=forms.EmailInput(attrs=field_options), required=False)
+        elif attribute_type == Attribute.URL:
+            self.fields['value'] = forms.URLField(widget=forms.URLInput(attrs=field_options), required=False)
+        elif attribute_type == Attribute.JSON:
+            self.fields['value'] = forms.JSONField(widget=forms.Textarea(attrs=field_options), required=False)
+
+    def save(self, commit=True):
+        instance = super(AssetAttributeForm, self).save(commit=False)
+        value = self.cleaned_data.get('value')
+
+        # Сохраняем значение в зависимости от типа атрибута
+        attribute_type = instance.attribute.attribute_type
+
+        if attribute_type == Attribute.TEXT:
+            instance.value_text = value
+        elif attribute_type == Attribute.NUMBER:
+            instance.value_number = value
+        elif attribute_type == Attribute.DATE:
+            instance.value_date = value
+        elif attribute_type == Attribute.BOOLEAN:
+            instance.value_boolean = value
+        elif attribute_type == Attribute.EMAIL:
+            instance.value_email = value
+        elif attribute_type == Attribute.URL:
+            instance.value_url = value
+        elif attribute_type == Attribute.JSON:
+            instance.value_json = value
+
+        if commit:
+            instance.save()
+        return instance
 class AssetForm(forms.ModelForm):
     class Meta:
         model = Asset

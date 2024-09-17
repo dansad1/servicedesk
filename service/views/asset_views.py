@@ -2,7 +2,7 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse
 from service.forms.Asset_Forms import AssetForm
-from service.models import AssetAttribute, Attribute, Asset, AssetTypeAttribute
+from service.models import AssetAttribute, Attribute, Asset, AssetTypeAttribute, AssetType
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
@@ -55,7 +55,9 @@ def get_inherited_attributes(request, asset_type_id):
 
     # Получаем атрибуты, связанные с типом актива
     if asset_type_id:
-        type_attributes = AssetTypeAttribute.objects.filter(asset_type_id=asset_type_id).values('attribute__id', 'attribute__name', 'attribute__attribute_type')
+        type_attributes = AssetTypeAttribute.objects.filter(asset_type_id=asset_type_id).values(
+            'attribute__id', 'attribute__name', 'attribute__attribute_type'
+        )
         attributes.extend(list(type_attributes))
 
     # Если указан родительский актив, добавляем его атрибуты

@@ -1,30 +1,92 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2 class="text-center mb-4">Создание нового типа актива</h2>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Создание типа актива</h2>
 
-<form method="post" class="form-horizontal">
-    {% csrf_token %}
+    <!-- Форма создания типа актива -->
+    <form method="post" id="asset-type-form">
+        {% csrf_token %}
+        <div class="form-group mb-3">
+            {{ form.name.label_tag }}
+            {{ form.name }}
+            {% if form.name.errors %}
+            <div class="text-danger">{{ form.name.errors }}</div>
+            {% endif %}
+        </div>
 
-    <div class="form-group mb-3">
-        {{ form.name.label_tag }}
-        {{ form.name }}
-        {% if form.name.errors %}
-        <div class="text-danger">{{ form.name.errors }}</div>
-        {% endif %}
-    </div>
+        <div class="form-group mb-3">
+            {{ form.parent.label_tag }}
+            {{ form.parent }}
+            {% if form.parent.errors %}
+            <div class="text-danger">{{ form.parent.errors }}</div>
+            {% endif %}
+        </div>
 
-    <div class="form-group mb-3">
-        {{ form.parent.label_tag }}
-        {{ form.parent }}
-        {% if form.parent.errors %}
-        <div class="text-danger">{{ form.parent.errors }}</div>
-        {% endif %}
-    </div>
+        <!-- Ссылка для создания нового атрибута -->
+        <div class="mb-4 text-right">
+            <a href="{% url 'attribute_create_for_type' asset_type_id=0 %}" class="btn btn-primary btn-sm">Добавить атрибут для типа</a>
+        </div>
 
-    <div class="form-group text-center">
-        <button type="submit" class="btn btn-primary">Создать</button>
-    </div>
-</form>
+        <!-- Таблица для отображения собственных и унаследованных атрибутов -->
+        <h3 class="mt-4">Атрибуты типа актива (включая унаследованные)</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Имя атрибута</th>
+                    <th>Тип атрибута</th>
+                    <th>Значение атрибута</th>
+                </tr>
+            </thead>
+            <tbody id="attribute-table-body">
+                <!-- AJAX будет вставлять сюда строки с атрибутами и их значениями -->
+            </tbody>
+        </table>
 
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-success">Создать тип актива</button>
+        </div>
+    </form>
+</div>
+
+<script>
+// Функция для загрузки собственных атрибутов текущего типа актива и унаследованных от родителя
+function loadAttributes() {
+    const assetTypeId = document.getElementById('id_asset_type').value; // Собственные атрибуты текущего типа актива
+    const parentAssetTypeId = document.getElementById('id_parent').value; // Унаследованные атрибуты от родителя
+
+    if (assetTypeId || parentAssetTypeId) {
+        $.ajax({
+            url: "{% url 'get_inherited_attributes' asset_type_id=0 %}".replace('0', assetTypeId || parentAssetTypeId),  // Динамически подставляем asset_type_id
+// Динамически подставляем asset_type_id
+            data: {
+                asset_type_id: assetTypeId,
+                parent_type_id: parentAssetTypeId
+            },
+            success: function(response) {
+                const attributeTableBody = document.getElementById('attribute-table-body');
+                attributeTableBody.innerHTML = '';  // Очищаем таблицу перед вставкой новых данных
+
+                // Проходим по каждому атрибуту и добавляем строки в таблицу
+                response.forEach(function(attribute) {
+                    const row = `
+                        <tr>
+                            <td>${attribute.attribute__name}</td>
+                            <td>${attribute.attribute__attribute_type}</td>
+                            <td>${attribute.value || '—'}</td>  <!-- Отображаем значение атрибута -->
+                        </tr>
+                    `;
+                    attributeTableBody.innerHTML += row;
+                });
+            }
+        });
+    } else {
+        document.getElementById('attribute-table-body').innerHTML = '';  // Очищаем таблицу, если родительский тип не выбран
+    }
+}
+
+// Запускаем подгрузку атрибутов при изменении родительского типа или текущего типа
+document.getElementById('id_parent').addEventListener('change', loadAttributes);
+document.getElementById('id_asset_type').addEventListener('change', loadAttributes);
+</script>
 {% endblock %}

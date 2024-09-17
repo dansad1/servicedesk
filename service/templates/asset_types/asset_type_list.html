@@ -11,6 +11,7 @@
                 <tr>
                     <th class="text-center"><input type="checkbox" id="select-all"></th>
                     <th class="text-center">Имя</th>
+                    <th class="text-center">Родительский тип</th>
                     <th class="text-center">Действия</th>
                 </tr>
             </thead>
@@ -24,12 +25,19 @@
                         <a href="{% url 'asset_type_edit' asset_type_id=asset_type.pk %}">{{ asset_type.name }}</a>
                     </td>
                     <td class="text-center">
-                        <button onclick="window.location.href='{% url 'attribute_create' asset_type_id=asset_type.pk %}'" type="button" class="btn btn-secondary btn-sm">Создать атрибут</button>
+                        {% if asset_type.parent %}
+                            {{ asset_type.parent.name }}
+                        {% else %}
+                            <span class="text-muted">Нет родителя</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-center">
+                        <a href="{% url 'asset_type_edit' asset_type_id=asset_type.pk %}" class="btn btn-primary btn-sm">Редактировать</a>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="3" class="text-center">Типы активов не найдены.</td>
+                    <td colspan="4" class="text-center">Типы активов не найдены.</td>
                 </tr>
                 {% endfor %}
             </tbody>

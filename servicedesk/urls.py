@@ -7,8 +7,9 @@ import service.models
 from service.views.chat_views import chat_view
 from service.views.asset_type_views import *
 from service.views.asset_views import asset_create, asset_list, get_inherited_attributes, asset_edit, asset_delete
-from service.views.attribute_views import attribute_create, attribute_edit, attribute_delete_from_asset, \
-    attribute_delete_from_type
+from service.views.attribute_views import   attribute_delete_from_asset, \
+    attribute_delete_from_type, attribute_create_for_type, attribute_edit_for_type, attribute_list_for_asset, \
+    attribute_create_for_asset, attribute_edit_for_asset, attribute_list_for_type
 from service.views.file_views import file_view
 from service.views.reference_views import reference_list, reference_create, reference_edit, reference_item_create, reference_item_edit, reference_item_delete, reference_delete
 from service.views.request_field_views import request_field_edit, request_field_create, get_default_value_widget,request_field_delete
@@ -115,13 +116,27 @@ urlpatterns = [
     path('asset_types/delete/', asset_type_delete, name='asset_type_delete'),
     path('asset_types/', asset_type_list, name='asset_type_list'),
 
-    # Маршруты для атрибутов
-    path('attributes/edit/<int:pk>/', attribute_edit, name='attribute_edit'),
-    path('asset_types/<int:asset_type_id>/attributes/create/', service.views.attribute_views.attribute_create, name='attribute_create'),
-    path('assets/types/<int:asset_type_id>/attributes/', get_inherited_attributes, name='get_inherited_attributes'),
-    path('attribute/delete/<int:pk>/from_type/<int:asset_type_id>/', attribute_delete_from_type,name='attribute_delete_from_type'),
-    path('attribute/delete/<int:pk>/from_asset/<int:asset_id>/', attribute_delete_from_asset, name='attribute_delete_from_asset'),
-# URL-паттерны для отделов
+    # Атрибуты для типов активов
+    path('asset_types/<int:asset_type_id>/attributes/create/', attribute_create_for_type,
+         name='attribute_create_for_type'),
+    path('attribute/edit/<int:attribute_id>/type/<int:asset_type_id>/',
+         attribute_edit_for_type, name='attribute_edit_for_type'),
+    path('attribute/delete/<int:attribute_id>/type/<int:asset_type_id>/', attribute_delete_from_type,
+         name='attribute_delete_from_type'),
+    path('asset_types/<int:asset_type_id>/attributes/', attribute_list_for_type, name='attribute_list_for_type'),
+    path('assets/types/<int:asset_type_id>/attributes/', get_inherited_attributes,
+         name='get_inherited_attributes'),
+
+
+    # Атрибуты для активов
+    path('assets/<int:asset_id>/attributes/create/', attribute_create_for_asset, name='attribute_create_for_asset'),
+    path('assets/<int:asset_id>/attributes/edit/<int:pk>/', attribute_edit_for_asset, name='attribute_edit_for_asset'),
+    path('assets/<int:asset_id>/attributes/delete/<int:pk>/', attribute_delete_from_asset, name='attribute_delete_from_asset'),
+    path('assets/<int:asset_id>/attributes/', attribute_list_for_asset, name='attribute_list_for_asset'),
+    path('assets/<int:asset_id>/inherited_attributes/', get_inherited_attributes,
+         name='get_inherited_attributes_by_asset'),
+
+    # URL-паттерны для отделов
     path('department/<int:company_pk>/create_department/', department_create, name='department_create'),
     path('department/<int:department_id>/subdepartment_create/', subdepartment_create, name='subdepartment_create'),
     path('department/<int:pk>/edit/', department_edit, name='department_edit'),

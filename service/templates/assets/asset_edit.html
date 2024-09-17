@@ -25,7 +25,7 @@
         function loadAttributes() {
             var assetId = "{{ asset.id }}";
             $.ajax({
-                url: `{% url 'get_attributes_by_asset' asset.id %}`,
+                url: `{% url 'get_inherited_attributes' asset.id %}`,
                 success: function(data) {
                     data.forEach(function(attr) {
                         var fieldHtml = '<div class="form-group"><label>' + attr.attribute_name + ':</label>';
