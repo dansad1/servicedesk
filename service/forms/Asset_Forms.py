@@ -2,6 +2,9 @@ from django import forms
 from service.models import Attribute, Asset, AssetType,AssetAttribute,AssetTypeAttribute
 
 
+from django import forms
+from service.models import AssetType, Attribute
+
 class AssetTypeForm(forms.ModelForm):
     class Meta:
         model = AssetType
@@ -9,12 +12,24 @@ class AssetTypeForm(forms.ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'parent': forms.Select(attrs={'class': 'form-control'}),
-            'components': forms.SelectMultiple(attrs={'class': 'form-control'}),  # Множественный выбор для компонентов
+            'components': forms.SelectMultiple(attrs={'class': 'form-control'}),  # Поле для выбора компонентов
         }
 
     def __init__(self, *args, **kwargs):
         super(AssetTypeForm, self).__init__(*args, **kwargs)
+        # Установка пустого значения для родительского типа
         self.fields['parent'].empty_label = "Без родительского типа"
+
+    def save(self, commit=True):
+        """
+        Переопределяем метод сохранения, чтобы работать с компонентами
+        """
+        instance = super(AssetTypeForm, self).save(commit=False)
+        # Логика копирования атрибутов и работы с компонентами будет вынесена в сервисные функции.
+        if commit:
+            instance.save()
+            self.save_m2m()  # Сохраняем ManyToMany связи для компонентов
+        return instance
 
 class AttributeForm(forms.ModelForm):
     class Meta:

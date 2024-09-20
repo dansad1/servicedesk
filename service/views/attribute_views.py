@@ -8,51 +8,100 @@ from service.forms.Asset_Forms import AttributeForm
 from service.models import AssetType, AssetTypeAttribute, AssetAttribute, Asset, Attribute
 
 
-def attribute_create_for_type(request, asset_type_id):
+def attribute_create_for_type(request, asset_type_id, component_type_id=None):
+    """
+    Функция для создания атрибута для типа актива или его компонента.
+    """
+    # Получаем основной тип актива
     asset_type = get_object_or_404(AssetType, pk=asset_type_id)
+    component_type = None
+
+    # Если компонент указан, получаем его
+    if component_type_id:
+        component_type = get_object_or_404(AssetType, pk=component_type_id)
 
     if request.method == 'POST':
         form = AttributeForm(request.POST)
         if form.is_valid():
             attribute = form.save()
-            AssetTypeAttribute.objects.create(asset_type=asset_type, attribute=attribute)
-            return redirect('asset_type_edit', asset_type_id=asset_type_id)
+
+            if component_type:
+                # Привязываем атрибут к компоненту
+                AssetTypeAttribute.objects.create(asset_type=component_type, attribute=attribute)
+                messages.success(request, 'Атрибут успешно создан для компонента.')
+                # Возвращаемся к редактированию всего актива
+                return redirect('asset_type_edit', asset_type_id=asset_type_id)
+            else:
+                # Привязываем атрибут к основному типу
+                AssetTypeAttribute.objects.create(asset_type=asset_type, attribute=attribute)
+                messages.success(request, 'Атрибут успешно создан для типа актива.')
+                return redirect('asset_type_edit', asset_type_id=asset_type_id)
     else:
         form = AttributeForm()
 
     return render(request, 'attributes/attribute_create_for_type.html', {
         'form': form,
-        'asset_type': asset_type
+        'asset_type': asset_type,
+        'component_type': component_type
     })
 
-
-def attribute_edit_for_type(request, asset_type_id, attribute_id):
+def attribute_edit_for_type(request, asset_type_id, attribute_id, component_type_id=None):
+    """
+    Функция для редактирования атрибута, привязанного к типу актива или его компоненту.
+    """
+    # Получаем основной тип актива
     asset_type = get_object_or_404(AssetType, pk=asset_type_id)
+    component_type = None
+
+    # Если компонент указан, получаем его
+    if component_type_id:
+        component_type = get_object_or_404(AssetType, pk=component_type_id)
+
     attribute = get_object_or_404(Attribute, pk=attribute_id)
 
     if request.method == 'POST':
         form = AttributeForm(request.POST, instance=attribute)
         if form.is_valid():
             form.save()
-            return redirect('asset_type_edit', asset_type_id=asset_type_id)
+
+            if component_type:
+                messages.success(request, 'Атрибут успешно обновлен для компонента.')
+                # Возвращаемся к редактированию всего актива
+                return redirect('asset_type_edit', asset_type_id=asset_type_id)
+            else:
+                messages.success(request, 'Атрибут успешно обновлен для типа актива.')
+                return redirect('asset_type_edit', asset_type_id=asset_type_id)
     else:
         form = AttributeForm(instance=attribute)
 
     return render(request, 'attributes/attribute_edit_for_type.html', {
         'form': form,
         'asset_type': asset_type,
+        'component_type': component_type,
         'attribute': attribute
     })
+
 @require_POST
-def attribute_delete_from_type(request, attribute_id, asset_type_id):
-    # Удаляем атрибут, связанный с типом актива
-    AssetTypeAttribute.objects.filter(asset_type_id=asset_type_id, attribute_id=attribute_id).delete()
+def attribute_delete_from_type(request, asset_type_id, attribute_id, component_type_id=None):
+    """
+    Функция для удаления атрибута, связанного с типом актива или его компонентом.
+    """
+    asset_type = get_object_or_404(AssetType, pk=asset_type_id)
 
-    # Добавляем сообщение об успешном удалении
-    messages.success(request, 'Атрибут успешно удален.')
+    # Если компонент указан, удаляем атрибут компонента
+    if component_type_id:
+        component_type = get_object_or_404(AssetType, pk=component_type_id)
+        AssetTypeAttribute.objects.filter(asset_type_id=component_type.id, attribute_id=attribute_id).delete()
+        messages.success(request, 'Атрибут компонента успешно удален.')
+    else:
+        # Удаляем атрибут основного типа актива
+        AssetTypeAttribute.objects.filter(asset_type_id=asset_type.id, attribute_id=attribute_id).delete()
+        messages.success(request, 'Атрибут типа актива успешно удален.')
 
-    # Редирект на страницу редактирования типа актива
+    # Возврат на редактирование основного типа актива
     return redirect('asset_type_edit', asset_type_id=asset_type_id)
+
+
 def attribute_list_for_type(request, asset_type_id):
     asset_type = get_object_or_404(AssetType, pk=asset_type_id)
     attributes = AssetTypeAttribute.objects.filter(asset_type=asset_type)

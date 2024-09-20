@@ -696,7 +696,6 @@ class AssetTypeAttribute(models.Model):
     def __str__(self):
         return f"{self.asset_type.name} - {self.attribute.name}"
 
-
 class AssetAttribute(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name='asset_attributes')
     attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE)
@@ -733,6 +732,7 @@ class AssetAttribute(models.Model):
             Attribute.ATTRIBUTE_REFERENCE: self.value_attribute_reference.get_value() if self.value_attribute_reference else None,
         }
         return type_map.get(self.attribute.attribute_type)
+
 class ChatMessage(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     message = models.TextField()
