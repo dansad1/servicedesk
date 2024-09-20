@@ -5,15 +5,15 @@ from service.models import Attribute, Asset, AssetType,AssetAttribute,AssetTypeA
 class AssetTypeForm(forms.ModelForm):
     class Meta:
         model = AssetType
-        fields = ['name', 'parent']  # Основные поля формы
+        fields = ['name', 'parent', 'components']  # Основные поля формы
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'parent': forms.Select(attrs={'class': 'form-control'}),
+            'components': forms.SelectMultiple(attrs={'class': 'form-control'}),  # Множественный выбор для компонентов
         }
 
     def __init__(self, *args, **kwargs):
         super(AssetTypeForm, self).__init__(*args, **kwargs)
-        # Если родительский тип не выбран, отображаем пустой вариант
         self.fields['parent'].empty_label = "Без родительского типа"
 
 class AttributeForm(forms.ModelForm):
@@ -177,22 +177,55 @@ class AssetForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(AssetForm, self).__init__(*args, **kwargs)
 
-        # Добавление пустого значения для родительского актива
+        # Добавляем пустое значение для родительского актива
         self.fields['parent_asset'].empty_label = "Без родительского актива"
 
-        # Если есть инстанс актива, выполняем наследование атрибутов
+        # Если есть инстанс актива, наследуем атрибуты
         if self.instance.pk:
             self.inherit_attributes()
+        elif 'parent_asset' in self.data or 'asset_type' in self.data:
+            # Если создаем новый актив, пытаемся наследовать атрибуты при выборе родителя или типа актива
+            self.inherit_attributes_for_creation()
+
+    def inherit_attributes_for_creation(self):
+        """Наследование атрибутов при создании актива от типа или родительского актива."""
+        asset_attributes = {}
+
+        # Наследуем атрибуты от родительского актива
+        parent_asset_id = self.data.get('parent_asset')
+        if parent_asset_id:
+            parent_asset = Asset.objects.get(id=parent_asset_id)
+            parent_attributes = parent_asset.asset_attributes.all()
+            for attr in parent_attributes:
+                asset_attributes[attr.attribute.pk] = attr
+
+        # Наследуем атрибуты от типа актива
+        asset_type_id = self.data.get('asset_type')
+        if asset_type_id:
+            asset_type_attributes = AssetTypeAttribute.objects.filter(asset_type_id=asset_type_id)
+            for type_attr in asset_type_attributes:
+                if type_attr.attribute.pk not in asset_attributes:
+                    asset_attributes[type_attr.attribute.pk] = AssetAttribute(
+                        asset=None, attribute=type_attr.attribute, value_text=None
+                    )
+
+        # Создаем поля для каждого атрибута
+        for attribute_pk, asset_attr in asset_attributes.items():
+            field_name = f'attribute_{attribute_pk}_value'
+            field_value = asset_attr.get_value()
+            field_class, widget_class = self.get_field_class_and_widget(asset_attr.attribute.attribute_type)
+            self.fields[field_name] = field_class(
+                initial=field_value,
+                label=asset_attr.attribute.name,
+                widget=widget_class(attrs={'class': 'form-control'}),
+                required=False
+            )
 
     def inherit_attributes(self):
-        """
-        Функция наследует атрибуты от родительского актива и типа актива.
-        Приоритет: атрибуты текущего актива > атрибуты родительского актива > атрибуты типа актива.
-        """
-        # Сначала получаем текущие атрибуты актива
+        """Наследуем атрибуты для уже существующего актива."""
         asset_attributes = {attr.attribute.pk: attr for attr in self.instance.asset_attributes.all()}
 
-        # Наследуем атрибуты от родителя
+        # Наследуем атрибуты от родительского актива
         if self.instance.parent_asset:
             parent_attributes = self.instance.parent_asset.asset_attributes.all()
             for attr in parent_attributes:
@@ -208,7 +241,7 @@ class AssetForm(forms.ModelForm):
                         asset=self.instance, attribute=type_attr.attribute, value_text=None
                     )
 
-        # Для каждого атрибута создаём динамическое поле формы
+        # Создаем динамические поля для каждого атрибута
         for attribute_pk, asset_attr in asset_attributes.items():
             field_name = f'attribute_{attribute_pk}_value'
             field_value = asset_attr.get_value()
@@ -221,9 +254,7 @@ class AssetForm(forms.ModelForm):
             )
 
     def get_field_class_and_widget(self, attribute_type):
-        """
-        Возвращает класс поля и виджет в зависимости от типа атрибута.
-        """
+        """Возвращает класс поля и виджет в зависимости от типа атрибута."""
         type_map = {
             Attribute.TEXT: (forms.CharField, forms.TextInput),
             Attribute.NUMBER: (forms.FloatField, forms.NumberInput),

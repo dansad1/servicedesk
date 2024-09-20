@@ -12,12 +12,13 @@ def asset_create(request):
     if request.method == 'POST':
         form = AssetForm(request.POST)
         if form.is_valid():
-            form.save()  # Форма обрабатывает как актив, так и атрибуты
+            form.save()  # Форма обработает как сам актив, так и его атрибуты
             return redirect('asset_list')
     else:
         form = AssetForm()
 
     return render(request, 'assets/asset_create.html', {'form': form})
+
 # Функция редактирования актива
 def asset_edit(request, pk):
     asset = get_object_or_404(Asset, pk=pk)
@@ -25,32 +26,31 @@ def asset_edit(request, pk):
     if request.method == 'POST':
         form = AssetForm(request.POST, instance=asset)
         if form.is_valid():
-            form.save()  # Форма обрабатывает как актив, так и атрибуты
+            form.save()  # Форма обработает как сам актив, так и его атрибуты
             return redirect('asset_list')
     else:
         form = AssetForm(instance=asset)
 
     return render(request, 'assets/asset_edit.html', {'form': form, 'asset': asset})
+
 # Функция удаления актива
-@login_required
-def asset_delete(request):
-    if request.method == 'POST':
-        asset_ids = request.POST.getlist('selected_assets')
-        if asset_ids:
-            Asset.objects.filter(id__in=asset_ids).delete()
-            messages.success(request, 'Выбранные активы были удалены.')
-        else:
-            messages.warning(request, 'Пожалуйста, выберите хотя бы один актив для удаления.')
-    return redirect('asset_list')
-# Функция вывода списка активов
+def asset_delete(request, pk):
+    asset = get_object_or_404(Asset, pk=pk)
+
+    if request.method == "POST":
+        asset.delete()
+        return redirect('asset_list')  # Или куда нужно перенаправить после удаления
+
+    # Для GET-запросов можно добавить страницу подтверждения
+# Функция отображения списка активов
 def asset_list(request):
     assets = Asset.objects.select_related('asset_type', 'parent_asset').prefetch_related('asset_attributes__attribute').all()
     return render(request, 'assets/asset_list.html', {'assets': assets})
 
+# Функция для получения унаследованных атрибутов
 def get_inherited_attributes(request, asset_type_id):
     parent_asset_id = request.GET.get('parent_asset_id')
 
-    # Список для хранения атрибутов
     attributes = []
 
     # Получаем атрибуты, связанные с типом актива

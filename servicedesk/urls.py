@@ -119,10 +119,9 @@ urlpatterns = [
     # Атрибуты для типов активов
     path('asset_types/<int:asset_type_id>/attributes/create/', attribute_create_for_type,
          name='attribute_create_for_type'),
-    path('attribute/edit/<int:attribute_id>/type/<int:asset_type_id>/',
-         attribute_edit_for_type, name='attribute_edit_for_type'),
-    path('attribute/delete/<int:attribute_id>/type/<int:asset_type_id>/', attribute_delete_from_type,
-         name='attribute_delete_from_type'),
+    path('assets/<int:asset_id>/attributes/edit/<int:attribute_id>/', attribute_edit_for_asset, name='attribute_edit_for_asset'),
+
+    path('assets/<int:asset_id>/attributes/delete/<int:attribute_id>/', attribute_delete_from_asset, name='attribute_delete_from_asset'),
     path('asset_types/<int:asset_type_id>/attributes/', attribute_list_for_type, name='attribute_list_for_type'),
     path('assets/types/<int:asset_type_id>/attributes/', get_inherited_attributes,
          name='get_inherited_attributes'),

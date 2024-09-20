@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-center mb-4">Добавить атрибут для актива: {{ asset.name }}</h2>
+
+    <!-- Форма создания атрибута для актива -->
+    <form method="post" class="form-horizontal p-3" style="background-color: #f8f9fa; border-radius: 10px;">
+        {% csrf_token %}
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form.name.label_tag }}
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                    <div class="text-danger">{{ form.name.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form.attribute_type.label_tag }}
+                    {{ form.attribute_type }}
+                    {% if form.attribute_type.errors %}
+                    <div class="text-danger">{{ form.attribute_type.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Поле для ввода значения атрибута (в зависимости от типа) -->
+        <div class="form-group mb-3">
+            {{ form.value.label_tag }}
+            {{ form.value }}
+            {% if form.value.errors %}
+            <div class="text-danger">{{ form.value.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary">Добавить атрибут</button>
+        </div>
+    </form>
+
+    <!-- Кнопки возврата -->
+    <div class="text-center mt-4">
+        <a href="{% url 'asset_edit' asset.id %}" class="btn btn-secondary">Вернуться к редактированию актива</a>
+    </div>
+</div>
+
+{% endblock %}

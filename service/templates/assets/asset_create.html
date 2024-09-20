@@ -10,7 +10,7 @@
 
         <!-- Поле имени актива -->
         <div class="form-group mb-3">
-            {{ form.name.label_tag }}
+            <label for="id_name">Название актива</label>
             {{ form.name }}
             {% if form.name.errors %}
             <div class="text-danger">{{ form.name.errors }}</div>
@@ -19,7 +19,7 @@
 
         <!-- Поле типа актива -->
         <div class="form-group mb-3">
-            {{ form.asset_type.label_tag }}
+            <label for="id_asset_type">Тип актива</label>
             {{ form.asset_type }}
             {% if form.asset_type.errors %}
             <div class="text-danger">{{ form.asset_type.errors }}</div>
@@ -28,7 +28,7 @@
 
         <!-- Поле родительского актива -->
         <div class="form-group mb-3">
-            {{ form.parent_asset.label_tag }}
+            <label for="id_parent_asset">Родительский актив</label>
             {{ form.parent_asset }}
             {% if form.parent_asset.errors %}
             <div class="text-danger">{{ form.parent_asset.errors }}</div>
@@ -54,7 +54,7 @@
         if (assetTypeId || parentAssetId) {
             // Отправляем AJAX-запрос для получения атрибутов
             $.ajax({
-            const url = `/assets/types/${assetTypeId}/attributes/`;  // Динамически создаем URL
+                url: `/assets/types/${assetTypeId}/attributes/`,  // Динамически создаем URL
                 data: {
                     'parent_asset_id': parentAssetId,  // Передаем родительский актив как параметр
                 },

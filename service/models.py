@@ -642,10 +642,15 @@ class PerformerGroup(models.Model):
 
 class AssetType(models.Model):
     name = models.CharField(max_length=255)
-    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
+    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='children')  # Родительский тип
+    components = models.ManyToManyField('self', symmetrical=False, related_name='included_in', blank=True)  # Вложенные типы
 
     def __str__(self):
         return self.name
+
+    def get_all_components(self):
+        """ Возвращает все компоненты (вложенные типы) для данного типа """
+        return self.components.all()
 
 class Attribute(models.Model):
     TEXT = 'text'

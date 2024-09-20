@@ -75,9 +75,9 @@ def attribute_create_for_asset(request, asset_id):
         form = AttributeForm()
 
     return render(request, 'attributes/attribute_create_for_type.html', {'form': form, 'asset': asset})
-def attribute_edit_for_asset(request, pk, asset_id):
-    attribute = get_object_or_404(Attribute, pk=pk)
+def attribute_edit_for_asset(request, asset_id, attribute_id):
     asset = get_object_or_404(Asset, pk=asset_id)
+    attribute = get_object_or_404(Attribute, pk=attribute_id)
 
     if request.method == 'POST':
         form = AttributeForm(request.POST, instance=attribute)
@@ -87,11 +87,22 @@ def attribute_edit_for_asset(request, pk, asset_id):
     else:
         form = AttributeForm(instance=attribute)
 
-    return render(request, 'attributes/attribute_edit_for_asset.html', {'form': form, 'asset': asset, 'attribute': attribute})
+    return render(request, 'attributes/attribute_edit_for_asset.html', {
+        'form': form,
+        'asset': asset,
+        'attribute': attribute
+    })
+
+
 @require_POST
-def attribute_delete_from_asset(request, pk, asset_id):
-    AssetAttribute.objects.filter(asset_id=asset_id, attribute_id=pk).delete()
-    return JsonResponse({'status': 'success'})
+def attribute_delete_from_asset(request, asset_id, attribute_id):
+    # Удаляем связь между активом и атрибутом
+    AssetAttribute.objects.filter(asset_id=asset_id, attribute_id=attribute_id).delete()
+
+    messages.success(request, 'Атрибут был успешно удалён.')
+    return redirect('asset_edit', pk=asset_id)
+
+
 def attribute_list_for_asset(request, asset_id):
     asset = get_object_or_404(Asset, pk=asset_id)
     attributes = AssetAttribute.objects.filter(asset=asset)
