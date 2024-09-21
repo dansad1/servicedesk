@@ -123,8 +123,10 @@ urlpatterns = [
 
     path('assets/<int:asset_id>/attributes/delete/<int:attribute_id>/', attribute_delete_from_asset, name='attribute_delete_from_asset'),
     path('asset_types/<int:asset_type_id>/attributes/', attribute_list_for_type, name='attribute_list_for_type'),
-    path('assets/types/<int:asset_type_id>/attributes/', get_inherited_attributes,
-         name='get_inherited_attributes'),
+path('asset_types/<int:asset_type_id>/attributes_components/', get_inherited_attributes_and_components, name='get_inherited_attributes_and_components'),
+    path('asset_types/<int:asset_type_id>/components/add/', asset_type_add_component, name='add_component'),
+    path('asset_types/<int:asset_type_id>/components/remove/<int:component_id>/', asset_type_remove_component,
+         name='remove_component'),
 
 
     # Атрибуты для активов
@@ -134,6 +136,9 @@ urlpatterns = [
     path('assets/<int:asset_id>/attributes/', attribute_list_for_asset, name='attribute_list_for_asset'),
     path('assets/<int:asset_id>/inherited_attributes/', get_inherited_attributes,
          name='get_inherited_attributes_by_asset'),
+ path('asset_types/<int:asset_type_id>/components/create/', attribute_create_for_type, name='component_create_for_type'),  # Создание компонента для типа актива
+    path('asset_types/<int:asset_type_id>/components/delete/<int:component_id>/', attribute_delete_from_type, name='component_delete_from_type'),  # Удаление компонента из типа актива
+
 
     # URL-паттерны для отделов
     path('department/<int:company_pk>/create_department/', department_create, name='department_create'),

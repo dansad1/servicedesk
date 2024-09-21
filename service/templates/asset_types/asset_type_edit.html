@@ -5,7 +5,7 @@
     <h2 class="text-center mb-4">Редактирование типа актива: {{ asset_type.name }}</h2>
 
     <!-- Форма редактирования типа актива -->
-    <form method="post" id="asset-type-edit-form">
+    <form method="post" id="asset-type-form">
         {% csrf_token %}
         <div class="form-group mb-3">
             {{ form.name.label_tag }}
@@ -23,98 +23,148 @@
             {% endif %}
         </div>
 
-        <!-- Ссылка на создание атрибутов для текущего типа актива -->
+        <!-- Ссылки для создания атрибутов и добавления компонентов -->
         <div class="mb-4 text-right">
-            <a href="{% url 'attribute_create_for_type' asset_type_id=asset_type.pk %}" class="btn btn-primary btn-sm">Добавить атрибут</a>
+            <a href="{% url 'attribute_create_for_type' asset_type_id=asset_type.id %}" class="btn btn-primary btn-sm">Добавить атрибут для типа</a>
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#addComponentModal">Добавить компонент</button>
         </div>
 
-        <!-- Таблица для отображения атрибутов текущего типа и унаследованных -->
-        <h3 class="mt-4">Атрибуты типа актива</h3>
+        <!-- Таблица для отображения собственных и унаследованных атрибутов -->
+        <h3 class="mt-4">Атрибуты типа актива (включая унаследованные)</h3>
         <table class="table table-striped">
             <thead>
                 <tr>
                     <th>Имя атрибута</th>
                     <th>Тип атрибута</th>
                     <th>Значение атрибута</th>
-                    <th>Действия</th> <!-- Добавляем колонку для действий (редактирование/удаление) -->
+                    <th>Источник</th>
                 </tr>
             </thead>
             <tbody id="attribute-table-body">
-                <!-- Выводим статически атрибуты текущего типа актива -->
-                {% for attribute in type_attributes %}
-                    <tr>
-                        <td>{{ attribute.attribute.name }}</td>
-                        <td>{{ attribute.attribute.attribute_type }}</td>
-                        <td>—</td> <!-- Или выводите значение, если оно есть -->
-                        <td>
-                            <!-- Ссылка на редактирование атрибута -->
-                            <a href="{% url 'attribute_edit_for_type' attribute_id=attribute.attribute.pk asset_type_id=asset_type.pk %}" class="btn btn-sm btn-warning">Редактировать</a>
-                            <!-- Ссылка на удаление атрибута -->
-                            <form method="post" action="{% url 'attribute_delete_from_type' attribute_id=attribute.attribute.pk asset_type_id=asset_type.pk %}" style="display:inline;">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-danger">Удалить</button>
-                            </form>
-                        </td>
-                    </tr>
-                {% endfor %}
-
-                <!-- Динамически подгруженные унаследованные атрибуты появятся здесь -->
+                <!-- AJAX будет вставлять сюда строки с атрибутами и их значениями -->
             </tbody>
         </table>
 
+        <!-- Компоненты (собственные и унаследованные) -->
+        <h3 class="mt-4">Компоненты (включая унаследованные)</h3>
+        <div class="accordion" id="componentsAccordion">
+            <!-- Компоненты будут добавлены через AJAX -->
+        </div>
+
         <div class="text-center mt-4">
-            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+            <button type="submit" class="btn btn-success">Сохранить изменения</button>
         </div>
     </form>
 </div>
 
+<!-- Модальное окно для добавления компонента -->
+<div class="modal fade" id="addComponentModal" tabindex="-1" aria-labelledby="addComponentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addComponentModalLabel">Добавить компонент</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'add_component' asset_type_id=asset_type.id %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="componentSelect">Выберите компонент:</label>
+                        <select name="component" id="componentSelect" class="form-control">
+                            {% for available_component in available_components %}
+                            <option value="{{ available_component.id }}">{{ available_component.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Добавить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-// Функция для загрузки унаследованных атрибутов
-function loadInheritedAttributes() {
-    const assetTypeId = "{{ asset_type.pk }}";
-    const parentAssetTypeId = document.getElementById('id_parent').value;
+    // Функция для загрузки атрибутов и компонентов (включая унаследованные)
+    function loadAttributesAndComponents() {
+        const assetTypeId = "{{ asset_type.id }}"; // Текущий тип актива
+        const parentAssetTypeId = document.getElementById('id_parent').value; // Родительский тип актива
 
-    if (parentAssetTypeId) {
-        $.ajax({
-            url: "{% url 'get_inherited_attributes' asset_type_id=0 %}".replace('0', assetTypeId),
-            data: {
-                parent_asset_id: parentAssetTypeId
-            },
-            success: function(response) {
-                const attributeTableBody = document.getElementById('attribute-table-body');
+        if (assetTypeId) {
+            // AJAX запрос для получения атрибутов и компонентов (как собственных, так и унаследованных)
+            $.ajax({
+                type: "GET",
+                url: "{% url 'get_inherited_attributes_and_components' asset_type_id=asset_type.id %}", // URL, который будет отдавать атрибуты и компоненты
+                data: {
+                    parent_type_id: parentAssetTypeId
+                },
+                success: function(response) {
+                    // Очищаем таблицы перед добавлением новых данных
+                    const attributeTableBody = document.getElementById('attribute-table-body');
+                    const componentsAccordion = document.getElementById('componentsAccordion');
+                    attributeTableBody.innerHTML = '';
+                    componentsAccordion.innerHTML = '';
 
-                // Очищаем ранее загруженные унаследованные атрибуты
-                const currentRows = attributeTableBody.querySelectorAll('.inherited-attribute');
-                currentRows.forEach(row => row.remove());
+                    // Заполняем таблицу атрибутов (как собственных, так и унаследованных)
+                    response.attributes.forEach(function(attribute) {
+                        const row = `
+                            <tr>
+                                <td>${attribute.attribute__name}</td>
+                                <td>${attribute.attribute__attribute_type}</td>
+                                <td>${attribute.value || '—'}</td>
+                                <td>${attribute.is_inherited ? 'Унаследован' : 'Собственный'}</td>
+                            </tr>
+                        `;
+                        attributeTableBody.innerHTML += row;
+                    });
 
-                // Добавляем новые строки с унаследованными атрибутами
-                response.forEach(function(attribute) {
-                    const row = `
-                        <tr class="inherited-attribute">
-                            <td>${attribute.attribute__name}</td>
-                            <td>${attribute.attribute__attribute_type}</td>
-                            <td>${attribute.value || '—'}</td>
-                            <td>
-                                <!-- Здесь унаследованные атрибуты нельзя редактировать -->
-                                <span class="text-muted">Унаследован</span>
-                            </td>
-                        </tr>
-                    `;
-                    attributeTableBody.innerHTML += row;
-                });
-            }
-        });
+                    // Заполняем аккордеон компонентами
+                    response.components.forEach(function(component) {
+                        let componentAccordion = `
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading${component.id}">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${component.id}" aria-expanded="false" aria-controls="collapse${component.id}">
+                                        Компонент: ${component.name} ${component.is_inherited ? '(унаследован)' : ''}
+                                    </button>
+                                </h2>
+                                <div id="collapse${component.id}" class="accordion-collapse collapse" aria-labelledby="heading${component.id}" data-bs-parent="#componentsAccordion">
+                                    <div class="accordion-body">
+                                        <h5>Атрибуты компонента</h5>
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Имя атрибута</th>
+                                                    <th>Тип атрибута</th>
+                                                    <th>Значение</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${component.attributes.map(attr => `
+                                                    <tr>
+                                                        <td>${attr.attribute__name}</td>
+                                                        <td>${attr.attribute__attribute_type}</td>
+                                                        <td>${attr.value || '—'}</td>
+                                                    </tr>
+                                                `).join('')}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        componentsAccordion.innerHTML += componentAccordion;
+                    });
+                },
+                error: function(response) {
+                    alert('Ошибка при загрузке компонентов и атрибутов.');
+                }
+            });
+        }
     }
-}
 
-// Запускаем подгрузку унаследованных атрибутов при изменении родительского типа
-document.getElementById('id_parent').addEventListener('change', loadInheritedAttributes);
-
-// Подгружаем унаследованные атрибуты при загрузке страницы, если родитель уже выбран
-window.onload = function() {
-    if (document.getElementById('id_parent').value) {
-        loadInheritedAttributes();
-    }
-};
+    // Подгрузка компонентов и атрибутов при изменении родителя
+    document.getElementById('id_parent').addEventListener('change', loadAttributesAndComponents);
+    loadAttributesAndComponents(); // Запуск при загрузке страницы
 </script>
 {% endblock %}
