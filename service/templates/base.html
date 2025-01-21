@@ -328,37 +328,15 @@ button:hover {
          {% if request.user.is_authenticated %}
     <nav>
         <ul>
-            {% if 'interface_can_view_requests' in user_permissions %}
+
                 <li><a href="{% url 'request_list' %}">Список заявок</a></li>
-            {% endif %}
-
-            {% if 'interface_can_view_profile' in user_permissions %}
                 <li><a href="{% url 'profile' %}">Профиль</a></li>
-            {% endif %}
-
-            {% if 'interface_can_view_settings' in user_permissions %}
                 <li><a href="{% url 'settings_sidebar' %}">Настройки</a></li>
-            {% endif %}
-
-            {% if 'interface_can_view_roles' in user_permissions %}
                 <li><a href="{% url 'role_list' %}">Управление ролями</a></li>
-            {% endif %}
-
-            {% if 'interface_can_view_assets' in user_permissions %}
                 <li><a href="{% url 'asset_list' %}">Список активов</a></li>
-            {% endif %}
-
-            {% if 'interface_can_view_chat' in user_permissions %}
                 <li><a href="{% url 'chat_view' %}">Чат</a></li>
-            {% endif %}
-
-            {% if 'interface_can_view_users' in user_permissions %}
                 <li><a href="{% url 'user_list' %}">Список пользователей</a></li>
-            {% endif %}
-
-            {% if 'interface_can_view_companies' in user_permissions %}
                 <li><a href="{% url 'company_list' %}">Список компаний</a></li>
-            {% endif %}
         </ul>
     </nav>
 {% endif %}

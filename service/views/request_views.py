@@ -1,53 +1,47 @@
-from django.core.checks import messages
-from django.shortcuts import render, redirect
+import json
+import logging
 from django.contrib.auth.decorators import login_required
-from reportlab.pdfbase import pdfmetrics
-from reportlab.platypus import SimpleDocTemplate, TableStyle,Table
 
-from service.models import CustomUser, Company,Request,Status,RequestType
-from service.forms.Company_forms import  CompanyForm
-from django.contrib.auth import login
-from service.forms.User_forms import CustomUserCreationForm
-from django.urls import reverse_lazy
-from  service.forms import *
+from django.shortcuts import render, redirect
+from django.db.models import Q
+from django.db.models.query import QuerySet
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from django.urls import reverse
-from django.contrib.auth.decorators import login_required, permission_required,user_passes_test
-from django.contrib.auth.models import Group
-from django.utils import timezone
-from service.models import *
-from datetime import timedelta
+from django.shortcuts import render, redirect
+from django.utils.formats import date_format
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.platypus import SimpleDocTemplate, TableStyle, Table
+from django.contrib import messages
 
+from service.models import *
 from ..forms.Request_forms import *
 from ..models import SavedFilter
-from django.db.models import QuerySet
-import json
-from django.core.exceptions import ValidationError
-import json
-from django.contrib import messages
-from django.http import HttpResponse, HttpResponseRedirect
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
-from reportlab.lib import colors
-from reportlab.pdfbase.ttfonts import TTFont
-from django.utils.formats import date_format
-import json
-from django.views.decorators.csrf import csrf_exempt
 
+logger = logging.getLogger(__name__)
 
 def handle_filters(request, initial_requests, form):
+    """
+    Обрабатывает фильтры и возвращает отфильтрованные заявки.
+    """
     load_filter_id = request.GET.get('load_filter')
     loaded_filters = {}
 
+    # Загрузка сохраненного фильтра
     if load_filter_id:
         try:
             saved_filter = SavedFilter.objects.get(id=load_filter_id, user=request.user)
             loaded_filters = json.loads(saved_filter.filter_data)
             loaded_filters.pop('filter_name', None)
             initial_requests = apply_optional_filters(initial_requests, loaded_filters)
-        except (SavedFilter.DoesNotExist, json.JSONDecodeError):
-            pass
+        except SavedFilter.DoesNotExist:
+            logger.warning(f"Сохраненный фильтр с ID {load_filter_id} не найден для пользователя {request.user}.")
+        except json.JSONDecodeError:
+            logger.error(f"Ошибка декодирования JSON для фильтра ID {load_filter_id}.")
 
+    # Обработка данных формы
     if request.method == "GET" and form.is_valid():
         filters = form.cleaned_data
         filters.pop('filter_name', None)
@@ -56,114 +50,68 @@ def handle_filters(request, initial_requests, form):
         filtered_requests = initial_requests
 
     return filtered_requests, form
+
+
 def apply_optional_filters(queryset, filters):
+    """
+    Применяет фильтры к QuerySet на основе переданных данных.
+    """
     for field, value in filters.items():
         if value:
-            if isinstance(value, list) or isinstance(value, QuerySet):
-                queryset = queryset.filter(**{f"field_values__field_meta__name": field, f"field_values__value_text__in": value})
-            else:
-                queryset = queryset.filter(**{f"field_values__field_meta__name": field, f"field_values__value_text": value})
+            try:
+                if isinstance(value, (list, QuerySet)):
+                    # Фильтрация по списку значений
+                    queryset = queryset.filter(
+                        Q(field_values__field_meta__name=field) &
+                        Q(field_values__value_text__in=value)
+                    )
+                else:
+                    # Фильтрация по одному значению
+                    queryset = queryset.filter(
+                        Q(field_values__field_meta__name=field) &
+                        Q(field_values__value_text=value)
+                    )
+            except Exception as e:
+                logger.error(f"Ошибка применения фильтра {field}={value}: {e}")
     return queryset
-
 def select_request_type(request):
     types = RequestType.objects.all()
     return render(request, 'request/select_request_type.html', {'types': types})
 
 @login_required
 def request_create(request, request_type_id):
+    # Получаем объект RequestType по ID
     request_type = get_object_or_404(RequestType, id=request_type_id)
-    if request.method == 'POST':
-        form = RequestForm(request.POST, request.FILES, user=request.user, request_type=request_type)
-        if form.is_valid():
-            new_request = form.save(commit=False)
-            new_request.request_type = request_type
-            new_request.save()
-            for field_name, field_value in form.cleaned_data.items():
-                if field_name.startswith('custom_field_'):
-                    field_id = int(field_name.split('_')[-1])
-                    field_meta = get_object_or_404(RequestFieldMeta, id=field_id)
-                    if field_meta.field_type == 'comment':
-                        if field_value[0].strip() or field_value[1]:
-                            comment = Comment(
-                                request=new_request,
-                                author=request.user,
-                                text=field_value[0],
-                                attachment=field_value[1]
-                            )
-                            comment.save()
-                    elif field_meta.field_type == 'description':
-                        if field_value[0].strip() or field_value[1]:
-                            description = RequestFiledValue(
-                                request=new_request,
-                                field_meta=field_meta
-                            )
-                            description.set_value(f"{field_value[0]},{field_value[1]}")
-                            description.save()
-                    else:
-                        field_value_obj, created = RequestFiledValue.objects.get_or_create(
-                            request=new_request,
-                            field_meta=field_meta
-                        )
-                        field_value_obj.set_value(field_value)
-                        field_value_obj.save()
 
+    if request.method == 'POST':
+        # Передаем request_type в initial и user
+        form = RequestForm(request.POST, request.FILES, user=request.user, initial={'request_type': request_type})
+        if form.is_valid():
+            form.save()
             return redirect('request_list')
     else:
-        form = RequestForm(user=request.user, request_type=request_type)
+        # Передаем request_type в initial для GET-запроса
+        form = RequestForm(user=request.user, initial={'request_type': request_type})
 
-    excluded_fields = ['title', 'description', 'attachment', 'request_type']
     return render(request, 'request/request_create.html', {
         'form': form,
-        'request_type': request_type,
-        'excluded_fields': excluded_fields,
+        'request_type': request_type
     })
-@login_required
 def request_edit(request, request_id):
-    req = get_object_or_404(Request, id=request_id)
-    request_type = req.request_type
-    if request.method == 'POST':
-        form = RequestForm(request.POST, request.FILES, instance=req, user=request.user, request_type=request_type)
+    # Получаем существующую заявку
+    existing_request = get_object_or_404(Request, id=request_id)
+
+    if request.method == "POST":
+        # Создаем форму с переданными данными и существующей заявкой
+        form = RequestForm(request.POST, instance=existing_request, user=request.user)
         if form.is_valid():
-            req = form.save()
-            for field_name, field_value in form.cleaned_data.items():
-                if field_name.startswith('custom_field_'):
-                    field_id = int(field_name.split('_')[-1])
-                    field_meta = get_object_or_404(RequestFieldMeta, id=field_id)
-                    if field_meta.field_type == 'comment':
-                        if field_value[0].strip() or field_value[1]:
-                            comment = Comment(
-                                request=req,
-                                author=request.user,
-                                text=field_value[0],
-                                attachment=field_value[1]
-                            )
-                            comment.save()
-                    elif field_meta.field_type == 'description':
-                        if field_value[0].strip() or field_value[1]:
-                            description = RequestFiledValue(
-                                request=req,
-                                field_meta=field_meta
-                            )
-                            description.set_value(f"{field_value[0]},{field_value[1]}")
-                            description.save()
-                    else:
-                        field_value_obj, created = RequestFiledValue.objects.get_or_create(
-                            request=req,
-                            field_meta=field_meta
-                        )
-                        field_value_obj.set_value(field_value)
-                        field_value_obj.save()
-
-            return redirect('request_list')
+            form.save()
+            return redirect('request_list')  # Перенаправляем пользователя на список заявок
     else:
-        form = RequestForm(instance=req, user=request.user, request_type=request_type)
+        # Создаем форму с данными существующей заявки
+        form = RequestForm(instance=existing_request, user=request.user)
 
-    return render(request, 'request/request_edit.html', {
-        'form': form,
-        'request': req,
-        'excluded_fields': ['title', 'description', 'attachment', 'request_type']
-    })
-
+    return render(request, 'request/request_edit.html', {'form': form})
 def calculate_due_date(request_instance):
     """Рассчитывает и возвращает значение due_date для кастомного поля на основе приоритета."""
     priority_value = request_instance.field_values.filter(field_meta__field_type='priority').first()

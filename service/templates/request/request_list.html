@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 <link href="https://cdn.jsdelivr.net/npm/select2/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2/dist/js/select2.min.js"></script>
@@ -24,9 +25,10 @@
 </div>
 
 <div id="modalBackdrop" class="modal-backdrop relative">
-  <div id="filters" class="modal">
+  <div id="filters" class="modal bg-white shadow-md rounded-lg p-6 space-y-6">
+    <!-- Форма применения фильтров -->
     <form method="get" id="filterForm" class="max-w-4xl m-auto">
-      <div class='mb-2 flex flex-col gap-4'>
+      <div class="mb-2 flex flex-col gap-4">
         {{ filter_form.as_p }}
       </div>
       <button class="btn btn-secondary" type="submit">Применить фильтр</button>
@@ -35,20 +37,22 @@
       </button>
     </form>
 
+    <!-- Форма сохранения фильтров -->
     <form method="post" id="saveFilterForm" class="max-w-4xl m-auto">
-        {% csrf_token %}
-        {{ save_filter_form.as_p }}
-        <button class="btn btn-success" type="submit" name="save_filter">Сохранить фильтр</button>
+      {% csrf_token %}
+      {{ save_filter_form.as_p }}
+      <button class="btn btn-success" type="submit" name="save_filter">Сохранить фильтр</button>
     </form>
 
+    <!-- Сохраненные фильтры -->
     <div id="savedFilters" class="m-auto max-w-4xl">
       <h3 class="text-2xl p-10 text-center">Сохраненные фильтры:</h3>
       <ul>
         {% for saved_filter in saved_filters %}
-          <li>
-            <a href="?load_filter={{ saved_filter.id }}">{{ saved_filter.filter_name }}</a>
-            <a href="?delete_filter={{ saved_filter.id }}" class="deleteFilter">Удалить</a>
-          </li>
+        <li class="flex justify-between items-center">
+          <a href="?load_filter={{ saved_filter.id }}" class="text-blue-500 hover:underline">{{ saved_filter.filter_name }}</a>
+          <a href="?delete_filter={{ saved_filter.id }}" class="deleteFilter text-red-500 hover:underline">Удалить</a>
+        </li>
         {% endfor %}
       </ul>
     </div>
@@ -66,42 +70,50 @@
 {% else %}
     <form id="delete-form" method="post" action="{% url 'request_delete' %}">
         {% csrf_token %}
-        <table id="requestsTable" class="table">
-            <thead>
-                <tr>
-                    <th class="text-center"><input type="checkbox" id="select-all"></th>
-                    {% for field in fieldset.fields.all %}
-                        {% if field.name != "Comments" and field.name != "Attachment" %}
-                            <th class="text-center column-{{ field.name|lower }}">{{ field.name }}</th>
-                        {% endif %}
-                    {% endfor %}
-                    <th class="text-center">Действия</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in requests_with_field_values %}
-                    <tr class="align-middle">
-                        <td class="text-center"><input type="checkbox" name="selected_requests" value="{{ item.request.pk }}"></td>
+        <table id="requestsTable" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th class="text-center"><input type="checkbox" id="select-all"></th>
                         {% for field in fieldset.fields.all %}
                             {% if field.name != "Comments" and field.name != "Attachment" %}
-                                {% with field_name=field.name %}
-                                    {% for key, value in item.field_values.items %}
-                                        {% if key == field_name %}
-                                            <td class="text-center column-{{ field_name|lower }}">
-                                                {{ value|default_if_none:'' }}
-                                            </td>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endwith %}
+                                <th class="text-center column-{{ field.name|lower }}">{{ field.name }}</th>
                             {% endif %}
                         {% endfor %}
-                        <td class="flex gap-2 justify-evenly">
-                            <button onclick="window.location.href='{% url 'request_edit' item.request.pk %}'" type="button" class="btn btn-primary">Редактировать</button>
-                        </td>
+                        <th class="text-center">Действия</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+<tbody>
+    {% for item in requests_with_field_values %}
+    <tr class="align-middle">
+        <!-- Чекбокс выбора заявки -->
+        <td class="text-center">
+            <input type="checkbox" name="selected_requests" value="{{ item.request.pk }}">
+        </td>
+
+        <!-- Значения полей -->
+        {% for field in fieldset.fields.all %}
+            {% if field.name != "Comments" and field.name != "Attachment" %}
+                <td class="text-center column-{{ field.name|lower }}">
+                    {% for key, value in item.field_values.items %}
+                        {% if key == field.name %}
+                            {{ value }}
+                        {% endif %}
+                    {% endfor %}
+                    {% if field.name not in item.field_values %}
+                        -
+                    {% endif %}
+                </td>
+            {% endif %}
+        {% endfor %}
+
+        <!-- Действия -->
+        <td class="flex gap-2 justify-evenly">
+            <a href="{% url 'request_edit' item.request.pk %}" class="btn btn-primary">Редактировать</a>
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
+            </table>
         <button type="submit" class="btn btn-danger mb-3">Удалить выбранные заявки</button>
     </form>
 {% endif %}
@@ -110,76 +122,82 @@
 <button class="btn btn-secondary" id="exportPdf">Экспорт в PDF</button>
 </div>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const openColumnModalButton = document.getElementById('openColumnModal');
-    const closeColumnModalButton = document.getElementById('closeColumnModal');
-    const columnModal = document.getElementById('columnModal');
-    const saveColumnsButton = document.getElementById('saveColumns');
-    const columnToggles = document.querySelectorAll('.column-toggle');
+ document.addEventListener('DOMContentLoaded', function () {
+    const modalBackdrop = document.getElementById('modalBackdrop');
+    const openFiltersButton = document.getElementById('openFilters');
+    const closeFiltersButton = document.getElementById('closeFilters');
 
-    // Открытие модального окна выбора столбцов
-    openColumnModalButton.addEventListener('click', function() {
-        columnModal.style.display = 'block';
+    openFiltersButton?.addEventListener('click', function (e) {
+      e.preventDefault();
+      modalBackdrop.classList.remove('hidden');
+      modalBackdrop.classList.add('flex');
     });
 
-    // Закрытие модального окна выбора столбцов
-    closeColumnModalButton.addEventListener('click', function() {
-        columnModal.style.display = 'none';
+    closeFiltersButton?.addEventListener('click', function (e) {
+      e.preventDefault();
+      modalBackdrop.classList.remove('flex');
+      modalBackdrop.classList.add('hidden');
     });
+  });
+  // Функция открытия/закрытия модального окна
+  function toggleModal(modal, show) {
+    modal.style.display = show ? 'block' : 'none';
+  }
 
-    // Сохранение выбранных столбцов в локальное хранилище
-    saveColumnsButton.addEventListener('click', function() {
-        const selectedColumns = {};
-        columnToggles.forEach(toggle => {
-            selectedColumns[toggle.dataset.column] = toggle.checked;
-        });
-        localStorage.setItem('selectedColumns', JSON.stringify(selectedColumns));
-        columnModal.style.display = 'none';
-        applyColumnVisibility(selectedColumns);
+  // Сохранение настроек столбцов в локальном хранилище
+  function saveColumnPreferences() {
+    const selectedColumns = {};
+    columnToggles.forEach((toggle) => {
+      selectedColumns[toggle.dataset.column] = toggle.checked;
     });
+    localStorage.setItem('selectedColumns', JSON.stringify(selectedColumns));
+    toggleModal(columnModal, false);
+    applyColumnVisibility(selectedColumns);
+  }
 
-    // Применение видимости столбцов на основе сохраненных настроек
-    function applyColumnVisibility(selectedColumns) {
-        for (const [column, visible] of Object.entries(selectedColumns)) {
-            const elements = document.querySelectorAll(`.column-${column}`);
-            elements.forEach(element => {
-                element.style.display = visible ? '' : 'none';
-            });
-        }
+  // Применение настроек видимости столбцов
+  function applyColumnVisibility(selectedColumns) {
+    for (const [column, visible] of Object.entries(selectedColumns)) {
+      document.querySelectorAll(`.column-${column}`).forEach((element) => {
+        element.style.display = visible ? '' : 'none';
+      });
     }
+  }
 
-    // Загрузка сохраненных настроек столбцов при загрузке страницы
-    const savedColumns = JSON.parse(localStorage.getItem('selectedColumns')) || {};
-    applyColumnVisibility(savedColumns);
+  // Загрузка сохраненных настроек столбцов
+  const savedColumns = JSON.parse(localStorage.getItem('selectedColumns')) || {};
+  applyColumnVisibility(savedColumns);
 
-    // Инициализация DataTables
-    $('#requestsTable').DataTable({
-        "language": {
-            "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Russian.json" // Подключение русского языка
-        }
+  // Инициализация DataTables
+  $('#requestsTable').DataTable({
+    language: {
+      url: '//cdn.datatables.net/plug-ins/1.10.24/i18n/Russian.json',
+    },
+  });
+
+  // Экспорт в PDF
+  document.getElementById('exportPdf')?.addEventListener('click', () => {
+    window.location.href = '{% url "export_pdf" %}';
+  });
+
+  // Подтверждение удаления
+  document.querySelectorAll('.deleteFilter').forEach((button) => {
+    button.addEventListener('click', (event) => {
+      if (!confirm('Вы уверены, что хотите удалить этот фильтр?')) {
+        event.preventDefault();
+      }
     });
+  });
 
-    // Прочие функции
-    document.getElementById('exportPdf').addEventListener('click', function() {
-        window.location.href = '{% url "export_pdf" %}';
+  // Выбор всех чекбоксов
+  document.getElementById('select-all')?.addEventListener('click', (event) => {
+    const isChecked = event.target.checked;
+    document.querySelectorAll('input[name="selected_requests"]').forEach((checkbox) => {
+      checkbox.checked = isChecked;
     });
-
-    document.querySelectorAll('.delete-btn').forEach(function(button) {
-        button.addEventListener('click', function(event) {
-            if (!confirm('Вы уверены, что хотите удалить эту заявку?')) {
-                event.preventDefault();
-            }
-        });
-    });
-
-    // Select all checkboxes
-    document.getElementById('select-all').addEventListener('click', function(event) {
-        var isChecked = event.target.checked;
-        document.querySelectorAll('input[name="selected_requests"]').forEach(function(checkbox) {
-            checkbox.checked = isChecked;
-        });
-    });
+  });
 });
+
 </script>
 
 <style>

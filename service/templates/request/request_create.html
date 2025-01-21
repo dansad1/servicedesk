@@ -1,74 +1,198 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
-<div class="container mt-5">
-  <h2 class="text-center mb-4">Создать новую заявку</h2>
-  <div class="form-container">
-    <form method="post" enctype="multipart/form-data">
+    <script src="https://cdn.ckeditor.com/4.20.2/standard/ckeditor.js"></script>
+<div class="container mx-auto p-8 max-w-6xl">
+    <h2 class="text-3xl font-bold text-center mb-8">Создание заявки</h2>
+
+    <form method="post" enctype="multipart/form-data" class="bg-white shadow-md rounded-lg p-6 space-y-6">
         {% csrf_token %}
-        {{ form.non_field_errors }}
+        {{ form.media }}
 
-        <div class="form-group">
-            <label for="{{ form.request_type.id_for_label }}" class="form-label">Тип заявки:</label>
+        <!-- Отображение ошибок формы -->
+        {% if form.non_field_errors %}
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+            <ul>
+                {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- Поле типа заявки -->
+        {% if form.request_type %}
+        <div class="w-full">
+            <label for="{{ form.request_type.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                {{ form.request_type.label }}
+                {% if form.request_type.field.required %}<span class="text-red-500">*</span>{% endif %}
+            </label>
             {{ form.request_type }}
+            {% if form.request_type.help_text %}
+            <p class="text-xs text-gray-500">{{ form.request_type.help_text }}</p>
+            {% endif %}
+            {% for error in form.request_type.errors %}
+            <p class="text-red-500 text-xs italic">{{ error }}</p>
+            {% endfor %}
         </div>
+        {% endif %}
 
-        {% if 'title' in form.fields %}
-        <div class="form-group">
-            <label for="{{ form.title.id_for_label }}" class="form-label">Название:</label>
+        <!-- Поле названия -->
+        {% if form.title %}
+        <div class="w-full">
+            <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                {{ form.title.label }}
+                {% if form.title.field.required %}<span class="text-red-500">*</span>{% endif %}
+            </label>
             {{ form.title }}
+            {% if form.title.help_text %}
+            <p class="text-xs text-gray-500">{{ form.title.help_text }}</p>
+            {% endif %}
+            {% for error in form.title.errors %}
+            <p class="text-red-500 text-xs italic">{{ error }}</p>
+            {% endfor %}
         </div>
         {% endif %}
 
-        {% if 'description' in form.fields %}
-        <div class="form-group">
-            <label for="{{ form.description.id_for_label }}" class="form-label">Описание:</label>
+        <!-- Поле описания -->
+        {% if form.description %}
+        <div class="bg-gray-50 p-6 rounded-lg shadow">
+            <h3 class="text-xl font-bold text-gray-800 text-center mb-4">Описание</h3>
+            <label for="{{ form.description.id_for_label }}" class="block text-lg font-medium text-gray-700 text-center">
+                {{ form.description.label }}
+            </label>
             {{ form.description }}
+            {% if form.description.help_text %}
+            <p class="text-xs text-gray-500 text-center mt-2">{{ form.description.help_text }}</p>
+            {% endif %}
+            {% for error in form.description.errors %}
+            <p class="text-red-500 text-sm italic text-center">{{ error }}</p>
+            {% endfor %}
         </div>
         {% endif %}
 
-        {% if 'attachment' in form.fields %}
-        <div class="form-group">
-            <label for="{{ form.attachment.id_for_label }}" class="form-label">Вложение:</label>
-            {{ form.attachment }}
+        <!-- Поля формы (исключая request_type, title, description, comment) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for field in form %}
+           {% if field.name != 'request_type' and field.name != 'title'  and field.name != 'description' and field.name != 'comment'%}
+
+            <div>
+                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                    {{ field.label }}
+                    {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
+                </label>
+                {{ field }}
+                {% if field.help_text %}
+                <p class="text-xs text-gray-500">{{ field.help_text }}</p>
+                {% endif %}
+                {% for error in field.errors %}
+                <p class="text-red-500 text-xs italic">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- Поле комментариев -->
+           {% if form.comment %}
+        <div class="bg-gray-50 p-6 rounded-lg shadow w-full mt-6">
+            <h3 class="text-xl font-bold text-gray-800 text-center mb-4">Комментарии</h3>
+            <label for="{{ form.comment.id_for_label }}" class="block text-lg font-medium text-gray-700 text-center mb-4">
+                {{ form.comment.label }}
+            </label>
+            <div class="flex justify-center">
+                <div class="w-full md:w-2/3">
+                    {{ form.comment }}
+                </div>
+            </div>
+            {% if form.comment.help_text %}
+            <p class="text-xs text-gray-500 text-center mt-2">{{ form.comment.help_text }}</p>
+            {% endif %}
+            {% for error in form.comment.errors %}
+            <p class="text-red-500 text-sm italic text-center">{{ error }}</p>
+            {% endfor %}
         </div>
         {% endif %}
 
-        <div class="row">
-            <div class="col-md-6">
-                {% for field in form %}
-                    {% if not field.is_hidden and field.name not in excluded_fields and forloop.counter0|divisibleby:2 %}
-                        <div class="form-group">
-                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                            {{ field }}
-                            {% if field.help_text %}
-                                <small class="form-text text-muted">{{ field.help_text }}</small>
-                            {% endif %}
-                            {{ field.errors }}
-                        </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
-            <div class="col-md-6">
-                {% for field in form %}
-                    {% if not field.is_hidden and field.name not in excluded_fields and not forloop.counter0|divisibleby:2 %}
-                        <div class="form-group">
-                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                            {{ field }}
-                            {% if field.help_text %}
-                                <small class="form-text text-muted">{{ field.help_text }}</small>
-                            {% endif %}
-                            {{ field.errors }}
-                        </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
-        </div>
 
-        <div class="form-group text-center">
-            <button type="submit" class="btn btn-primary">Сохранить</button>
+        <!-- Кнопки -->
+        <div class="flex justify-between items-center mt-6">
+            <a href="{% url 'request_list' %}" class="text-gray-700 hover:text-gray-900 underline">
+                Отмена
+            </a>
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition">
+                Сохранить
+            </button>
         </div>
     </form>
-  </div>
-</div>
+</div><style>
+    html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    font-family: Arial, sans-serif;
+    background-color: #f7fafc;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+header {
+    background-color: #1e3a8a;
+    color: white;
+    padding: 1rem 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+main {
+    flex-grow: 1;
+    padding: 2rem 0;
+}
+
+form {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+footer {
+    background-color: #2d3748;
+    color: white;
+    text-align: center;
+    padding: 1rem 0;
+    margin-top: auto;
+}
+
+</style>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        if (document.getElementById("id_description")) {
+            CKEDITOR.replace("id_description");
+        }
+    });
+</script>
 {% endblock %}
